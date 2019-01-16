@@ -129,13 +129,13 @@ class ImageModel:
             grayscale_box.append([])
 
             for col in range(0, maximum_col - f_edge_length, f_edge_length):
-                block_total_grayscale = 0.0
+                block_total_grayscale = 0
 
                 for sub_row in range(row, row + f_edge_length):
                     for sub_col in range(col, col + f_edge_length):
                         block_total_grayscale += self.__image_matrix[sub_row][sub_col]
 
-                grayscale_box[n].append(block_total_grayscale / (f_edge_length ** 2))
+                grayscale_box[n].append(float(block_total_grayscale) / (f_edge_length ** 2))
 
             n += 1
 
@@ -244,7 +244,7 @@ def register_image(f_query_img, f_train_img):
 def thresholding_modelization_filtering(f_image_matrix, f_method=None):
 
     f_thresholding_image_obj = Thresholding(f_image_matrix)
-    f_thresholding_image_obj.get_gaussian_kernel(10)
+    f_thresholding_image_obj.get_gaussian_kernel(6)
 
     if f_method is not None and f_method == 'otsu':
         f_thresholding_image_obj.thresholding_by_otsu()
@@ -259,7 +259,7 @@ def thresholding_modelization_filtering(f_image_matrix, f_method=None):
     f_modelled_image = f_modelled_image_obj.modelled_image
 
     f_filtered_image_obj = Filter(f_modelled_image)
-    f_filtered_image_obj.filter_by_contour_size(4)
+    f_filtered_image_obj.filter_by_contour_size(9)
     f_filtered_image = f_filtered_image_obj.filtered_image
 
     return f_filtered_image
@@ -342,4 +342,4 @@ if __name__ == '__main__':
 
         bases_cube.append(called_base)
 
-    write_reads_into_file('reads.output.lst', bases_cube)
+    write_reads_into_file('reads.output.txt', bases_cube)
