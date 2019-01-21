@@ -20,9 +20,9 @@ import cv2 as cv
 import numpy as np
 
 
-######################
-# Initiating classes #
-######################
+#########
+# Class #
+#########
 
 
 class ImageRegistration:
@@ -33,6 +33,7 @@ class ImageRegistration:
         self.__train_mat = f_train_mat
 
         self.registered_image = np.array([], dtype='uint8')
+        self.matrix = np.array([], dtype='uint8')
 
     @staticmethod
     def __sift_kp(f_gray_img):
@@ -66,17 +67,19 @@ class ImageRegistration:
 
         good_match = self.__get_good_match(des1, des2)
 
-        if len(good_match) > 4:
+        if len(good_match) > 5:
 
             pts_a = np.float32([kp1[_.queryIdx].pt for _ in good_match]).reshape(-1, 1, 2)
             pts_b = np.float32([kp2[_.trainIdx].pt for _ in good_match]).reshape(-1, 1, 2)
 
-            h, _ = cv.findHomography(pts_a, pts_b, cv.RANSAC, 4)
+            self.matrix, _ = cv.findHomography(pts_a, pts_b, cv.RANSAC, 4)
 
-            self.registered_image = cv.warpPerspective(self.__train_mat, h,
-                                                       (self.__query_mat.shape[1],
-                                                        self.__query_mat.shape[0]),
+            self.registered_image = cv.warpPerspective(self.__train_mat, self.matrix,
+                                                       (self.__query_mat.shape[1], self.__query_mat.shape[0]),
                                                        flags=cv.INTER_LINEAR + cv.WARP_INVERSE_MAP)
+
+        else:
+            print('REGISTERING ERROR', file=sys.stderr)
 
 
 class Thresholding:
@@ -84,29 +87,18 @@ class Thresholding:
     def __init__(self, f_image_matrix):
 
         self.__image_matrix = f_image_matrix
-        self.__ksize = 0
-        self.__sigma = 0
 
         self.thresholding_image = np.array([], dtype='uint8')
 
-    def get_gaussian_kernel(self, f_block_diameter):
+    def thresholding_by_man(self):
+        
+        element = cv.getStructuringElement(cv.MORPH_RECT, (2, 2))
+        
+        blured_image1 = cv.morphologyEx(self.__image_matrix, cv.MORPH_TOPHAT, element, iterations=1)
 
-        self.__ksize = int(f_block_diameter / 0.95 * 0.68) \
-            if int(f_block_diameter / 0.95 * 0.68) % 2 == 1 else int(f_block_diameter / 0.95 * 0.68) + 1
+        blured_image2 = cv.morphologyEx(blured_image1, cv.MORPH_OPEN, element, iterations=1)
 
-        self.__sigma = 0.3 * ((self.__ksize - 1) * 0.5 - 1) + 0.8
-
-    def thresholding_by_otsu(self):
-
-        blured_image = cv.GaussianBlur(self.__image_matrix, (self.__ksize, self.__ksize), self.__sigma, 0,
-                                       cv.BORDER_CONSTANT)
-
-        _, self.thresholding_image = cv.threshold(blured_image, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
-
-    def auto_thresholding(self):
-
-        self.thresholding_image = cv.adaptiveThreshold(self.__image_matrix, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C,
-                                                       cv.THRESH_BINARY, self.__ksize, 2)
+        _, self.thresholding_image = cv.threshold(blured_image2, 25, 255, cv.THRESH_BINARY)
 
 
 class ImageModel:
@@ -159,9 +151,10 @@ class Filter:
         for contour in contour_list:
 
             if 1 <= len(contour) <= f_size_limit:
-                for dot_list in contour:
 
+                for dot_list in contour:
                     for dot in dot_list:
+
                         self.filtered_image[dot[1]][dot[0]] = self.__image_matrix[dot[1]][dot[0]]
 
 
@@ -237,21 +230,15 @@ def register_image(f_query_img, f_train_img):
     registered_image_obj.sift_image_registration()
 
     f_registered_image = registered_image_obj.registered_image
+    f_matrix = registered_image_obj.matrix
 
-    return f_registered_image
+    return f_registered_image, f_matrix
 
 
-def thresholding_modelization_filtering(f_image_matrix, f_method=None):
+def thresholding_modelization_filtering(f_image_matrix):
 
     f_thresholding_image_obj = Thresholding(f_image_matrix)
-    f_thresholding_image_obj.get_gaussian_kernel(6)
-
-    if f_method is not None and f_method == 'otsu':
-        f_thresholding_image_obj.thresholding_by_otsu()
-
-    else:
-        f_thresholding_image_obj.auto_thresholding()
-
+    f_thresholding_image_obj.thresholding_by_man()
     f_thresholding_image = f_thresholding_image_obj.thresholding_image
 
     f_modelled_image_obj = ImageModel(f_thresholding_image)
@@ -259,7 +246,7 @@ def thresholding_modelization_filtering(f_image_matrix, f_method=None):
     f_modelled_image = f_modelled_image_obj.modelled_image
 
     f_filtered_image_obj = Filter(f_modelled_image)
-    f_filtered_image_obj.filter_by_contour_size(9)
+    f_filtered_image_obj.filter_by_contour_size(20)
     f_filtered_image = f_filtered_image_obj.filtered_image
 
     return f_filtered_image
@@ -302,7 +289,7 @@ def write_reads_into_file(f_output, f_bases_cube):
 
 
 ########
-# main #
+# Main #
 ########
 
 
@@ -311,11 +298,11 @@ if __name__ == '__main__':
     bases_cube = []
 
     combined_image = []
-
+    
     for i in range(0, len(sys.argv[1:])):
 
         channel_A_path = sys.argv[i + 1] + '/Y5.tif'
-        channel_T_path = sys.argv[i + 1] + '/GFP.tif'
+        channel_T_path = sys.argv[i + 1] + '/FAM.tif'
         channel_C_path = sys.argv[i + 1] + '/TXR.tif'
         channel_G_path = sys.argv[i + 1] + '/Y3.tif'
 
@@ -326,18 +313,25 @@ if __name__ == '__main__':
 
         combined_image.append(combine_base_channel_in_same_cycle(img_A, img_T, img_C, img_G))
 
-        registered_img = register_image(combined_image[0], combined_image[i])
+        registered_img, matrix = register_image(combined_image[0], combined_image[i])
+        
+        registered_img_A = cv.warpPerspective(img_A, matrix, (registered_img.shape[1], registered_img.shape[0]),
+                                              flags=cv.INTER_LINEAR + cv.WARP_INVERSE_MAP)
 
-        registered_img_A = register_image(registered_img, img_A)
-        registered_img_T = register_image(registered_img, img_T)
-        registered_img_C = register_image(registered_img, img_C)
-        registered_img_G = register_image(registered_img, img_G)
+        registered_img_T = cv.warpPerspective(img_T, matrix, (registered_img.shape[1], registered_img.shape[0]),
+                                              flags=cv.INTER_LINEAR + cv.WARP_INVERSE_MAP)
 
-        filtered_img_A = thresholding_modelization_filtering(registered_img_A, 'otsu')
-        filtered_img_T = thresholding_modelization_filtering(registered_img_T, 'otsu')
-        filtered_img_C = thresholding_modelization_filtering(registered_img_C, 'otsu')
-        filtered_img_G = thresholding_modelization_filtering(registered_img_G, 'otsu')
+        registered_img_C = cv.warpPerspective(img_C, matrix, (registered_img.shape[1], registered_img.shape[0]),
+                                              flags=cv.INTER_LINEAR + cv.WARP_INVERSE_MAP)
 
+        registered_img_G = cv.warpPerspective(img_G, matrix, (registered_img.shape[1], registered_img.shape[0]),
+                                              flags=cv.INTER_LINEAR + cv.WARP_INVERSE_MAP)
+
+        filtered_img_A = thresholding_modelization_filtering(registered_img_A)
+        filtered_img_T = thresholding_modelization_filtering(registered_img_T)
+        filtered_img_C = thresholding_modelization_filtering(registered_img_C)
+        filtered_img_G = thresholding_modelization_filtering(registered_img_G)
+        
         called_base = base_calling(filtered_img_A, filtered_img_T, filtered_img_C, filtered_img_G)
 
         bases_cube.append(called_base)
