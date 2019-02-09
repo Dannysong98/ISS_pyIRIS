@@ -3,7 +3,7 @@
 
 """
 
-    Author: Hao Yu  (yuhao@genomics.cn)
+    Author: Yang Zhou (zhouyang@genomics.cn)
     Date:   2018-10-21
 
     ChangeLog:
@@ -312,8 +312,10 @@ if __name__ == '__main__':
         img_G = cv.imread(channel_G_path, cv.IMREAD_GRAYSCALE)
 
         combined_image.append(combine_base_channel_in_same_cycle(img_A, img_T, img_C, img_G))
+        cv.imwrite('c1_' + str(i + 1) + '.com.jpg', combined_image[i])  # debug
 
         registered_img, matrix = register_image(combined_image[0], combined_image[i])
+        cv.imwrite('c1_' + str(i + 1) + '.reg.jpg', registered_img)  # debug
         
         registered_img_A = cv.warpPerspective(img_A, matrix, (registered_img.shape[1], registered_img.shape[0]),
                                               flags=cv.INTER_LINEAR + cv.WARP_INVERSE_MAP)
@@ -337,3 +339,12 @@ if __name__ == '__main__':
         bases_cube.append(called_base)
 
     write_reads_into_file('reads.output.txt', bases_cube)
+
+    # DEBUG
+    img_REF = cv.imread('1/DAPI.tif', cv.IMREAD_GRAYSCALE)
+    modelled_img_REF_obj = ImageModel(img_REF)
+    modelled_img_REF_obj.simple_block_modeling(6)
+    modelled_img_REF = modelled_img_REF_obj.modelled_image
+
+    for i in bases_cube:
+        print(i)
