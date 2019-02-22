@@ -239,15 +239,15 @@ class BasesCube:
         r = int(f_ref_coordinate[1:5].lstrip('0'))
         c = int(f_ref_coordinate[6:].lstrip('0'))
 
-        for row in range(r - 2, r + 3):
-            for col in range(c - 2, c + 3):
+        for row in range(r - 3, r + 4):
+            for col in range(c - 3, c + 4):
 
                 coor = str('r' + ('%04d' % row) + 'c' + ('%04d' % col))
 
-                if coor in f_bases_cube[f_cycle_id - 1] and ord(f_bases_cube[f_cycle_id - 1][coor][1]) > max_qual:
+                if coor in f_bases_cube[f_cycle_id] and ord(f_bases_cube[f_cycle_id][coor][1]) > max_qual:
 
-                    max_qual_base = f_bases_cube[f_cycle_id - 1][coor][0]
-                    max_qual = ord(f_bases_cube[f_cycle_id - 1][coor][1])
+                    max_qual_base = f_bases_cube[f_cycle_id][coor][0]
+                    max_qual = ord(f_bases_cube[f_cycle_id][coor][1])
 
         f_adjusted_bases_cube[f_cycle_id][f_ref_coordinate] = [max_qual_base, chr(max_qual)]
 
@@ -369,7 +369,7 @@ def write_reads_into_file(f_output_prefix, f_background_img, f_bases_cube):
         print(j + '\t' + ''.join(seq) + '\t' + ''.join(qul), file=ou)
 
         if 'N' not in seq:
-            cv.circle(background_imgMat, (int(j[6:]) - 1, int(j[1:5]) - 1), 0, (55, 255, 155), -1)
+            cv.circle(background_imgMat, (int(j[6:]) - 1, int(j[1:5]) - 1), 4, (55, 255, 155), 1)
 
         # DEBUG #
         # if 'N' not in seq[0]:
@@ -412,18 +412,20 @@ if __name__ == '__main__':
         img_C = cv.imread(channel_C_path, cv.IMREAD_GRAYSCALE)
         img_G = cv.imread(channel_G_path, cv.IMREAD_GRAYSCALE)
 
-        if i == 0:
-
-            detected_cycle1_img_A = feature_detecting_and_modelization(img_A)
-            detected_cycle1_img_T = feature_detecting_and_modelization(img_T)
-            detected_cycle1_img_C = feature_detecting_and_modelization(img_C)
-            detected_cycle1_img_G = feature_detecting_and_modelization(img_G)
-
-            fg_imgMat = combine_base_channel_in_same_cycle(detected_cycle1_img_A,
-                                                           detected_cycle1_img_T,
-                                                           detected_cycle1_img_C,
-                                                           detected_cycle1_img_G)
-            _, fg_imgMat = cv.threshold(fg_imgMat, 1, 255, cv.THRESH_BINARY)
+        # DEBUG #
+        # if i == 0:
+        #
+        #     detected_cycle1_img_A = feature_detecting_and_modelization(img_A)
+        #     detected_cycle1_img_T = feature_detecting_and_modelization(img_T)
+        #     detected_cycle1_img_C = feature_detecting_and_modelization(img_C)
+        #     detected_cycle1_img_G = feature_detecting_and_modelization(img_G)
+        #
+        #     fg_imgMat = combine_base_channel_in_same_cycle(detected_cycle1_img_A,
+        #                                                    detected_cycle1_img_T,
+        #                                                    detected_cycle1_img_C,
+        #                                                    detected_cycle1_img_G)
+        #     _, fg_imgMat = cv.threshold(fg_imgMat, 1, 255, cv.THRESH_BINARY)
+        #########
 
         combined_image.append(combine_base_channel_in_same_cycle(img_A, img_T, img_C, img_G))
         # cv.imwrite('cycle_' + str(i + 1) + '.com.tif', combined_image[i])  # debug
