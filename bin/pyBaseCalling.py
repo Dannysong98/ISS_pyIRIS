@@ -5,6 +5,7 @@
 
     Author: Hao Yu (yuhao@genomics.cn)
             Yang Zhou (zhouyang@genomics.cn)
+
     Initial Date:   2018-10-21
 
     ChangeLog:
@@ -67,7 +68,6 @@ class Profile:
     def parse_profile(self):
 
         for cy in self.__par_box['cycle_mask']:
-
             self.par_pool['baseImg_path_A'].append(self.__par_box['root_path'] + cy + self.__par_box['channel_A'])
             self.par_pool['baseImg_path_T'].append(self.__par_box['root_path'] + cy + self.__par_box['channel_T'])
             self.par_pool['baseImg_path_C'].append(self.__par_box['root_path'] + cy + self.__par_box['channel_C'])
@@ -86,7 +86,7 @@ class ImageRegistration:
         self.__train_mat = f_train_mat
 
         self.registered_image = np.array([], dtype='uint8')
-        self.matrix = np.array([], dtype='uint8')
+        self.matrix = np.zeros((3, 3), dtype='float32')
 
     @staticmethod
     def __get_kp(f_gray_img):
@@ -100,9 +100,9 @@ class ImageRegistration:
     @staticmethod
     def __get_good_match(f_des1, f_des2):
 
-        bf = cv.BFMatcher()
+        matcher = cv.DescriptorMatcher_create(cv.DESCRIPTOR_MATCHER_BRUTEFORCE_HAMMING)
 
-        matches = bf.knnMatch(f_des1, f_des2, k=2)
+        matches = matcher.knnMatch(f_des1, f_des2, 2)
 
         good_matches = []
 
@@ -111,6 +111,8 @@ class ImageRegistration:
             if m.distance < 0.75 * n.distance:
                 good_matches.append(m)
 
+        good_matches = sorted(good_matches, key=lambda x: x.distance)
+
         return good_matches
 
     def image_registration(self):
@@ -118,17 +120,18 @@ class ImageRegistration:
         kp1, des1 = self.__get_kp(self.__query_mat)
         kp2, des2 = self.__get_kp(self.__train_mat)
 
-        good_match = self.__get_good_match(des1, des2)
+        good_matchs = self.__get_good_match(des1, des2)
 
-        if len(good_match) > 4:
+        if len(good_matchs) > 4:
 
-            pts_a = np.float32([kp1[_.queryIdx].pt for _ in good_match]).reshape(-1, 1, 2)
-            pts_b = np.float32([kp2[_.trainIdx].pt for _ in good_match]).reshape(-1, 1, 2)
+            pts_a = np.float32([kp1[_.queryIdx].pt for _ in good_matchs]).reshape(-1, 1, 2)
+            pts_b = np.float32([kp2[_.trainIdx].pt for _ in good_matchs]).reshape(-1, 1, 2)
 
             self.matrix, _ = cv.findHomography(pts_a, pts_b, cv.RANSAC, 4)
 
             self.registered_image = cv.warpPerspective(self.__train_mat, self.matrix,
                                                        (self.__query_mat.shape[1], self.__query_mat.shape[0]),
+                                                       self.registered_image,
                                                        flags=cv.INTER_LINEAR + cv.WARP_INVERSE_MAP)
 
         else:
@@ -144,28 +147,52 @@ class Detector:
     def __init__(self, f_img_taking_bg):
 
         self.__img_mat = f_img_taking_bg
+        self.__contour_level = np.zeros(self.__img_mat.shape, dtype='uint8')
+
         self.keypoint_greyscale_model = np.zeros(self.__img_mat.shape, dtype='uint8')
 
     def detect(self):
 
+        blur_img = np.zeros(self.__img_mat.shape, dtype='uint8')
+        blur_img = cv.GaussianBlur(self.__img_mat, (3, 3), 1, blur_img)
+
+        lap1 = np.zeros(self.__img_mat.shape, dtype='uint8')
+        lap2 = np.zeros(self.__img_mat.shape, dtype='uint8')
+
+        lap1 = cv.Laplacian(blur_img, cv.CV_16S, lap1, 1)
+        lap2 = cv.Laplacian(blur_img, cv.CV_16S, lap2, 3)
+
+        lap1 = cv.convertScaleAbs(lap1)
+        lap2 = cv.convertScaleAbs(lap2)
+
+        lap_img = cv.absdiff(lap1, lap2)
+
         detector = cv.BRISK_create()
 
-        keypoints = detector.detect(self.__img_mat)
+        keypoints = detector.detect(lap_img)
 
         for keypoint in keypoints:
 
-            greyscale_mean = 0
+            r = int(keypoint.pt[1])
+            c = int(keypoint.pt[0])
 
-            r = int(np.around(keypoint.pt[1], 0))
-            c = int(np.around(keypoint.pt[0], 0))
+            self.__contour_level[r:(r + 2), c:(c + 2)] = self.__img_mat[r:(r + 2), c:(c + 2)]
 
-            for row in range(r - 3, r + 4):
-                for col in range(c - 3, c + 4):
+        _, contours, _ = cv.findContours(self.__contour_level, cv.RETR_LIST, cv.CHAIN_APPROX_NONE)
 
-                    greyscale_mean += int(np.around(float(self.__img_mat[row][col]) / 49, 0))
+        for cnt in contours:
 
-            if greyscale_mean > self.keypoint_greyscale_model[r][c]:
-                self.keypoint_greyscale_model[r][c] = greyscale_mean
+            if cv.contourArea(cnt) < 64:
+
+                M = cv.moments(cnt)
+
+                if M['m00'] > 0:
+
+                    c_row = int(M['m01'] / M['m00'])
+                    c_col = int(M['m10'] / M['m00'])
+
+                    self.keypoint_greyscale_model[c_row, c_col] = \
+                        np.sum(self.__img_mat[(c_row - 2):(c_row + 4), (c_col - 2):(c_col + 4)]) / 36
 
 
 ########################
@@ -174,7 +201,7 @@ class Detector:
 
 class BaseCaller:
 
-    __base_mat = {}
+    __base_pool = {}
 
     def __init__(self):
 
@@ -188,33 +215,38 @@ class BaseCaller:
 
                 read_id = 'r' + ('%04d' % (row + 1)) + 'c' + ('%04d' % (col + 1))
 
-                if read_id not in cls.__base_mat:
-                    cls.__base_mat.update({read_id: {'A': 0.0, 'T': 0.0, 'C': 0.0, 'G': 0.0}})
+                if read_id not in cls.__base_pool:
+                    cls.__base_pool.update({read_id: {'A': 0.0, 'T': 0.0, 'C': 0.0, 'G': 0.0}})
 
-                cls.__base_mat[read_id][f_base_type] = f_image_model[row][col]
+                cls.__base_pool[read_id][f_base_type] = f_image_model[row, col]
 
     def mat2base(self):
 
-        for n in BaseCaller.__base_mat:
+        for n in BaseCaller.__base_pool:
 
             if n not in self.bases_box:
                 self.bases_box.update({n: []})
 
             sorted_base_quality = [base_quality for base_quality in
-                                   sorted(BaseCaller.__base_mat[n].items(), key=lambda x: x[1], reverse=True)]
+                                   sorted(BaseCaller.__base_pool[n].items(), key=lambda x: x[1], reverse=True)]
 
             quality_sum = sum([sorted_base_quality[0][1], sorted_base_quality[1][1],
                                sorted_base_quality[2][1], sorted_base_quality[3][1]])
 
             if quality_sum > 0:
 
-                self.bases_box[n].append(sorted_base_quality[0][0])
+                # quality = int(-10 * np.log10(1 - sorted_base_quality[0][1] / quality_sum * 0.9999)) + 33
+                quality = int(-10 * np.log10(1 - sorted_base_quality[0][1] / 255 * 0.9999)) + 33
 
-                self.bases_box[n].append(chr(
-                    # Get sequencing quality #
-                    int(-10 * np.log10(1 - (float(sorted_base_quality[0][1]) / float(quality_sum)) * 0.9999)) + 33
-                    ##########################
-                ))
+                if quality > 33:
+
+                    self.bases_box[n].append(sorted_base_quality[0][0])
+                    self.bases_box[n].append(chr(quality))
+
+                else:
+
+                    self.bases_box[n].append(sorted_base_quality[0][0])
+                    self.bases_box[n].append(chr(34))
 
             else:
 
@@ -231,25 +263,41 @@ class BasesCube:
         self.adjusted_bases_cube = []
 
     @staticmethod
-    def __check_greyscale(f_ref_coordinate, f_bases_cube, f_adjusted_bases_cube, f_cycle_id):
+    def __check_greyscale(f_bases_cube, f_adjusted_bases_cube, f_cycle_id):
 
-        max_qual_base = 'N'
-        max_qual = 33
+        for ref_coordinate in f_bases_cube[0]:
 
-        r = int(f_ref_coordinate[1:5].lstrip('0'))
-        c = int(f_ref_coordinate[6:].lstrip('0'))
+            if f_bases_cube[0][ref_coordinate][0] != 'N':
 
-        for row in range(r - 3, r + 4):
-            for col in range(c - 3, c + 4):
+                max_qual_base = 'N'
+                max_qual = 33
 
-                coor = str('r' + ('%04d' % row) + 'c' + ('%04d' % col))
+                r = int(ref_coordinate[1:5].lstrip('0'))
+                c = int(ref_coordinate[6:].lstrip('0'))
 
-                if coor in f_bases_cube[f_cycle_id] and ord(f_bases_cube[f_cycle_id][coor][1]) > max_qual:
+                for row in range(r - 8, r + 10):
+                    for col in range(c - 8, c + 10):
 
-                    max_qual_base = f_bases_cube[f_cycle_id][coor][0]
-                    max_qual = ord(f_bases_cube[f_cycle_id][coor][1])
+                        # m_dis = abs(row - r) + abs(col - c)
 
-        f_adjusted_bases_cube[f_cycle_id][f_ref_coordinate] = [max_qual_base, chr(max_qual)]
+                        # MEAN, SD, MAG = (0, 5, 12.5)
+                        # W = np.exp(-((m_dis - MEAN) ** 2)/(2 * SD ** 2)) / (SD * np.sqrt(2 * np.pi)) * MAG
+
+                        coor = str('r' + ('%04d' % row) + 'c' + ('%04d' % col))
+
+                        if coor in f_bases_cube[0]:
+
+                            # if int(ord(f_bases_cube[f_cycle_id][coor][1]) * W) > max_qual:
+                            if int(ord(f_bases_cube[f_cycle_id][coor][1])) > max_qual:
+
+                                max_qual_base = f_bases_cube[f_cycle_id][coor][0]
+                                max_qual = int(ord(f_bases_cube[f_cycle_id][coor][1]))
+
+                if max_qual == 33 and max_qual_base != 'N':
+                    max_qual = 34
+
+                if ref_coordinate not in f_adjusted_bases_cube[f_cycle_id]:
+                    f_adjusted_bases_cube[f_cycle_id].update({ref_coordinate: [max_qual_base, chr(max_qual)]})
 
     @classmethod
     def collect_called_bases(cls, f_called_base_in_one_cycle):
@@ -266,11 +314,7 @@ class BasesCube:
 
                 self.adjusted_bases_cube.append({})
 
-                for ref_coor in self.__bases_cube[0]:
-
-                    self.adjusted_bases_cube[cycle_id].update({ref_coor: ['N', '!']})
-
-                    self.__check_greyscale(ref_coor, self.__bases_cube, self.adjusted_bases_cube, cycle_id)
+                self.__check_greyscale(self.__bases_cube, self.adjusted_bases_cube, cycle_id)
 
         else:
             print('There is only one cycle in this run', file=sys.stderr)
@@ -287,10 +331,10 @@ class BasesCube:
 def combine_base_channel_in_same_cycle(f_base_channel_img1, f_base_channel_img2,
                                        f_base_channel_img3, f_base_channel_img4):
 
-    tmp_img1_2 = cv.addWeighted(f_base_channel_img1, 1, f_base_channel_img2, 1, 0)
-    tmp_img3_4 = cv.addWeighted(f_base_channel_img3, 1, f_base_channel_img4, 1, 0)
+    tmp_img1_2 = cv.addWeighted(f_base_channel_img1, 0.8, f_base_channel_img2, 0.8, 0)
+    tmp_img3_4 = cv.addWeighted(f_base_channel_img3, 0.8, f_base_channel_img4, 0.8, 0)
 
-    f_combined_image = cv.addWeighted(tmp_img1_2, 1, tmp_img3_4, 1, 0)
+    f_combined_image = cv.addWeighted(tmp_img1_2, 0.8, tmp_img3_4, 0.8, 0)
 
     return f_combined_image
 
@@ -350,41 +394,25 @@ def base_calling(f_feature_detecting_imgModel1,
 # Function of Image File IO #
 #############################
 
-def write_reads_into_file(f_output_prefix, f_background_img, f_bases_cube):
+def write_reads_into_file(f_output_prefix, f_bases_cube):
 
     ou = open(f_output_prefix + '.lst.txt', 'w')
 
-    background_imgMat = f_background_img
-
     for j in f_bases_cube[0]:
 
-        seq = []
-        qul = []
+        if f_bases_cube[0][j][0] != 'N':
 
-        for k in range(0, len(sys.argv[1:])):
+            seq = []
+            qul = []
 
-            seq.append(f_bases_cube[k][j][0])
-            qul.append(f_bases_cube[k][j][1])
+            for k in range(0, len(sys.argv[1:])):
 
-        print(j + '\t' + ''.join(seq) + '\t' + ''.join(qul), file=ou)
+                seq.append(f_bases_cube[k][j][0])
+                qul.append(f_bases_cube[k][j][1])
 
-        if 'N' not in seq:
-            cv.circle(background_imgMat, (int(j[6:]) - 1, int(j[1:5]) - 1), 4, (55, 255, 155), 1)
-
-        # DEBUG #
-        # if 'N' not in seq[0]:
-        #     cv.circle(background_imgMat, (int(j[6:]), int(j[1:5])), 1, (255, 0, 0), 1)
-        # if 'N' not in seq[1]:
-        #     cv.circle(background_imgMat, (int(j[6:]), int(j[1:5])), 2, (0, 255, 0), 1)
-        # if 'N' not in seq[2]:
-        #     cv.circle(background_imgMat, (int(j[6:]), int(j[1:5])), 3, (0, 0, 255), 1)
-        # if 'N' not in seq:
-        #     cv.circle(background_imgMat, (int(j[6:]), int(j[1:5])), 4, (127, 255, 255), 1)
-        #########
+            print(j + '\t' + ''.join(seq) + '\t' + ''.join(qul), file=ou)
 
     ou.close()
-
-    cv.imwrite(f_output_prefix + '.img.tif', background_imgMat)
 
 
 #################
@@ -396,9 +424,6 @@ if __name__ == '__main__':
     bases_cube_obj = BasesCube()
 
     combined_image = []
-
-    bg_imgMat = cv.imread('1/DAPI.tif', cv.IMREAD_GRAYSCALE)
-    fg_imgMat = np.zeros((bg_imgMat.shape[1], bg_imgMat.shape[0]), dtype='uint8')
 
     for i in range(0, len(sys.argv[1:])):
 
@@ -412,38 +437,27 @@ if __name__ == '__main__':
         img_C = cv.imread(channel_C_path, cv.IMREAD_GRAYSCALE)
         img_G = cv.imread(channel_G_path, cv.IMREAD_GRAYSCALE)
 
-        # DEBUG #
-        # if i == 0:
-        #
-        #     detected_cycle1_img_A = feature_detecting_and_modelization(img_A)
-        #     detected_cycle1_img_T = feature_detecting_and_modelization(img_T)
-        #     detected_cycle1_img_C = feature_detecting_and_modelization(img_C)
-        #     detected_cycle1_img_G = feature_detecting_and_modelization(img_G)
-        #
-        #     fg_imgMat = combine_base_channel_in_same_cycle(detected_cycle1_img_A,
-        #                                                    detected_cycle1_img_T,
-        #                                                    detected_cycle1_img_C,
-        #                                                    detected_cycle1_img_G)
-        #     _, fg_imgMat = cv.threshold(fg_imgMat, 1, 255, cv.THRESH_BINARY)
-        #########
-
         combined_image.append(combine_base_channel_in_same_cycle(img_A, img_T, img_C, img_G))
         # cv.imwrite('cycle_' + str(i + 1) + '.com.tif', combined_image[i])  # debug
 
         registered_img, matrix = register_image(combined_image[0], combined_image[i])
         # cv.imwrite('cycle_' + str(i + 1) + '.reg.tif', registered_img)  # debug
 
+        registered_img_A = np.array([], dtype='uint8')
         registered_img_A = cv.warpPerspective(img_A, matrix, (registered_img.shape[1], registered_img.shape[0]),
-                                              flags=cv.INTER_LINEAR + cv.WARP_INVERSE_MAP)
+                                              registered_img_A, flags=cv.INTER_LINEAR + cv.WARP_INVERSE_MAP)
 
+        registered_img_T = np.array([], dtype='uint8')
         registered_img_T = cv.warpPerspective(img_T, matrix, (registered_img.shape[1], registered_img.shape[0]),
-                                              flags=cv.INTER_LINEAR + cv.WARP_INVERSE_MAP)
+                                              registered_img_T, flags=cv.INTER_LINEAR + cv.WARP_INVERSE_MAP)
 
+        registered_img_C = np.array([], dtype='uint8')
         registered_img_C = cv.warpPerspective(img_C, matrix, (registered_img.shape[1], registered_img.shape[0]),
-                                              flags=cv.INTER_LINEAR + cv.WARP_INVERSE_MAP)
+                                              registered_img_C, flags=cv.INTER_LINEAR + cv.WARP_INVERSE_MAP)
 
+        registered_img_G = np.array([], dtype='uint8')
         registered_img_G = cv.warpPerspective(img_G, matrix, (registered_img.shape[1], registered_img.shape[0]),
-                                              flags=cv.INTER_LINEAR + cv.WARP_INVERSE_MAP)
+                                              registered_img_G, flags=cv.INTER_LINEAR + cv.WARP_INVERSE_MAP)
 
         detected_registered_img_A = feature_detecting_and_modelization(registered_img_A)
         detected_registered_img_T = feature_detecting_and_modelization(registered_img_T)
@@ -461,7 +475,4 @@ if __name__ == '__main__':
 
     bases_cube = bases_cube_obj.adjusted_bases_cube
 
-    new_bg_imgMat = cv.addWeighted(bg_imgMat, 1, fg_imgMat, 1, 0)
-    new_bg_imgMat = cv.cvtColor(new_bg_imgMat, cv.COLOR_GRAY2RGB)
-
-    write_reads_into_file('reads.output', new_bg_imgMat, bases_cube)
+    write_reads_into_file('reads.output', bases_cube)
