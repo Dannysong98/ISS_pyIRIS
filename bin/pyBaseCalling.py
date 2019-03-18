@@ -13,6 +13,10 @@
             2019-01-15
                 First release
 
+        r002
+            2019-03-18
+                Make Simple Blob Detector as the default detector
+
 """
 
 
@@ -68,6 +72,7 @@ class Profile:
     def parse_profile(self):
 
         for cy in self.__par_box['cycle_mask']:
+
             self.par_pool['baseImg_path_A'].append(self.__par_box['root_path'] + cy + self.__par_box['channel_A'])
             self.par_pool['baseImg_path_T'].append(self.__par_box['root_path'] + cy + self.__par_box['channel_T'])
             self.par_pool['baseImg_path_C'].append(self.__par_box['root_path'] + cy + self.__par_box['channel_C'])
@@ -154,7 +159,7 @@ class Detector:
     def detect(self):
 
         blur_img = np.zeros(self.__img_mat.shape, dtype='uint8')
-        blur_img = cv.GaussianBlur(self.__img_mat, (3, 3), 1, blur_img)
+        blur_img = cv.GaussianBlur(self.__img_mat, (5, 5), 1.5, blur_img)
 
         lap1 = np.zeros(self.__img_mat.shape, dtype='uint8')
         lap2 = np.zeros(self.__img_mat.shape, dtype='uint8')
@@ -167,7 +172,23 @@ class Detector:
 
         lap_img = cv.absdiff(lap1, lap2)
 
-        detector = cv.BRISK_create()
+        params = cv.SimpleBlobDetector_Params()
+
+        params.filterByColor = True
+        params.filterByArea = True
+        params.filterByConvexity = True
+        params.filterByCircularity = True
+        params.filterByInertia = True
+
+        params.blobColor = 255
+        params.minDistBetweenBlobs = 1
+        params.minThreshold = 1
+        params.minArea = 1
+        params.minConvexity = 0
+        params.minCircularity = 0
+        params.minInertiaRatio = 0
+
+        detector = cv.SimpleBlobDetector_create(params)
 
         keypoints = detector.detect(lap_img)
 
@@ -176,13 +197,13 @@ class Detector:
             r = int(keypoint.pt[1])
             c = int(keypoint.pt[0])
 
-            self.__contour_level[r:(r + 2), c:(c + 2)] = self.__img_mat[r:(r + 2), c:(c + 2)]
+            self.__contour_level[(r - 1):(r + 2), (c - 1):(c + 2)] = self.__img_mat[(r - 1):(r + 2), (c - 1):(c + 2)]
 
         _, contours, _ = cv.findContours(self.__contour_level, cv.RETR_LIST, cv.CHAIN_APPROX_NONE)
 
         for cnt in contours:
 
-            if cv.contourArea(cnt) < 64:
+            if cv.contourArea(cnt) <= 64:
 
                 M = cv.moments(cnt)
 
@@ -192,7 +213,8 @@ class Detector:
                     c_col = int(M['m10'] / M['m00'])
 
                     self.keypoint_greyscale_model[c_row, c_col] = \
-                        np.sum(self.__img_mat[(c_row - 2):(c_row + 4), (c_col - 2):(c_col + 4)]) / 36
+                        np.mean(self.__img_mat[(c_row - 1):(c_row + 2), (c_col - 1):(c_col + 2)], dtype='int16') - \
+                        np.mean(self.__img_mat[(c_row - 4):(c_row + 5), (c_col - 3):(c_col + 4)], dtype='int16')
 
 
 ########################
@@ -210,8 +232,8 @@ class BaseCaller:
     @classmethod
     def image_model_parsing(cls, f_image_model, f_base_type):
 
-        for row in range(0, len(f_image_model) - 1):
-            for col in range(0, len(f_image_model[row]) - 1):
+        for row in range(0, len(f_image_model)):
+            for col in range(0, len(f_image_model[row])):
 
                 read_id = 'r' + ('%04d' % (row + 1)) + 'c' + ('%04d' % (col + 1))
 
@@ -222,36 +244,26 @@ class BaseCaller:
 
     def mat2base(self):
 
-        for n in BaseCaller.__base_pool:
+        for read_id in BaseCaller.__base_pool:
 
-            if n not in self.bases_box:
-                self.bases_box.update({n: []})
+            sorted_base_score = [base_quality for base_quality in
+                                 sorted(BaseCaller.__base_pool[read_id].items(), key=lambda x: x[1], reverse=True)]
 
-            sorted_base_quality = [base_quality for base_quality in
-                                   sorted(BaseCaller.__base_pool[n].items(), key=lambda x: x[1], reverse=True)]
+            score_sum = sum([sorted_base_score[0][1],
+                             sorted_base_score[1][1],
+                             sorted_base_score[2][1],
+                             sorted_base_score[3][1]])
 
-            quality_sum = sum([sorted_base_quality[0][1], sorted_base_quality[1][1],
-                               sorted_base_quality[2][1], sorted_base_quality[3][1]])
+            if score_sum > 0:
 
-            if quality_sum > 0:
+                if read_id not in self.bases_box:
+                    self.bases_box.update({read_id: []})
 
-                # quality = int(-10 * np.log10(1 - sorted_base_quality[0][1] / quality_sum * 0.9999)) + 33
-                quality = int(-10 * np.log10(1 - sorted_base_quality[0][1] / 255 * 0.9999)) + 33
+                # quality = sorted_base_score[0][1] / score_sum
+                quality = sorted_base_score[0][1]
 
-                if quality > 33:
-
-                    self.bases_box[n].append(sorted_base_quality[0][0])
-                    self.bases_box[n].append(chr(quality))
-
-                else:
-
-                    self.bases_box[n].append(sorted_base_quality[0][0])
-                    self.bases_box[n].append(chr(34))
-
-            else:
-
-                self.bases_box[n].append('N')
-                self.bases_box[n].append(chr(33))
+                self.bases_box[read_id].append(sorted_base_score[0][0])
+                self.bases_box[read_id].append(quality)
 
 
 class BasesCube:
@@ -267,37 +279,37 @@ class BasesCube:
 
         for ref_coordinate in f_bases_cube[0]:
 
-            if f_bases_cube[0][ref_coordinate][0] != 'N':
+            if ref_coordinate not in f_adjusted_bases_cube[f_cycle_id]:
+                f_adjusted_bases_cube[f_cycle_id].update({ref_coordinate: []})
 
-                max_qual_base = 'N'
-                max_qual = 33
+            max_qual_base = 'N'
+            max_qual = 0
 
-                r = int(ref_coordinate[1:5].lstrip('0'))
-                c = int(ref_coordinate[6:].lstrip('0'))
+            r = int(ref_coordinate[1:5].lstrip('0'))
+            c = int(ref_coordinate[6:].lstrip('0'))
 
-                for row in range(r - 8, r + 10):
-                    for col in range(c - 8, c + 10):
+            for row in range(r - 4, r + 5):
+                for col in range(c - 4, c + 5):
 
-                        # m_dis = abs(row - r) + abs(col - c)
+                    coor = str('r' + ('%04d' % row) + 'c' + ('%04d' % col))
 
-                        # MEAN, SD, MAG = (0, 5, 12.5)
-                        # W = np.exp(-((m_dis - MEAN) ** 2)/(2 * SD ** 2)) / (SD * np.sqrt(2 * np.pi)) * MAG
+                    # m_dis = abs(row - r) + abs(col - c)
+                    #
+                    # MEAN, SD = (0, 1)
+                    #
+                    # W = np.exp(-((m_dis - MEAN) ** 2) / (2 * SD ** 2)) / (SD * np.sqrt(2 * np.pi))
 
-                        coor = str('r' + ('%04d' % row) + 'c' + ('%04d' % col))
+                    if coor in f_bases_cube[f_cycle_id]:
 
-                        if coor in f_bases_cube[0]:
+                        # Q = int(f_bases_cube[f_cycle_id][coor][1] - m_dis * W)
+                        Q = f_bases_cube[f_cycle_id][coor][1]
 
-                            # if int(ord(f_bases_cube[f_cycle_id][coor][1]) * W) > max_qual:
-                            if int(ord(f_bases_cube[f_cycle_id][coor][1])) > max_qual:
+                        if Q >= max_qual:
 
-                                max_qual_base = f_bases_cube[f_cycle_id][coor][0]
-                                max_qual = int(ord(f_bases_cube[f_cycle_id][coor][1]))
+                            max_qual_base = f_bases_cube[f_cycle_id][coor][0]
+                            max_qual = Q
 
-                if max_qual == 33 and max_qual_base != 'N':
-                    max_qual = 34
-
-                if ref_coordinate not in f_adjusted_bases_cube[f_cycle_id]:
-                    f_adjusted_bases_cube[f_cycle_id].update({ref_coordinate: [max_qual_base, chr(max_qual)]})
+            f_adjusted_bases_cube[f_cycle_id][ref_coordinate] = [max_qual_base, max_qual]
 
     @classmethod
     def collect_called_bases(cls, f_called_base_in_one_cycle):
@@ -324,6 +336,25 @@ class BasesCube:
 # Basic Function #
 ##################
 
+###############################
+# Function of Image Enhancing #
+###############################
+
+def image_enhancing(f_base_channel_img1, f_base_channel_img2, f_base_channel_img3, f_base_channel_img4):
+
+    en_base_channel_img1 = np.power(f_base_channel_img1 / float(np.max(f_base_channel_img1)), 1.5) * 255
+    en_base_channel_img2 = np.power(f_base_channel_img2 / float(np.max(f_base_channel_img2)), 1.5) * 255
+    en_base_channel_img3 = np.power(f_base_channel_img3 / float(np.max(f_base_channel_img3)), 1.5) * 255
+    en_base_channel_img4 = np.power(f_base_channel_img4 / float(np.max(f_base_channel_img4)), 1.5) * 255
+
+    en_base_channel_img1 = cv.convertScaleAbs(en_base_channel_img1)
+    en_base_channel_img2 = cv.convertScaleAbs(en_base_channel_img2)
+    en_base_channel_img3 = cv.convertScaleAbs(en_base_channel_img3)
+    en_base_channel_img4 = cv.convertScaleAbs(en_base_channel_img4)
+
+    return en_base_channel_img1, en_base_channel_img2, en_base_channel_img3, en_base_channel_img4
+
+
 ####################################################
 # Function of Base Channel in Same Cycle Combining #
 ####################################################
@@ -334,7 +365,7 @@ def combine_base_channel_in_same_cycle(f_base_channel_img1, f_base_channel_img2,
     tmp_img1_2 = cv.addWeighted(f_base_channel_img1, 0.8, f_base_channel_img2, 0.8, 0)
     tmp_img3_4 = cv.addWeighted(f_base_channel_img3, 0.8, f_base_channel_img4, 0.8, 0)
 
-    f_combined_image = cv.addWeighted(tmp_img1_2, 0.8, tmp_img3_4, 0.8, 0)
+    f_combined_image = cv.addWeighted(tmp_img1_2, 0.8, tmp_img3_4, 0.8, 2)
 
     return f_combined_image
 
@@ -400,17 +431,25 @@ def write_reads_into_file(f_output_prefix, f_bases_cube):
 
     for j in f_bases_cube[0]:
 
-        if f_bases_cube[0][j][0] != 'N':
+        seq = []
+        qul = []
 
-            seq = []
-            qul = []
+        max_s = 0
 
-            for k in range(0, len(sys.argv[1:])):
+        for k in range(0, len(sys.argv[1:])):
+            max_s = f_bases_cube[k][j][1] if f_bases_cube[k][j][1] > max_s else max_s
 
-                seq.append(f_bases_cube[k][j][0])
-                qul.append(f_bases_cube[k][j][1])
+        for k in range(0, len(sys.argv[1:])):
 
-            print(j + '\t' + ''.join(seq) + '\t' + ''.join(qul), file=ou)
+            # quality = int(-10 * np.log10(1 - f_bases_cube[k][j][1] * 0.9999)) + 33
+            quality = 33 + int(f_bases_cube[k][j][1] * (41 / max_s))
+
+            # quality = f_bases_cube[k][j][1]
+
+            seq.append(f_bases_cube[k][j][0])
+            qul.append(chr(quality))
+
+        print(j + '\t' + ''.join(seq) + '\t' + ''.join(qul), file=ou)
 
     ou.close()
 
@@ -437,11 +476,12 @@ if __name__ == '__main__':
         img_C = cv.imread(channel_C_path, cv.IMREAD_GRAYSCALE)
         img_G = cv.imread(channel_G_path, cv.IMREAD_GRAYSCALE)
 
+        # img_A, img_T, img_C, img_G = image_enhancing(img_A, img_T, img_C, img_G)
+
         combined_image.append(combine_base_channel_in_same_cycle(img_A, img_T, img_C, img_G))
-        # cv.imwrite('cycle_' + str(i + 1) + '.com.tif', combined_image[i])  # debug
 
         registered_img, matrix = register_image(combined_image[0], combined_image[i])
-        # cv.imwrite('cycle_' + str(i + 1) + '.reg.tif', registered_img)  # debug
+        cv.imwrite('cycle_' + str(i + 1) + '.reg.tif', registered_img)  # debug
 
         registered_img_A = np.array([], dtype='uint8')
         registered_img_A = cv.warpPerspective(img_A, matrix, (registered_img.shape[1], registered_img.shape[0]),

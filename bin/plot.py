@@ -7,7 +7,7 @@ import cv2 as cv
 
 if __name__ == '__main__':
 
-    bg_imgMat = cv.imread('1/DAPI.tif')
+    bg_imgMat = cv.imread(sys.argv[2])
 
     calling_box = {}
 
@@ -29,16 +29,16 @@ if __name__ == '__main__':
 
             calling_box[code].append(coor)
 
-    for coordinate in calling_box[sys.argv[2]]:
+    for coordinate in calling_box[sys.argv[3]]:
         cv.circle(bg_imgMat, (coordinate[1] - 1, coordinate[0] - 1), 4, (255, 128, 128), 1)
 
-    for coordinate in calling_box[sys.argv[3]]:
+    for coordinate in calling_box[sys.argv[4]]:
         cv.circle(bg_imgMat, (coordinate[1] - 1, coordinate[0] - 1), 4, (128, 255, 128), 1)
 
-    for coordinate in calling_box[sys.argv[4]]:
+    for coordinate in calling_box[sys.argv[5]]:
         cv.circle(bg_imgMat, (coordinate[1] - 1, coordinate[0] - 1), 4, (128, 128, 255), 1)
 
-    for coordinate in calling_box[sys.argv[5]]:
+    for coordinate in calling_box[sys.argv[6]]:
         cv.circle(bg_imgMat, (coordinate[1] - 1, coordinate[0] - 1), 4, (255, 255, 128), 1)
 
-    cv.imwrite('plot.' + sys.argv[2] + '_' + sys.argv[3] + '_' + sys.argv[4] + '_' + sys.argv[5] + '.tif', bg_imgMat)
+    cv.imwrite('plot.' + sys.argv[3] + '_' + sys.argv[4] + '_' + sys.argv[5] + '_' + sys.argv[6] + '.tif', bg_imgMat)
