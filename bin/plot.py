@@ -3,42 +3,78 @@
 
 import sys
 
+import numpy as np
 import cv2 as cv
+import matplotlib.pyplot as plt
+import matplotlib.colors as clr
 
 if __name__ == '__main__':
 
-    bg_imgMat = cv.imread(sys.argv[2])
+    code_box = {}
 
-    calling_box = {}
+    with open(sys.argv[1]) as FH:
 
-    with open(sys.argv[1], 'r') as FH:
+        for line in FH:
 
-        for ln in FH:
+            line = line.split()
 
-            ln = ln.split()
+            row = int(line[0][1:5])
+            col = int(line[0][6:])
 
-            code = ln[1]
+            if 'N' in line[1]:
+                continue
 
-            r = int(ln[0][1:5].lstrip('0'))
-            c = int(ln[0][6:].lstrip('0'))
+            if line[1] not in code_box:
+                code_box.update({line[1]: []})
 
-            coor = (r, c)
+            code_box[line[1]].append([row, col])
 
-            if code not in calling_box:
-                calling_box.update({code: []})
+    img = cv.imread(sys.argv[2])
 
-            calling_box[code].append(coor)
+    fig = plt.figure(figsize=(img.shape[1]/100, img.shape[0]/100))
 
-    for coordinate in calling_box[sys.argv[3]]:
-        cv.circle(bg_imgMat, (coordinate[1] - 1, coordinate[0] - 1), 4, (255, 128, 128), 1)
+    fig.add_subplot(1, 1, 1, label='p1.1',
+                    xlim=(0, img.shape[1] + 1), ylim=(img.shape[0], 1),
+                    xticks=[], yticks=[], frame_on=False)
 
-    for coordinate in calling_box[sys.argv[4]]:
-        cv.circle(bg_imgMat, (coordinate[1] - 1, coordinate[0] - 1), 4, (128, 255, 128), 1)
+    plt.imshow(img)
 
-    for coordinate in calling_box[sys.argv[5]]:
-        cv.circle(bg_imgMat, (coordinate[1] - 1, coordinate[0] - 1), 4, (128, 128, 255), 1)
+    fig.add_subplot(1, 1, 1, label='p1.2',
+                    xlim=(0, img.shape[1] + 1), ylim=(-img.shape[0], 1),
+                    xticks=[], yticks=[], frame_on=False)
 
-    for coordinate in calling_box[sys.argv[6]]:
-        cv.circle(bg_imgMat, (coordinate[1] - 1, coordinate[0] - 1), 4, (255, 255, 128), 1)
+    n = 0
+    content = []
 
-    cv.imwrite('plot.' + sys.argv[3] + '_' + sys.argv[4] + '_' + sys.argv[5] + '_' + sys.argv[6] + '.tif', bg_imgMat)
+    if len(sys.argv) <= 3:
+
+        for i in sorted(code_box.keys(), key=lambda x: len(code_box[x]), reverse=True):
+
+            plt.scatter(np.asarray(code_box[i])[:, 1] - 1, -np.asarray(code_box[i])[:, 0] + 1,
+                        s=9, label=i, marker='o', c=[c for c in clr.cnames.values()][n], edgecolor='', alpha=1)
+
+            content.append('%s: %i' % (i, np.shape(code_box[i])[0]))
+
+            n += 1
+
+        plt.legend(content, loc=0, markerscale=4)
+
+        plt.savefig(sys.argv[1] + '.ALL_BARCODE.eps', format='eps', ppi=300)
+
+    else:
+
+        for i in sorted(code_box.keys(), key=lambda x: len(code_box[x]), reverse=True):
+
+            if '-' + i in sys.argv[3:]:
+                continue
+
+            plt.scatter(np.asarray(code_box[i])[:, 1] - 1, -np.asarray(code_box[i])[:, 0] + 1,
+                        s=9, label=i, marker='o', c=[c for c in clr.cnames.values()][n], edgecolor='', alpha=1)
+
+            content.append('%s: %i' % (i, np.shape(code_box[i])[0]))
+
+            n += 1
+
+        plt.legend(content, loc=0, markerscale=4)
+
+        plt.savefig(sys.argv[1] + '.' + '_'.join(sys.argv[3:]) + '.eps', format='eps', ppi=300)

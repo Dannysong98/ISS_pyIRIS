@@ -154,23 +154,25 @@ class Detector:
         self.__img_mat = f_img_taking_bg
         self.__contour_level = np.zeros(self.__img_mat.shape, dtype='uint8')
 
-        self.keypoint_greyscale_model = np.zeros(self.__img_mat.shape, dtype='uint8')
+        self.keypoint_score_model = np.zeros(self.__img_mat.shape, dtype='uint8')
 
     def detect(self):
 
         blur_img = np.zeros(self.__img_mat.shape, dtype='uint8')
-        blur_img = cv.GaussianBlur(self.__img_mat, (5, 5), 1.5, blur_img)
+        blur_img = cv.GaussianBlur(self.__img_mat, (3, 3), 2, blur_img)
 
-        lap1 = np.zeros(self.__img_mat.shape, dtype='uint8')
-        lap2 = np.zeros(self.__img_mat.shape, dtype='uint8')
+        lap1 = np.zeros(self.__img_mat.shape, dtype='float32')
+        lap2 = np.zeros(self.__img_mat.shape, dtype='float32')
 
         lap1 = cv.Laplacian(blur_img, cv.CV_16S, lap1, 1)
         lap2 = cv.Laplacian(blur_img, cv.CV_16S, lap2, 3)
 
-        lap1 = cv.convertScaleAbs(lap1)
-        lap2 = cv.convertScaleAbs(lap2)
+        lap1 = cv.convertScaleAbs(lap1) * 3
+        lap2 = cv.convertScaleAbs(lap2) * 3
 
-        lap_img = cv.absdiff(lap1, lap2)
+        lap_img = np.zeros(self.__img_mat.shape, dtype='uint16')
+        lap_img = cv.addWeighted(lap1, 0.8, lap2, 0.5, 0.5, lap_img)
+        lap_img = cv.convertScaleAbs(lap_img)
 
         params = cv.SimpleBlobDetector_Params()
 
@@ -180,10 +182,15 @@ class Detector:
         params.filterByCircularity = True
         params.filterByInertia = True
 
+        params.minThreshold = 30
+        params.thresholdStep = 1
+
+        params.minDistBetweenBlobs = 3
+
         params.blobColor = 255
-        params.minDistBetweenBlobs = 1
-        params.minThreshold = 1
-        params.minArea = 1
+
+        params.minArea = 4
+        params.maxArea = 65
         params.minConvexity = 0
         params.minCircularity = 0
         params.minInertiaRatio = 0
@@ -192,6 +199,8 @@ class Detector:
 
         keypoints = detector.detect(lap_img)
 
+        cv.imwrite('debug.tif', lap_img)
+
         for keypoint in keypoints:
 
             r = int(keypoint.pt[1])
@@ -199,22 +208,22 @@ class Detector:
 
             self.__contour_level[(r - 1):(r + 2), (c - 1):(c + 2)] = self.__img_mat[(r - 1):(r + 2), (c - 1):(c + 2)]
 
-        _, contours, _ = cv.findContours(self.__contour_level, cv.RETR_LIST, cv.CHAIN_APPROX_NONE)
+        _, contours, _ = cv.findContours(self.__contour_level, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)
 
         for cnt in contours:
 
-            if cv.contourArea(cnt) <= 64:
+            if cv.contourArea(cnt) <= 18:
 
                 M = cv.moments(cnt)
 
-                if M['m00'] > 0:
+                if M['m00'] != 0:
 
                     c_row = int(M['m01'] / M['m00'])
                     c_col = int(M['m10'] / M['m00'])
 
-                    self.keypoint_greyscale_model[c_row, c_col] = \
-                        np.mean(self.__img_mat[(c_row - 1):(c_row + 2), (c_col - 1):(c_col + 2)], dtype='int16') - \
-                        np.mean(self.__img_mat[(c_row - 4):(c_row + 5), (c_col - 3):(c_col + 4)], dtype='int16')
+                    self.keypoint_score_model[c_row, c_col] = \
+                        np.sum(self.__img_mat[c_row:(c_row + 2), c_col:(c_col + 2)], dtype='int16') / 4 - \
+                        np.sum(self.__img_mat[(c_row - 2):(c_row + 4), (c_col - 2):(c_col + 4)], dtype='int16') / 36
 
 
 ########################
@@ -288,23 +297,23 @@ class BasesCube:
             r = int(ref_coordinate[1:5].lstrip('0'))
             c = int(ref_coordinate[6:].lstrip('0'))
 
-            for row in range(r - 4, r + 5):
-                for col in range(c - 4, c + 5):
+            for row in range(r - 2, r + 4):
+                for col in range(c - 2, c + 4):
 
                     coor = str('r' + ('%04d' % row) + 'c' + ('%04d' % col))
 
-                    # m_dis = abs(row - r) + abs(col - c)
-                    #
-                    # MEAN, SD = (0, 1)
-                    #
-                    # W = np.exp(-((m_dis - MEAN) ** 2) / (2 * SD ** 2)) / (SD * np.sqrt(2 * np.pi))
+                    # MEAN, SD2 = (0, 1.5 ** 2)
+
+                    # W = np.exp(-((row - r) ** 2 + (col - c) ** 2) / (2 * SD2)) / (SD2 * 2 * np.pi)
 
                     if coor in f_bases_cube[f_cycle_id]:
 
-                        # Q = int(f_bases_cube[f_cycle_id][coor][1] - m_dis * W)
-                        Q = f_bases_cube[f_cycle_id][coor][1]
+                        # print(f_bases_cube[f_cycle_id][coor][1] * W)
 
-                        if Q >= max_qual:
+                        # Q = int(np.around(f_bases_cube[f_cycle_id][coor][1] * W, 0))
+                        Q = int(np.around(f_bases_cube[f_cycle_id][coor][1], 0))
+
+                        if Q > max_qual:
 
                             max_qual_base = f_bases_cube[f_cycle_id][coor][0]
                             max_qual = Q
@@ -359,13 +368,16 @@ def image_enhancing(f_base_channel_img1, f_base_channel_img2, f_base_channel_img
 # Function of Base Channel in Same Cycle Combining #
 ####################################################
 
-def combine_base_channel_in_same_cycle(f_base_channel_img1, f_base_channel_img2,
+def combine_base_channel_in_same_cycle(f_base_channel_img0,
+                                       f_base_channel_img1, f_base_channel_img2,
                                        f_base_channel_img3, f_base_channel_img4):
 
     tmp_img1_2 = cv.addWeighted(f_base_channel_img1, 0.8, f_base_channel_img2, 0.8, 0)
     tmp_img3_4 = cv.addWeighted(f_base_channel_img3, 0.8, f_base_channel_img4, 0.8, 0)
 
-    f_combined_image = cv.addWeighted(tmp_img1_2, 0.8, tmp_img3_4, 0.8, 2)
+    tmp_img1_2_3_4 = cv.addWeighted(tmp_img1_2, 0.8, tmp_img3_4, 0.8, 0)
+
+    f_combined_image = cv.addWeighted(tmp_img1_2_3_4, 0.8, f_base_channel_img0, 0.8, 0)
 
     return f_combined_image
 
@@ -393,7 +405,7 @@ def feature_detecting_and_modelization(f_image_matrix):
 
     f_detected_image_obj = Detector(f_image_matrix)
     f_detected_image_obj.detect()
-    f_detected_image = f_detected_image_obj.keypoint_greyscale_model
+    f_detected_image = f_detected_image_obj.keypoint_score_model
 
     return f_detected_image
 
@@ -466,11 +478,13 @@ if __name__ == '__main__':
 
     for i in range(0, len(sys.argv[1:])):
 
+        channel_0_path = sys.argv[i + 1] + '/DAPI.tif'
         channel_A_path = sys.argv[i + 1] + '/Y5.tif'
         channel_T_path = sys.argv[i + 1] + '/FAM.tif'
         channel_C_path = sys.argv[i + 1] + '/TXR.tif'
         channel_G_path = sys.argv[i + 1] + '/Y3.tif'
 
+        img_0 = cv.imread(channel_0_path, cv.IMREAD_GRAYSCALE)
         img_A = cv.imread(channel_A_path, cv.IMREAD_GRAYSCALE)
         img_T = cv.imread(channel_T_path, cv.IMREAD_GRAYSCALE)
         img_C = cv.imread(channel_C_path, cv.IMREAD_GRAYSCALE)
@@ -478,7 +492,7 @@ if __name__ == '__main__':
 
         # img_A, img_T, img_C, img_G = image_enhancing(img_A, img_T, img_C, img_G)
 
-        combined_image.append(combine_base_channel_in_same_cycle(img_A, img_T, img_C, img_G))
+        combined_image.append(combine_base_channel_in_same_cycle(img_0, img_A, img_T, img_C, img_G))
 
         registered_img, matrix = register_image(combined_image[0], combined_image[i])
         cv.imwrite('cycle_' + str(i + 1) + '.reg.tif', registered_img)  # debug
