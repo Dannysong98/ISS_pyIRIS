@@ -1,0 +1,2 @@
+AAGC	gene1
+AGGC	gene2

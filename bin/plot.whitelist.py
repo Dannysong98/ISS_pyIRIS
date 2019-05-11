@@ -39,9 +39,13 @@ if __name__ == '__main__':
 
     plt.imshow(img)
 
+    plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
+
     fig.add_subplot(1, 1, 1, label='p1.2',
                     xlim=(0, img.shape[1] + 1), ylim=(-img.shape[0], 1),
                     xticks=[], yticks=[], frame_on=False)
+
+    plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
 
     n = 0
 
@@ -77,7 +81,7 @@ if __name__ == '__main__':
     plt.legend(content, loc=0, markerscale=4)
 
     if len(sys.argv) <= 3:
-        plt.savefig(sys.argv[1] + '.ALL_BARCODE.eps', format='eps', ppi=300)
+        plt.savefig(sys.argv[1] + '.TOP10_BARCODE.eps', format='eps', ppi=300)
 
     else:
         plt.savefig(sys.argv[1] + '.' + '_'.join(sys.argv[3:]) + '.eps', format='eps', ppi=300)
