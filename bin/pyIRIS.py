@@ -20,6 +20,7 @@
                 2019-04-24  r008    To modify the algorithm for saturate blob exposing
                 2019-04-25  r009    To modify the strategy for blob richly exposing and detection
                 2019-05-09  r010    To modify the algorithm for blob exposing
+                2019-05-12  r011    To modify the algorithm for blob exposing, twice brighten exposed blobs
 """
 
 import re
@@ -218,14 +219,16 @@ class Detector:
         mor_img = cv.morphologyEx(self.__img_mat, cv.MORPH_TOPHAT,
                                   cv.getStructuringElement(cv.MORPH_ELLIPSE, (15, 15)), iterations=2)
 
-        img = cv.GaussianBlur(cv.add(self.__img_mat, mor_img), (5, 5), 0)
+        mor_img = cv.add(mor_img, cv.add(mor_img, mor_img))
+
+        img = cv.GaussianBlur(cv.add(mor_img, self.__img_mat), (3, 3), 0)
 
         blob_params = cv.SimpleBlobDetector_Params()
 
         blob_params.minThreshold = 1
         blob_params.thresholdStep = 2
         blob_params.minRepeatability = 2
-        blob_params.minDistBetweenBlobs = 2
+        blob_params.minDistBetweenBlobs = 1
 
         blob_params.filterByArea = True
         blob_params.minArea = 1
