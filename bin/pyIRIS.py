@@ -21,12 +21,17 @@
                 2019-04-25  r009    To modify the strategy for blob richly exposing and detection
                 2019-05-09  r010    To modify the algorithm for blob exposing
                 2019-05-12  r011    To modify the algorithm for blob exposing, twice brighten exposed blobs
+                2019-05-13  r012    1) To modify the method of channel merging by abandoning the DAPI dying
+                                    2) To brighten exposed blobs
+                2019-05-16  r013    To modify the merging strategy of channels
 """
+
 
 import re
 import sys
 
 import cv2 as cv
+import numba as nb
 import numpy as np
 import scipy.stats as sst
 
@@ -200,106 +205,125 @@ class Detector:
 
     channel_list = []
 
-    def __init__(self, f_img_taking_bg, f_img_taking_bg_A, f_img_taking_bg_T, f_img_taking_bg_C, f_img_taking_bg_G):
-
-        self.__img_mat = f_img_taking_bg
+    def __init__(self, f_img_taking_bg_A, f_img_taking_bg_T, f_img_taking_bg_C, f_img_taking_bg_G):
 
         self.__img_mat_A = f_img_taking_bg_A
         self.__img_mat_T = f_img_taking_bg_T
         self.__img_mat_C = f_img_taking_bg_C
         self.__img_mat_G = f_img_taking_bg_G
 
-        self.blob_greyscale_model_A = np.zeros(self.__img_mat.shape, dtype=np.float32)
-        self.blob_greyscale_model_T = np.zeros(self.__img_mat.shape, dtype=np.float32)
-        self.blob_greyscale_model_C = np.zeros(self.__img_mat.shape, dtype=np.float32)
-        self.blob_greyscale_model_G = np.zeros(self.__img_mat.shape, dtype=np.float32)
+        self.blob_greyscale_model_A = np.zeros(self.__img_mat_A.shape, dtype=np.float32)
+        self.blob_greyscale_model_T = np.zeros(self.__img_mat_T.shape, dtype=np.float32)
+        self.blob_greyscale_model_C = np.zeros(self.__img_mat_C.shape, dtype=np.float32)
+        self.blob_greyscale_model_G = np.zeros(self.__img_mat_G.shape, dtype=np.float32)
 
     def blob_richly_detect(self):
 
-        mor_img = cv.morphologyEx(self.__img_mat, cv.MORPH_TOPHAT,
-                                  cv.getStructuringElement(cv.MORPH_ELLIPSE, (15, 15)), iterations=2)
+        kernel1 = cv.getStructuringElement(cv.MORPH_ELLIPSE, (5, 5))
+        kernel2 = cv.getGaussianKernel(5, -1)
 
-        mor_img = cv.add(mor_img, cv.add(mor_img, mor_img))
+        channel_A = cv.morphologyEx(self.__img_mat_A, cv.MORPH_TOPHAT, kernel1 + kernel2)
+        channel_T = cv.morphologyEx(self.__img_mat_T, cv.MORPH_TOPHAT, kernel1 + kernel2)
+        channel_C = cv.morphologyEx(self.__img_mat_C, cv.MORPH_TOPHAT, kernel1 + kernel2)
+        channel_G = cv.morphologyEx(self.__img_mat_G, cv.MORPH_TOPHAT, kernel1 + kernel2)
 
-        img = cv.GaussianBlur(cv.add(mor_img, self.__img_mat), (3, 3), 0)
+        img = cv.add(cv.add(channel_A, channel_T),
+                     cv.add(channel_C, channel_G))
+
+        img = cv.GaussianBlur(img, (5, 5), 0)
+
+        # cv.imwrite('debug.tif', img)  # debug
 
         blob_params = cv.SimpleBlobDetector_Params()
 
-        blob_params.minThreshold = 1
-        blob_params.thresholdStep = 1
+        blob_params.minThreshold = sst.mode(np.around(np.reshape(img, (img.size,))))[0][0] + 1
+        blob_params.thresholdStep = 2
         blob_params.minRepeatability = 2
-        blob_params.minDistBetweenBlobs = 1
+        blob_params.minDistBetweenBlobs = 2
+
+        blob_params.filterByColor = True
+        blob_params.blobColor = 255
 
         blob_params.filterByArea = True
-        blob_params.minArea = 1
+        blob_params.minArea = 2
+        blob_params.maxArea = 145
+
+        blob_params.filterByCircularity = True
+        blob_params.minCircularity = 0.1
+
+        blob_params.filterByConvexity = True
+        blob_params.minConvexity = 0.1
 
         detector = cv.SimpleBlobDetector.create(blob_params)
 
-        mor_kps = detector.detect(cv.bitwise_not(img))
+        kps = detector.detect(img)
 
         diff_list_A = []
         diff_list_T = []
         diff_list_C = []
         diff_list_G = []
 
-        for key_point in mor_kps:
+        for key_point in kps:
 
             r = int(key_point.pt[1])
             c = int(key_point.pt[0])
 
-            diff_A = np.sum(self.__img_mat_A[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                     np.sum(self.__img_mat_A[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
+            diff_A = np.sum(channel_A[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
+                     np.sum(channel_A[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
 
-            diff_T = np.sum(self.__img_mat_T[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                     np.sum(self.__img_mat_T[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
+            diff_T = np.sum(channel_T[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
+                     np.sum(channel_T[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
 
-            diff_C = np.sum(self.__img_mat_C[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                     np.sum(self.__img_mat_C[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
+            diff_C = np.sum(channel_C[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
+                     np.sum(channel_C[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
 
-            diff_G = np.sum(self.__img_mat_G[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                     np.sum(self.__img_mat_G[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
+            diff_G = np.sum(channel_G[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
+                     np.sum(channel_G[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
 
-            diff_list_A.append(diff_A) if diff_A >= 0 else 0
-            diff_list_T.append(diff_T) if diff_T >= 0 else 0
-            diff_list_C.append(diff_C) if diff_C >= 0 else 0
-            diff_list_G.append(diff_G) if diff_G >= 0 else 0
+            if diff_A > 0:
+                diff_list_A.append(diff_A)
+
+            if diff_T > 0:
+                diff_list_T.append(diff_T)
+
+            if diff_C > 0:
+                diff_list_C.append(diff_C)
+
+            if diff_G > 0:
+                diff_list_G.append(diff_G)
 
         diff_break = 10
 
-        cut_off_A = int(sst.mode(np.around(np.divide(np.array(diff_list_A, dtype=np.float32), diff_break)))[0][0]) + \
-                    diff_break / 2
-        cut_off_T = int(sst.mode(np.around(np.divide(np.array(diff_list_T, dtype=np.float32), diff_break)))[0][0]) + \
-                    diff_break / 2
-        cut_off_C = int(sst.mode(np.around(np.divide(np.array(diff_list_C, dtype=np.float32), diff_break)))[0][0]) + \
-                    diff_break / 2
-        cut_off_G = int(sst.mode(np.around(np.divide(np.array(diff_list_G, dtype=np.float32), diff_break)))[0][0]) + \
-                    diff_break / 2
+        cut_off_A = int(sst.mode(np.around(np.divide(np.array(diff_list_A, dtype=np.float32), diff_break)))[0][0])
+        cut_off_T = int(sst.mode(np.around(np.divide(np.array(diff_list_T, dtype=np.float32), diff_break)))[0][0])
+        cut_off_C = int(sst.mode(np.around(np.divide(np.array(diff_list_C, dtype=np.float32), diff_break)))[0][0])
+        cut_off_G = int(sst.mode(np.around(np.divide(np.array(diff_list_G, dtype=np.float32), diff_break)))[0][0])
 
-        for key_point in mor_kps:
+        for key_point in kps:
 
             r = int(key_point.pt[1])
             c = int(key_point.pt[0])
 
-            if np.sum(self.__img_mat_A[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                    np.sum(self.__img_mat_A[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144 > cut_off_A:
+            if np.sum(channel_A[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
+                    np.sum(channel_A[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144 > cut_off_A:
                 self.blob_greyscale_model_A[r, c] = \
                     np.sum(self.__img_mat_A[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
                     np.sum(self.__img_mat_A[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
 
-            if np.sum(self.__img_mat_T[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                    np.sum(self.__img_mat_T[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144 > cut_off_T:
+            if np.sum(channel_T[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
+                    np.sum(channel_T[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144 > cut_off_T:
                 self.blob_greyscale_model_T[r, c] = \
                     np.sum(self.__img_mat_T[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
                     np.sum(self.__img_mat_T[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
 
-            if np.sum(self.__img_mat_C[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                    np.sum(self.__img_mat_C[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144 > cut_off_C:
+            if np.sum(channel_C[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
+                    np.sum(channel_C[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144 > cut_off_C:
                 self.blob_greyscale_model_C[r, c] = \
                     np.sum(self.__img_mat_C[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
                     np.sum(self.__img_mat_C[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
 
-            if np.sum(self.__img_mat_G[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                    np.sum(self.__img_mat_G[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144 > cut_off_G:
+            if np.sum(channel_G[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
+                    np.sum(channel_G[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144 > cut_off_G:
                 self.blob_greyscale_model_G[r, c] = \
                     np.sum(self.__img_mat_G[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
                     np.sum(self.__img_mat_G[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
@@ -333,37 +357,46 @@ class Detector:
 
 class BaseCaller:
 
-    __base_pool = {}
-
     def __init__(self):
+
+        self.__base_pool = {}
 
         self.bases_box = {}
 
-    @classmethod
-    def image_model_parsing(cls, f_image_model, f_base_type):
+    @nb.jit
+    def image_model_parsing(self, f_image_model_A, f_image_model_T, f_image_model_C, f_image_model_G):
 
-        for row in range(0, len(f_image_model)):
-            for col in range(0, len(f_image_model[row])):
+        for row in range(0, len(f_image_model_A)):
+            for col in range(0, len(f_image_model_A[row])):
 
                 read_id = 'r' + ('%04d' % (row + 1)) + 'c' + ('%04d' % (col + 1))
 
-                if read_id not in BaseCaller.__base_pool:
-                    BaseCaller.__base_pool.update({read_id: {'A': 0.0, 'T': 0.0, 'C': 0.0, 'G': 0.0}})
+                if read_id not in self.__base_pool:
+                    self.__base_pool.update({read_id: {'A': 0, 'T': 0, 'C': 0, 'G': 0}})
 
-                if f_image_model[row, col] >= 0:
-                    BaseCaller.__base_pool[read_id][f_base_type] = f_image_model[row, col]
+                if f_image_model_A[row, col] > 0:
+                    self.__base_pool[read_id]['A'] = f_image_model_A[row, col]
+
+                if f_image_model_T[row, col] > 0:
+                    self.__base_pool[read_id]['T'] = f_image_model_T[row, col]
+
+                if f_image_model_C[row, col] > 0:
+                    self.__base_pool[read_id]['C'] = f_image_model_C[row, col]
+
+                if f_image_model_G[row, col] > 0:
+                    self.__base_pool[read_id]['G'] = f_image_model_G[row, col]
 
     def mat2base(self):
 
-        for read_id in BaseCaller.__base_pool:
+        for read_id in self.__base_pool:
 
             sorted_base_score = [base_score for base_score in
-                                 sorted(BaseCaller.__base_pool[read_id].items(), key=lambda x: x[1], reverse=True)]
+                                 sorted(self.__base_pool[read_id].items(), key=lambda x: x[1], reverse=True)]
 
             if sorted_base_score[0][1] > sorted_base_score[1][1]:
 
-                error_rate = np.around(sst.binom_test((sorted_base_score[0][1], sorted_base_score[1][1]),
-                                                      p=0.5, alternative='greater'), 4)
+                error_rate = np.around(sst.binom_test((sorted_base_score[0][1],
+                                                       sorted_base_score[1][1]), p=0.5, alternative='greater'), 4)
 
                 if read_id not in self.bases_box:
                     self.bases_box.update({read_id: [sorted_base_score[0][0], error_rate]})
@@ -371,9 +404,9 @@ class BaseCaller:
 
 class BasesCube:
 
-    __bases_cube = []
-
     def __init__(self):
+
+        self.__bases_cube = []
 
         self.adjusted_bases_cube = []
 
@@ -406,10 +439,9 @@ class BasesCube:
 
             f_adjusted_bases_cube[f_cycle_id].update({ref_coordinate: [min_qual_base, min_error_rate]})
 
-    @classmethod
-    def collect_called_bases(cls, f_called_base_in_one_cycle):
+    def collect_called_bases(self, f_called_base_in_one_cycle):
 
-        cls.__bases_cube.append(f_called_base_in_one_cycle)
+        self.__bases_cube.append(f_called_base_in_one_cycle)
 
     def calling_adjust(self):
 
@@ -418,9 +450,10 @@ class BasesCube:
         if len(self.__bases_cube) > 1:
 
             for cycle_id in range(1, len(self.__bases_cube)):
+
                 self.adjusted_bases_cube.append({})
 
-                self.__check_greyscale(self.__bases_cube, self.adjusted_bases_cube, cycle_id)
+                BasesCube.__check_greyscale(self.__bases_cube, self.adjusted_bases_cube, cycle_id)
 
         else:
             print('There is only one cycle in this run', file=sys.stderr)
@@ -447,7 +480,7 @@ def combine_base_channel_in_same_cycle(f_base_channel_img1,
 
     tmp_img1_2_3_4 = cv.addWeighted(tmp_img1_2, 0.5, tmp_img3_4, 0.5, 0)
 
-    f_combined_image = cv.addWeighted(tmp_img1_2_3_4, 1, f_base_channel_img0, 1, 0)
+    f_combined_image = cv.add(f_base_channel_img0, tmp_img1_2_3_4)
 
     return f_combined_image
 
@@ -471,14 +504,12 @@ def register_image(f_query_img, f_train_img):
 # Function of Image Registration #
 ##################################
 
-def feature_detecting_and_modelization(f_image_matrix,
-                                       f_image_matrix_A,
+def feature_detecting_and_modelization(f_image_matrix_A,
                                        f_image_matrix_T,
                                        f_image_matrix_C,
                                        f_image_matrix_G):
 
-    f_detected_image_obj = Detector(f_image_matrix,
-                                    f_image_matrix_A,
+    f_detected_image_obj = Detector(f_image_matrix_A,
                                     f_image_matrix_T,
                                     f_image_matrix_C,
                                     f_image_matrix_G)
@@ -504,14 +535,10 @@ def base_calling(f_feature_detecting_imgModel1,
 
     calling_obj = BaseCaller()
 
-    calling_obj.image_model_parsing(f_feature_detecting_imgModel1, 'A')
-    calling_obj.image_model_parsing(f_feature_detecting_imgModel2, 'T')
-    calling_obj.image_model_parsing(f_feature_detecting_imgModel3, 'C')
-    calling_obj.image_model_parsing(f_feature_detecting_imgModel4, 'G')
+    calling_obj.image_model_parsing(f_feature_detecting_imgModel1, f_feature_detecting_imgModel2,
+                                    f_feature_detecting_imgModel3, f_feature_detecting_imgModel4)
 
     calling_obj.mat2base()
-
-    calling_obj.__base_pool = None
 
     f_base_output = calling_obj.bases_box
 
@@ -590,6 +617,7 @@ if __name__ == '__main__':
         combined_image.append(combine_base_channel_in_same_cycle(img_A, img_T, img_C, img_G, img_0))
 
         registered_img, matrix = register_image(combined_image[0], combined_image[i])
+
         cv.imwrite('cycle_' + str(i + 1) + '.reg.tif', registered_img)  # debug
 
         registered_img_A = np.array([], dtype=np.uint8)
@@ -611,8 +639,7 @@ if __name__ == '__main__':
         (detected_registered_img_A,
          detected_registered_img_T,
          detected_registered_img_C,
-         detected_registered_img_G) = feature_detecting_and_modelization(registered_img,
-                                                                         registered_img_A,
+         detected_registered_img_G) = feature_detecting_and_modelization(registered_img_A,
                                                                          registered_img_T,
                                                                          registered_img_C,
                                                                          registered_img_G)
@@ -623,6 +650,11 @@ if __name__ == '__main__':
                                                      detected_registered_img_G)
 
         bases_cube_obj.collect_called_bases(called_base_list_in_one_cycle)
+
+        if i == 0:
+
+            img_0 = cv.imread(sys.argv[1] + '/DAPI.tif', cv.IMREAD_GRAYSCALE)
+            cv.imwrite('background.tif', combined_image[0])
 
     bases_cube_obj.calling_adjust()
 
