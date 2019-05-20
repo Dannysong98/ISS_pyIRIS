@@ -24,6 +24,7 @@
                 2019-05-13  r012    1) To modify the method of channel merging by abandoning the DAPI dying
                                     2) To brighten exposed blobs
                 2019-05-16  r013    To modify the merging strategy of channels
+                2019-05-17  r014    To modify the strategy for blob richly exposing and detection
 """
 
 
@@ -219,24 +220,20 @@ class Detector:
 
     def blob_richly_detect(self):
 
-        kernel1 = cv.getStructuringElement(cv.MORPH_ELLIPSE, (5, 5))
+        kernel1 = cv.getStructuringElement(cv.MORPH_RECT, (5, 5))
         kernel2 = cv.getGaussianKernel(5, -1)
 
-        channel_A = cv.morphologyEx(self.__img_mat_A, cv.MORPH_TOPHAT, kernel1 + kernel2)
-        channel_T = cv.morphologyEx(self.__img_mat_T, cv.MORPH_TOPHAT, kernel1 + kernel2)
-        channel_C = cv.morphologyEx(self.__img_mat_C, cv.MORPH_TOPHAT, kernel1 + kernel2)
-        channel_G = cv.morphologyEx(self.__img_mat_G, cv.MORPH_TOPHAT, kernel1 + kernel2)
+        channel_A = cv.GaussianBlur(cv.morphologyEx(self.__img_mat_A, cv.MORPH_TOPHAT, kernel1 + kernel2), (5, 5), 0)
+        channel_T = cv.GaussianBlur(cv.morphologyEx(self.__img_mat_T, cv.MORPH_TOPHAT, kernel1 + kernel2), (5, 5), 0)
+        channel_C = cv.GaussianBlur(cv.morphologyEx(self.__img_mat_C, cv.MORPH_TOPHAT, kernel1 + kernel2), (5, 5), 0)
+        channel_G = cv.GaussianBlur(cv.morphologyEx(self.__img_mat_G, cv.MORPH_TOPHAT, kernel1 + kernel2), (5, 5), 0)
 
-        img = cv.add(cv.add(channel_A, channel_T),
-                     cv.add(channel_C, channel_G))
+        channle_list = [channel_A, channel_T, channel_C, channel_G]
 
-        img = cv.GaussianBlur(img, (5, 5), 0)
-
-        # cv.imwrite('debug.tif', img)  # debug
+        mor_kps = []
 
         blob_params = cv.SimpleBlobDetector_Params()
 
-        blob_params.minThreshold = sst.mode(np.around(np.reshape(img, (img.size,))))[0][0] + 1
         blob_params.thresholdStep = 2
         blob_params.minRepeatability = 2
         blob_params.minDistBetweenBlobs = 2
@@ -254,9 +251,30 @@ class Detector:
         blob_params.filterByConvexity = True
         blob_params.minConvexity = 0.1
 
+        for img in channle_list:
+
+            blob_params.minThreshold = sst.mode(np.around(np.reshape(img, (img.size,))))[0][0] + 1
+
+            mor_detector = cv.SimpleBlobDetector.create(blob_params)
+
+            mor_kps.extend(mor_detector.detect(img))
+
+        tmp_layer = np.zeros(self.__img_mat_A.shape, dtype=np.uint8)
+
+        for key_point in mor_kps:
+
+            r = int(key_point.pt[1])
+            c = int(key_point.pt[0])
+
+            tmp_layer[r:(r + 2), c:(c + 2)] = 255
+
+        blob_params.minThreshold = 1
+
         detector = cv.SimpleBlobDetector.create(blob_params)
 
-        kps = detector.detect(img)
+        tmp_layer = cv.GaussianBlur(tmp_layer, (5, 5), 0)
+
+        kps = detector.detect(tmp_layer)
 
         diff_list_A = []
         diff_list_T = []
