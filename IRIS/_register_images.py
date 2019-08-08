@@ -43,7 +43,8 @@ def register_cycles(f_reference_cycle, f_transform_cycle, f_detection_method=Non
         Input a gray scale image and one of the algorithms of detector.
         Returning the key points and their descriptions.
         """
-        kernel = getStructuringElement(MORPH_CROSS, (5, 5))
+        ksize = (15, 15)
+        kernel = getStructuringElement(MORPH_CROSS, ksize)
 
         f_gray_image = morphologyEx(f_gray_image, MORPH_GRADIENT, kernel, iterations=2)
         f_gray_image = morphologyEx(f_gray_image, MORPH_CLOSE, kernel, iterations=2)
