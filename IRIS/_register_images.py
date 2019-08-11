@@ -18,9 +18,9 @@ and rotation between images, no zooming and retortion.
 
 from sys import stderr
 
-from cv2 import (getStructuringElement, morphologyEx,
-                 BRISK, ORB, BFMatcher, findHomography, estimateRigidTransform,
-                 MORPH_CROSS, MORPH_GRADIENT, MORPH_CLOSE, NORM_HAMMING, RANSAC)
+from cv2.cv2 import (getStructuringElement, morphologyEx,
+                     BRISK, ORB, BFMatcher, findHomography, estimateRigidTransform,
+                     MORPH_CROSS, MORPH_GRADIENT, MORPH_CLOSE, NORM_HAMMING, RANSAC)
 from numpy import (array, float32)
 
 
@@ -47,7 +47,7 @@ def register_cycles(f_reference_cycle, f_transform_cycle, f_detection_method=Non
         kernel = getStructuringElement(MORPH_CROSS, ksize)
 
         f_gray_image = morphologyEx(f_gray_image, MORPH_GRADIENT, kernel, iterations=2)
-        f_gray_image = morphologyEx(f_gray_image, MORPH_CLOSE, kernel, iterations=2)
+        f_gray_image = morphologyEx(f_gray_image, MORPH_CLOSE,    kernel, iterations=2)
 
         det = ''
         ext = ''
@@ -97,7 +97,7 @@ def register_cycles(f_reference_cycle, f_transform_cycle, f_detection_method=Non
 
     good_matches = _get_good_matched_pairs(des1, des2)
 
-    if len(good_matches) >= 3:
+    if len(good_matches) >= 4:
         pts_a = float32([kp1[_.queryIdx].pt for _ in good_matches]).reshape(-1, 1, 2)
         pts_b = float32([kp2[_.trainIdx].pt for _ in good_matches]).reshape(-1, 1, 2)
 

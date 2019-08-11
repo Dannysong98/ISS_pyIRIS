@@ -18,10 +18,9 @@ score, which is calculated by their gray scale in core (3x3) region being divide
 recorded to be made as the measure of significance, it is also the base of called base quality in next step.
 """
 
-
-from cv2 import (getStructuringElement, morphologyEx, GaussianBlur,
-                 SimpleBlobDetector, SimpleBlobDetector_Params,
-                 MORPH_ELLIPSE, MORPH_TOPHAT)
+from cv2.cv2 import (getStructuringElement, morphologyEx, GaussianBlur,
+                     SimpleBlobDetector, SimpleBlobDetector_Params,
+                     MORPH_ELLIPSE, MORPH_TOPHAT)
 from numpy import (array, zeros, reshape,
                    sum, divide, around,
                    float32, uint8)
@@ -238,8 +237,8 @@ def detect_blobs_Eng(f_cycle):
     blob_params.blobColor = 255
 
     blob_params.filterByArea = True
-    blob_params.minArea = 2
-    blob_params.maxArea = 256
+    blob_params.minArea = 1
+    blob_params.maxArea = 196
 
     blob_params.filterByCircularity = False
     blob_params.filterByConvexity = True

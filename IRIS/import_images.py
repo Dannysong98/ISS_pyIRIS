@@ -2,15 +2,25 @@
 """
 This model is used to import the images and contain them into pixel-matrix.
 
-We prepared 3 types of method to parse the different techniques of in situ sequencing,
-which published by Rongqin Ke, Chee-Huat Linus Eng and Joshua A. Weinstein, respectively.
+We prepared 2 types of strategy to parse the different techniques of in situ sequencing, which published by R. Ke,
+CH. Eng.
+
+Here, Ke's data is employed as the major data type in our software, in this data, the barcode are composed of 5 types of
+pseudo-color, representing the A, T, C, G bases and background. While, in the type of Eng' data, Each image is composed
+of 4 channels, of which, the first 3 channels means blobs with distinction by 3 pseudo-colors and the last one means
+background. Then, each continuous 4 images are made a Round, also named a Cycle. So, there are 12 pseudo-colors in
+a Round. The Eng's data (CH. Eng, Nat Met., 2017) include 5 Rounds, 20 images, 80 channels.
+
+Our software generate a 3D tensor to store all the images, each channel is made into a matrix.
 """
 
 
 from sys import stderr
-from cv2 import (imread, imreadmulti,
-                 add, addWeighted, warpAffine,
-                 IMREAD_GRAYSCALE)
+
+from cv2.cv2 import (imread, imreadmulti,
+                     add, addWeighted, warpAffine,
+                     IMREAD_GRAYSCALE)
+
 from numpy import (array,
                    uint8)
 
@@ -19,10 +29,10 @@ from ._register_images import register_cycles
 
 def decode_data_Ke(f_cycles):
     """
-    For parsing the technique which published on Nature Methods in 2013 by Rongqin Ke.
+    For parsing the technique which published on Nature Methods in 2013 by R. Ke.
 
     Input the directories of cycle.
-    Returning a pixel matrix which contains all the gray scales of image pixel as well as their coordinates
+    Returning a pixel matrix which contains all the gray scales of image pixel as well as their coordinates.
     """
     if len(f_cycles) < 1:
         print('ERROR CYCLES', file=stderr)
@@ -34,10 +44,10 @@ def decode_data_Ke(f_cycles):
     f_std_cycle = array([], dtype=uint8)
 
     for cycle_id in range(0, len(f_cycles)):
-        channel_A = imread('/'.join((f_cycles[cycle_id], 'Y5.tif')), IMREAD_GRAYSCALE)
-        channel_T = imread('/'.join((f_cycles[cycle_id], 'FAM.tif')), IMREAD_GRAYSCALE)
-        channel_C = imread('/'.join((f_cycles[cycle_id], 'TXR.tif')), IMREAD_GRAYSCALE)
-        channel_G = imread('/'.join((f_cycles[cycle_id], 'Y3.tif')), IMREAD_GRAYSCALE)
+        channel_A = imread('/'.join((f_cycles[cycle_id], 'Y5.tif')),   IMREAD_GRAYSCALE)
+        channel_T = imread('/'.join((f_cycles[cycle_id], 'FAM.tif')),  IMREAD_GRAYSCALE)
+        channel_C = imread('/'.join((f_cycles[cycle_id], 'TXR.tif')),  IMREAD_GRAYSCALE)
+        channel_G = imread('/'.join((f_cycles[cycle_id], 'Y3.tif')),   IMREAD_GRAYSCALE)
         channel_0 = imread('/'.join((f_cycles[cycle_id], 'DAPI.tif')), IMREAD_GRAYSCALE)
 
         merge_cycle = addWeighted(add(add(add(channel_A, channel_T), channel_C), channel_G), 0.7, channel_0, 0.3, 0)

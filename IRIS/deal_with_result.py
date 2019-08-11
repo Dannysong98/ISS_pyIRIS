@@ -2,7 +2,7 @@
 """"""
 
 
-from cv2 import imwrite
+from cv2.cv2 import imwrite
 from numpy import log10
 
 

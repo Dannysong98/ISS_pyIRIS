@@ -39,7 +39,17 @@ from IRIS import (import_images, detect_signals, connect_barcodes, deal_with_res
 
 
 if __name__ == '__main__':
-    if len(argv) > 2:
+    """
+    This is the entry of function in our software, of which, this process can be split three parts, the images importing
+    model, the blob detecting model and the barcode connecting model.
+    
+    The images importing model can be compatible with two type of data, the one is conformed to the publish of 
+    Rongqin Ke in 2013, the other is Chee-Huat Linus Eng in 2017 and 2019.
+    
+    Our software control the data importing by two options following the main command, the '--ke' means to process the 
+    data belonging the type of R. Ke, and the '--eng' means another type.
+    """
+    if len(argv) > 2 or ('--ke' not in argv[1] or '--eng' not in argv[1]):
         cycle_stack = []
         std_cycle = array([], dtype=uint8)
         called_base_box_in_one_cycle = {}
@@ -52,7 +62,7 @@ if __name__ == '__main__':
             for cycle_id in range(0, len(cycle_stack)):
                 called_base_box_in_one_cycle = detect_signals.detect_blobs_Ke(cycle_stack[cycle_id])
 
-                # Unified Bases Collection, Filtering & Barcode Connection #
+                # Unified Bases Collection, Filtering #
                 barcode_cube.collect_called_bases(called_base_box_in_one_cycle)
                 barcode_cube.filter_blobs_list(std_cycle)
 
@@ -62,10 +72,11 @@ if __name__ == '__main__':
             for cycle_id in range(0, len(cycle_stack)):
                 called_base_box_in_one_cycle = detect_signals.detect_blobs_Eng(cycle_stack[cycle_id])
 
-                # Unified Bases Collection, Filtering & Barcode Connection #
+                # Unified Bases Collection, Filtering #
                 barcode_cube.collect_called_bases(called_base_box_in_one_cycle)
                 barcode_cube.filter_blobs_list(std_cycle)
 
+        # Unified Barcode Connection #
         barcode_cube.calling_adjust()
 
         deal_with_result.write_reads_into_file(std_cycle, barcode_cube.adjusted_bases_cube, len(cycle_stack))
