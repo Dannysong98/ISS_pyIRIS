@@ -1,13 +1,24 @@
 #!/usr/bin/env python3
-""""""
+"""
+This model is used to transform the error rate into Phred+ 33 score, then outputting the background and the reformatted
+result of base calling.
+"""
 
 
 from cv2.cv2 import imwrite
 from numpy import log10
 
 
-def write_reads_into_file(f_background, f_barcode_cube, f_cycle_num):
-    """"""
+def write_reads_into_file(f_background, f_barcode_cube, f_barcode_length):
+    """
+    This function is used to transform the error rate into Phred+ 33 score, then outputting the background and the
+    reformatted result of base calling.
+
+    :param f_background: The image matrix of background.
+    :param f_barcode_cube: The connected barcode, with error rate of each base.
+    :param f_barcode_length: The length of barcode.
+    :return: NONE
+    """
     imwrite('background.tif', f_background)
 
     ou = open('basecalling_data.txt', 'w')
@@ -17,7 +28,7 @@ def write_reads_into_file(f_background, f_barcode_cube, f_cycle_num):
         seq = []
         qul = []
 
-        for k in range(0, f_cycle_num):
+        for k in range(0, f_barcode_length):
             if f_barcode_cube[k][j][1] is not None:
                 # Transforming the Error Rate into the Phred+ 33 Score #
                 quality = int(-10 * log10(f_barcode_cube[k][j][1] + 0.0001)) + 33

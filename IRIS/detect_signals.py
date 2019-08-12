@@ -18,6 +18,7 @@ score, which is calculated by their gray scale in core (3x3) region being divide
 recorded to be made as the measure of significance, it is also the base of called base quality in next step.
 """
 
+
 from cv2.cv2 import (getStructuringElement, morphologyEx, GaussianBlur,
                      SimpleBlobDetector, SimpleBlobDetector_Params,
                      MORPH_ELLIPSE, MORPH_TOPHAT)
@@ -35,6 +36,9 @@ def detect_blobs_Ke(f_cycle):
 
     Input registered image from different channels.
     Returning the grey scale model.
+
+    :param f_cycle: A image matrix in the 3D common data tensor.
+    :return: A base box of this cycle, which store their coordinates, base and its error rate.
     """
     channel_A = f_cycle[0]
     channel_T = f_cycle[1]
@@ -177,6 +181,9 @@ def detect_blobs_Eng(f_cycle):
 
     Input registered image from different channels.
     Returning the grey scale model.
+
+    :param f_cycle: A image matrix in the 3D common data tensor.
+    :return: A base box of this cycle, which store their coordinates, base and its error rate.
     """
     channel_1 = f_cycle[0][0]
     channel_2 = f_cycle[0][1]
@@ -258,7 +265,7 @@ def detect_blobs_Eng(f_cycle):
 
         mask_layer[r:(r + 2), c:(c + 2)] = 255
 
-    mask_layer = GaussianBlur(mask_layer, (5, 5), 0)
+    # mask_layer = GaussianBlur(mask_layer, (5, 5), 0)
 
     blob_params.minThreshold = 1
 

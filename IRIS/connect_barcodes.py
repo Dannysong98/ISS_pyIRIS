@@ -1,33 +1,58 @@
 #!/usr/bin/env python3
-""""""
+"""
+This model is used to connect the base from different cycles.
+
+In this model, the connection is made as a class, the 'BarcodeCube', of which, three method will be employed. The method
+'collect_called_bases' is used to record the called bases in each cycle, and 'filter_blobs_list' is used to filter the
+bad or indistinguishable blobs by mapping them into a mask layer. At last, the method 'calling_adjust' is used to
+connect the bases as barcodes, by anchoring the coordinates of blobs in cycle 1, and search their 12x12 region in other
+cycles, respectively.
+"""
 
 
 from sys import stderr
-
 from cv2.cv2 import (findContours, moments,
-                     RETR_EXTERNAL,
+                     RETR_LIST,
                      CHAIN_APPROX_NONE)
 from numpy import (zeros,
                    sqrt,
                    uint8)
 
 
-class BasesCube:
+class BarcodeCube:
     def __init__(self):
-        """"""
+        """
+        This method will initialize three members, the '__all_blobs_list' store all the id of blobs, the 'bases_cube' is
+        A list which store the dictionary of bases in each cycle, while the 'adjusted_bases_cube' is A list which store
+        the dictionary of bases in each cycle, with error rate adjusted.
+        """
         self.__all_blobs_list = set()
 
         self.bases_cube = []
         self.adjusted_bases_cube = []
 
     def collect_called_bases(self, f_called_base_in_one_cycle):
-        """"""
+        """
+        This method is used to record the called bases in each cycle.
+
+        A list which store all the id of bases and A list which store the dictionary of bases in each cycle.
+
+        :param f_called_base_in_one_cycle: The dictionary of bases in a cycle.
+        :return: NONE
+        """
         self.__all_blobs_list.update([_ for _ in f_called_base_in_one_cycle.keys()
                                       if 'N' not in f_called_base_in_one_cycle[_]])
         self.bases_cube.append(f_called_base_in_one_cycle)
 
     def filter_blobs_list(self, f_background):
-        """"""
+        """
+        This method is used to filter the recorded bases in the called base list.
+
+        A new list will be generated, which store the filtered id of bases
+
+        :param f_background: The background image for ensuring the shape of mask layer.
+        :return: NONE
+        """
         blobs_mask = zeros(f_background.shape, dtype=uint8)
 
         new_coor = set()
@@ -38,7 +63,7 @@ class BasesCube:
 
             blobs_mask[r:(r + 2), c:(c + 2)] = 255
 
-            _, contours, _ = findContours(blobs_mask, RETR_EXTERNAL, CHAIN_APPROX_NONE)
+            _, contours, _ = findContours(blobs_mask, RETR_LIST, CHAIN_APPROX_NONE)
 
             for cnt in contours:
                 M = moments(cnt)
@@ -52,7 +77,12 @@ class BasesCube:
         self.__all_blobs_list = new_coor
 
     def calling_adjust(self):
-        """"""
+        """
+        This method is used to connect the bases as barcodes, by anchoring the coordinates of blobs in cycle 1, and
+        search their 12x12 region in other cycles, respectively.
+
+        :return: NONE
+        """
         def _check_greyscale(f_all_blobs_list, f_bases_cube, f_adjusted_bases_cube, f_cycle_id):
             """"""
             f_adjusted_bases_cube[f_cycle_id] = {}

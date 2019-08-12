@@ -27,7 +27,7 @@ ChangeLog:  2019-01-15  r001    First development version
             2019-07-09  r016    To modify the algorithm for error rate
             2019-07-12  r017    To modify the algorithm for base cube
             2019-07-12  r018    To modify the algorithm for blob detection
-            2019-08-08  v1.0    New release v1.0
+            2019-08-08  r019    New development version, the prototype version
 """
 
 
@@ -43,18 +43,19 @@ if __name__ == '__main__':
     This is the entry of function in our software, of which, this process can be split three parts, the images importing
     model, the blob detecting model and the barcode connecting model.
     
-    The images importing model can be compatible with two type of data, the one is conformed to the publish of 
-    Rongqin Ke in 2013, the other is Chee-Huat Linus Eng in 2017 and 2019.
+    The images importing model can be compatible with two types of data, which are conformed to the publish of 
+    Rongqin Ke in 2013, and Chee-Huat Linus Eng in 2017 and 2019, respectively.
     
-    Our software control the data importing by two options following the main command, the '--ke' means to process the 
-    data belonging the type of R. Ke, and the '--eng' means another type.
+    Our software control the data importing by two options following the main command, of which, the '--ke' means to 
+    process the data belonging the type of R. Ke, and the '--eng' means another type, with respective optimized 
+    parameters.
     """
     if len(argv) > 2 or ('--ke' not in argv[1] or '--eng' not in argv[1]):
         cycle_stack = []
         std_cycle = array([], dtype=uint8)
         called_base_box_in_one_cycle = {}
 
-        barcode_cube = connect_barcodes.BasesCube()
+        barcode_cube_obj = connect_barcodes.BarcodeCube()
 
         if argv[1] == '--ke':
             cycle_stack, std_cycle = import_images.decode_data_Ke(argv[2:])
@@ -62,9 +63,9 @@ if __name__ == '__main__':
             for cycle_id in range(0, len(cycle_stack)):
                 called_base_box_in_one_cycle = detect_signals.detect_blobs_Ke(cycle_stack[cycle_id])
 
-                # Unified Bases Collection, Filtering #
-                barcode_cube.collect_called_bases(called_base_box_in_one_cycle)
-                barcode_cube.filter_blobs_list(std_cycle)
+                # Bases Collection and Unified Filtering #
+                barcode_cube_obj.collect_called_bases(called_base_box_in_one_cycle)
+                barcode_cube_obj.filter_blobs_list(std_cycle)
 
         if argv[1] == '--eng':
             cycle_stack, std_cycle = import_images.decode_data_Eng(argv[2:])
@@ -72,14 +73,14 @@ if __name__ == '__main__':
             for cycle_id in range(0, len(cycle_stack)):
                 called_base_box_in_one_cycle = detect_signals.detect_blobs_Eng(cycle_stack[cycle_id])
 
-                # Unified Bases Collection, Filtering #
-                barcode_cube.collect_called_bases(called_base_box_in_one_cycle)
-                barcode_cube.filter_blobs_list(std_cycle)
+                # Bases Collection and Unified Filtering #
+                barcode_cube_obj.collect_called_bases(called_base_box_in_one_cycle)
+                barcode_cube_obj.filter_blobs_list(std_cycle)
 
         # Unified Barcode Connection #
-        barcode_cube.calling_adjust()
+        barcode_cube_obj.calling_adjust()
 
-        deal_with_result.write_reads_into_file(std_cycle, barcode_cube.adjusted_bases_cube, len(cycle_stack))
+        deal_with_result.write_reads_into_file(std_cycle, barcode_cube_obj.adjusted_bases_cube, len(cycle_stack))
 
     else:
         print('Invalid image group\nUSAGE:  ' + argv[0] + ' <--ke|--eng> <image group>', file=stderr)

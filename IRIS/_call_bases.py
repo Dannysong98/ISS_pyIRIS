@@ -26,7 +26,14 @@ from scipy.stats import binom_test
 
 
 def image_model_pooling_Ke(f_image_model_A, f_image_model_T, f_image_model_C, f_image_model_G):
-    """"""
+    """
+    :param f_image_model_A: Channel A in a cycle from the 3D common data tensor.
+    :param f_image_model_T: Channel T in a cycle from the 3D common data tensor.
+    :param f_image_model_C: Channel C in a cycle from the 3D common data tensor.
+    :param f_image_model_G: Channel G in a cycle from the 3D common data tensor.
+    :return: A dictionary of blobs, all the types of base in a certain location, including the coordinates, bases and
+    their base scores.
+    """
     f_image_model_pool = {}
 
     for row in range(0, len(f_image_model_A)):
@@ -55,7 +62,22 @@ def image_model_pooling_Eng(f_image_model_1, f_image_model_2, f_image_model_3,
                             f_image_model_4, f_image_model_5, f_image_model_6,
                             f_image_model_7, f_image_model_8, f_image_model_9,
                             f_image_model_A, f_image_model_B, f_image_model_C):
-    """"""
+    """
+    :param f_image_model_1: Channel 1 in a cycle from the 3D common data tensor.
+    :param f_image_model_2: Channel 2 in a cycle from the 3D common data tensor.
+    :param f_image_model_3: Channel 3 in a cycle from the 3D common data tensor.
+    :param f_image_model_4: Channel 4 in a cycle from the 3D common data tensor.
+    :param f_image_model_5: Channel 5 in a cycle from the 3D common data tensor.
+    :param f_image_model_6: Channel 6 in a cycle from the 3D common data tensor.
+    :param f_image_model_7: Channel 7 in a cycle from the 3D common data tensor.
+    :param f_image_model_8: Channel 8 in a cycle from the 3D common data tensor.
+    :param f_image_model_9: Channel 9 in a cycle from the 3D common data tensor.
+    :param f_image_model_A: Channel A in a cycle from the 3D common data tensor.
+    :param f_image_model_B: Channel B in a cycle from the 3D common data tensor.
+    :param f_image_model_C: Channel C in a cycle from the 3D common data tensor.
+    :return: A dictionary of blobs, all the types of base in a certain location, including the coordinate, bases and
+    their base scores.
+    """
     f_image_model_pool = {}
 
     for row in range(0, len(f_image_model_1)):
@@ -108,7 +130,11 @@ def image_model_pooling_Eng(f_image_model_1, f_image_model_2, f_image_model_3,
 
 
 def pool2base(f_image_model_pool):
-    """"""
+    """
+    :param f_image_model_pool: The dictionary of blobs, including the base and the coordinates.
+    :return: The dictionary of bases, only one representative in a certain location, including the coordinate, base and
+    its error rates.
+    """
     f_base_box = {}
 
     for read_id in f_image_model_pool:

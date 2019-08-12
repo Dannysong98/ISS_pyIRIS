@@ -5,22 +5,22 @@ This model is used to import the images and contain them into pixel-matrix.
 We prepared 2 types of strategy to parse the different techniques of in situ sequencing, which published by R. Ke,
 CH. Eng.
 
-Here, Ke's data is employed as the major data type in our software, in this data, the barcode are composed of 5 types of
-pseudo-color, representing the A, T, C, G bases and background. While, in the type of Eng' data, Each image is composed
-of 4 channels, of which, the first 3 channels means blobs with distinction by 3 pseudo-colors and the last one means
-background. Then, each continuous 4 images are made a Round, also named a Cycle. So, there are 12 pseudo-colors in
-a Round. The Eng's data (CH. Eng, Nat Met., 2017) include 5 Rounds, 20 images, 80 channels.
+Here, Ke's data (R. Ke, Nat. Methods, 2013) is employed as the major data type in our software, in this data, the
+barcode are composed of 5 types of pseudo-color, representing the A, T, C, G bases and background. While, in the type of
+Eng' data, Each image is composed of 4 channels, of which, the first 3 channels means blobs with distinction by 3
+pseudo-colors and the last one means background. Then, each continuous 4 images are made a Round, also named a Cycle.
+So, there are 12 pseudo-colors in a Round. The Eng's data (CH. Eng, Nat. Methods, 2017) include 5 Rounds, 20 images, 80
+channels in any view of shooting region.
 
-Our software generate a 3D tensor to store all the images, each channel is made into a matrix.
+Our software generate a 3D tensor to store all the images, each channel is made a image matrix, and insert into this
+tensor in sequence of cycles
 """
 
 
 from sys import stderr
-
 from cv2.cv2 import (imread, imreadmulti,
                      add, addWeighted, warpAffine,
                      IMREAD_GRAYSCALE)
-
 from numpy import (array,
                    uint8)
 
@@ -33,6 +33,9 @@ def decode_data_Ke(f_cycles):
 
     Input the directories of cycle.
     Returning a pixel matrix which contains all the gray scales of image pixel as well as their coordinates.
+
+    :param f_cycles: The image directories in sequence of cycles, of which the different channels are stored.
+    :return: A tuple including a 3D common data tensor and a background image matrix.
     """
     if len(f_cycles) < 1:
         print('ERROR CYCLES', file=stderr)
@@ -74,6 +77,9 @@ def decode_data_Eng(f_cycles):
 
     Input the directories of cycle.
     Returning a pixel matrix which contains all the gray scales of image pixel as well as their coordinates
+
+    :param f_cycles: The image files in sequence of cycles. Each file include 4 channels.
+    :return: A tuple including a 3D common data tensor and a background image matrix.
     """
     if len(f_cycles) % 4 != 0:
         print('ERROR ROUNDS', file=stderr)
@@ -134,6 +140,9 @@ def decode_data_Eng(f_cycles):
 #
 #     Input the directories of cycle.
 #     Returning a pixel matrix which contains all the gray scales of image pixel as well as their coordinates
+#
+#     :param f_cycles:
+#     :return:
 #     """
 #     pass
 

@@ -17,7 +17,6 @@ and rotation between images, no zooming and retortion.
 
 
 from sys import stderr
-
 from cv2.cv2 import (getStructuringElement, morphologyEx,
                      BRISK, ORB, BFMatcher, findHomography, estimateRigidTransform,
                      MORPH_CROSS, MORPH_GRADIENT, MORPH_CLOSE, NORM_HAMMING, RANSAC)
@@ -30,6 +29,11 @@ def register_cycles(f_reference_cycle, f_transform_cycle, f_detection_method=Non
 
     Input reference image, transform image and one of the algorithms of detector.
     Returning transform matrix.
+
+    :param f_reference_cycle: The image that will be used to register other images.
+    :param f_transform_cycle: The image will be registered.
+    :param f_detection_method: The detection algorithm of feature points.
+    :return: A transformation matrix from transformed image to reference.
     """
 
     def _get_key_points_and_descriptors(f_gray_image, f_method=None):
@@ -42,6 +46,10 @@ def register_cycles(f_reference_cycle, f_transform_cycle, f_detection_method=Non
 
         Input a gray scale image and one of the algorithms of detector.
         Returning the key points and their descriptions.
+
+        :param f_gray_image: The 8-bit image.
+        :param f_method: The detection algorithm of feature points.
+        :return: A tuple including a group of feature points and their descriptions.
         """
         ksize = (15, 15)
         kernel = getStructuringElement(MORPH_CROSS, ksize)
@@ -80,6 +88,10 @@ def register_cycles(f_reference_cycle, f_transform_cycle, f_detection_method=Non
 
         Input two groups of description.
         Returning the good matched pairs of key points.
+
+        :param f_description1: The description of feature points group 1.
+        :param f_description2: The description of feature points group 2.
+        :return: The good matched pairs between those two groups of feature points.
         """
         matcher = BFMatcher.create(normType=NORM_HAMMING, crossCheck=True)
 
@@ -103,7 +115,7 @@ def register_cycles(f_reference_cycle, f_transform_cycle, f_detection_method=Non
 
         _, mask = findHomography(pts_a, pts_b, RANSAC)
 
-        good_matches = [good_matches[k] for k in range(0, mask.size) if mask[k][0] == 1]
+        good_matches = [good_matches[_] for _ in range(0, mask.size) if mask[_][0] == 1]
 
         pts_a_filtered = float32([kp1[_.queryIdx].pt for _ in good_matches]).reshape(-1, 1, 2)
         pts_b_filtered = float32([kp2[_.trainIdx].pt for _ in good_matches]).reshape(-1, 1, 2)
