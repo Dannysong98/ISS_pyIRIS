@@ -50,7 +50,7 @@ if __name__ == '__main__':
     process the data belonging the type of R. Ke, and the '--eng' means another type, with respective optimized 
     parameters.
     """
-    if len(argv) > 2 or ('--ke' not in argv[1] or '--eng' not in argv[1]):
+    if len(argv) > 2 and ('--ke' in argv[1] or '--eng' in argv[1]):
         cycle_stack = []
         std_cycle = array([], dtype=uint8)
         called_base_box_in_one_cycle = {}
