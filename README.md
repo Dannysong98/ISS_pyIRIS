@@ -109,5 +109,6 @@ According to the directory structure which is mentioned above, you could just in
 
 You need input the the image files in each cycle like following form if your data belong to Ke's:
 
-	python3 pyIRIS.py --eng 1/img.tif 2/img.tif 3/img.tif 4/img.tif
-	python3 pyIRIS.py --eng {1..20}/img.tif
+	python3 pyIRIS.py --eng 1/pos1.tif 2/pos1.tif 3/pos1.tif 4/pos1.tif
+	python3 pyIRIS.py --eng 1/pos2.tif 2/pos2.tif 3/pos2.tif 4/pos2.tif
+	python3 pyIRIS.py --eng {1..20}/pos1.tif
