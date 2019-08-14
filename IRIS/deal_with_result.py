@@ -21,21 +21,18 @@ def write_reads_into_file(f_background, f_barcode_cube, f_barcode_length):
     """
     imwrite('background.tif', f_background)
 
-    ou = open('basecalling_data.txt', 'w')
+    with open('basecalling_data.txt', 'wt') as ou:
+        for j in f_barcode_cube[0]:
+            coo = [j[1:6], j[7:]]
+            seq = []
+            qul = []
 
-    for j in f_barcode_cube[0]:
-        coo = [j[1:6], j[7:]]
-        seq = []
-        qul = []
+            for k in range(0, f_barcode_length):
+                if f_barcode_cube[k][j][1] is not None:
+                    # Transforming the Error Rate into the Phred+ 33 Score #
+                    quality = int(-10 * log10(f_barcode_cube[k][j][1] + 0.0001)) + 33
 
-        for k in range(0, f_barcode_length):
-            if f_barcode_cube[k][j][1] is not None:
-                # Transforming the Error Rate into the Phred+ 33 Score #
-                quality = int(-10 * log10(f_barcode_cube[k][j][1] + 0.0001)) + 33
+                    seq.append(f_barcode_cube[k][j][0])
+                    qul.append(chr(quality))
 
-                seq.append(f_barcode_cube[k][j][0])
-                qul.append(chr(quality))
-
-        print(j + '\t' + ''.join(seq) + '\t' + ''.join(qul) + '\t' + '\t'.join(coo), file=ou)
-
-    ou.close()
+            print(j + '\t' + ''.join(seq) + '\t' + ''.join(qul) + '\t' + '\t'.join(coo), file=ou)
