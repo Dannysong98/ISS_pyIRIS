@@ -20,7 +20,7 @@ This software is used to transform the fluorescent signal of In Situ Sequencing 
 * Python3 3.7.x with models of
 	* numpy
 	* scipy	
-	* opencv-contrib-python 3.x
+	* opencv-python 3.x or opencv-contrib-python 3.x
 
 We didn't test our software on Microsoft Windows platform.
 
@@ -102,5 +102,12 @@ The Directory structure of CH Eng we recommended is like following table:
 
 # Usage
 
+According to the directory structure which is mentioned above, you could just input the directories of cycle like following form if your data belong to Ke's:
+
 	python3 pyIRIS.py --ke 1 2 3 4
+	python3 pyIRIS.py --ke {1..4}
+
+You need input the the image files in each cycle like following form if your data belong to Ke's:
+
+	python3 pyIRIS.py --eng 1/img.tif 2/img.tif 3/img.tif 4/img.tif
 	python3 pyIRIS.py --eng {1..20}/img.tif

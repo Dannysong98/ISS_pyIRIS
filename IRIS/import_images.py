@@ -2,15 +2,16 @@
 """
 This model is used to import the images and contain them into pixel-matrix.
 
-We prepared 2 types of strategy to parse the different techniques of in situ sequencing, which published by R. Ke,
-CH. Eng.
+We prepared 2 types of strategy to parse the different techniques of in situ sequencing, which published by R Ke,
+CH Eng.
 
-Here, Ke's data (R. Ke, Nat. Methods, 2013) is employed as the major data type in our software, in this data, the
-barcode are composed of 5 types of pseudo-color, representing the A, T, C, G bases and background. While, in the type of
-Eng' data, Each image is composed of 4 channels, of which, the first 3 channels means blobs with distinction by 3
-pseudo-colors and the last one means background. Then, each continuous 4 images are made a Round, also named a Cycle.
-So, there are 12 pseudo-colors in a Round. The Eng's data (CH. Eng, Nat. Methods, 2017) include 5 Rounds, 20 images, 80
-channels in any view of shooting region.
+Here, Ke's data (R Ke, Nat. Methods, 2013) is employed as the major data type in our software, in this data, the
+barcode are composed of 5 types of pseudo-color, representing the A, T, C, G bases and background.
+
+In the type of Eng's data, Each image is composed of 4 channels, of which, the first 3 channels means blobs with
+distinction by 3 pseudo-colors and the last one means background. Then, each continuous 4 images are made a Round, also
+named a Cycle. So, there are 12 pseudo-colors in a Round. For example, the Eng's data (CH Eng, Nat. Methods, 2017)
+include 5 Rounds, 20 images, 80 channels in any of shooting region.
 
 Our software generate a 3D tensor to store all the images, each channel is made a image matrix, and insert into this
 tensor in sequence of cycles
@@ -29,7 +30,7 @@ from ._register_images import register_cycles
 
 def decode_data_Ke(f_cycles):
     """
-    For parsing the technique which published on Nature Methods in 2013 by R. Ke.
+    For parsing the technique which published on Nature Methods in 2013 by R Ke.
 
     Input the directories of cycle.
     Returning a pixel matrix which contains all the gray scales of image pixel as well as their coordinates.
@@ -73,9 +74,9 @@ def decode_data_Ke(f_cycles):
 
 def decode_data_Eng(f_cycles):
     """
-    For parsing the technique which published on Nature Methods in 2013 and Nature in 2019 by Chee-Huat Linus Eng.
+    For parsing the technique which published on Nature Methods in 2013 and Nature in 2019 by CH Eng.
 
-    Input the directories of cycle.
+    Input the image files in each cycle.
     Returning a pixel matrix which contains all the gray scales of image pixel as well as their coordinates
 
     :param f_cycles: The image files in sequence of cycles. Each file include 4 channels.
@@ -136,7 +137,7 @@ def decode_data_Eng(f_cycles):
 
 # def decode_data_Weinstein(f_cycles):
 #     """
-#     For parsing the technique which published on Nature Methods in 2019 by Joshua A. Weinstein.
+#     For parsing the technique which published on Nature Methods in 2019 by JA Weinstein.
 #
 #     Input the directories of cycle.
 #     Returning a pixel matrix which contains all the gray scales of image pixel as well as their coordinates
