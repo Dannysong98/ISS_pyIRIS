@@ -11,7 +11,6 @@ This software is used to transform the fluorescent signal of In Situ Sequencing 
 ---
 
 # Installation
-
 ## The development environment passed our test
 
 * macOS 10.14.x
@@ -48,7 +47,6 @@ Here, Ke's data (R Ke, Nat. Methods, 2013) is the major data type for our softwa
 In the type of Eng's data, Each image is composed of 4 channels, of which, the first 3 channels means blobs with distinction by 3 pseudo-colors and the last one means background. Then, each continuous 4 images are made a Round, also named a Cycle. So, there are 12 pseudo-colors in a Round. For example, the Eng's data (CH Eng, Nat. Methods, 2017) include 5 Rounds, 20 images, 80 channels in any of shooting region.
 
 ## The directory structure of data
-
 ### Directory structure of R Ke
 
 The Directory structure of R Ke we recommended is like following table:
@@ -112,3 +110,20 @@ You need input the the image files in each cycle like following form if your dat
 	python3 pyIRIS.py --eng 1/pos1.tif 2/pos1.tif 3/pos1.tif 4/pos1.tif
 	python3 pyIRIS.py --eng 1/pos2.tif 2/pos2.tif 3/pos2.tif 4/pos2.tif
 	python3 pyIRIS.py --eng {1..20}/pos1.tif
+	
+---
+
+# Result
+
+There are two result files will be generated in your present directory, the base calling result and the background image file. Binding barcode info file, these two file would be used for following analysis of mating software, 'DAIBC'.
+
+    present directory
+    |---basecalling_data.txt
+    |---background.tif
+    
+---
+
+# DAIBC
+###### Data Analysis of In situ sequencing Base Calling
+###### (R + shiny version)
+
