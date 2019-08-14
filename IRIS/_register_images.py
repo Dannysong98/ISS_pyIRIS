@@ -2,7 +2,7 @@
 """
 This model is used to register the images which contained in pixel-matrix.
 
-The process of registration can be splited into 3 parts:
+The process of registration can be split into 3 parts:
 1) To detect the key points. Its results will be used in finding good matched key point pairs.
 2) To find the matched key point pairs. Then, to filter the bad matched pairs and retain good one.
 3) To compute the transform matrix, which can be used to transform the images of channel between different cycles.
@@ -35,7 +35,6 @@ def register_cycles(f_reference_cycle, f_transform_cycle, f_detection_method=Non
     :param f_detection_method: The detection algorithm of feature points.
     :return: A transformation matrix from transformed image to reference.
     """
-
     def _get_key_points_and_descriptors(f_gray_image, f_method=None):
         """
         For detecting the key points and their descriptions by BRISK or ORB.
