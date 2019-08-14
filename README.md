@@ -46,12 +46,12 @@ Here, Ke's data (R Ke, Nat. Methods, 2013) is the major data type for our softwa
 
 In the type of Eng's data, Each image is composed of 4 channels, of which, the first 3 channels means blobs with distinction by 3 pseudo-colors and the last one means background. Then, each continuous 4 images are made a Round, also named a Cycle. So, there are 12 pseudo-colors in a Round. For example, the Eng's data (CH Eng, Nat. Methods, 2017) include 5 Rounds, 20 images, 80 channels in any of shooting region.
 
-## The directory structure of data
-### Directory structure of R Ke
+## The directory construction form of data
+### Directory construction form of R Ke
 
-The Directory structure of R Ke we recommended is like following table:
+The Directory construction form of R Ke we recommended is like following table:
 
-	data   
+	data directory
 	|---cycle 1
 	|   |---Y5.tif
 	|   |---FAM.tif
@@ -69,11 +69,11 @@ The Directory structure of R Ke we recommended is like following table:
 	|---cycle 3
 	|---cycle 4
 
-### Directory structure of CH Eng
+### Directory construction form of CH Eng
 
-The Directory structure of CH Eng we recommended is like following table:
+The Directory construction form of CH Eng we recommended is like following table:
 
-	data   
+	data directory
 	|---hyb1
 	|   |---pos1.tif
 	|   |---pos2.tif
@@ -100,7 +100,7 @@ The Directory structure of CH Eng we recommended is like following table:
 
 # Usage
 
-According to the directory structure which is mentioned above, you could just input the directories of cycle like following form if your data belong to Ke's:
+According to the directory construction form which is mentioned above, you need only input the directories of cycle like following form if your data belong to Ke's:
 
 	python3 pyIRIS.py --ke 1 2 3 4
 	python3 pyIRIS.py --ke {1..4}
