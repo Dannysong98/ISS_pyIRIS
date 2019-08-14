@@ -49,10 +49,58 @@ In the type of Eng's data, Each image is composed of 4 channels, of which, the f
 
 ## The directory structure of data
 
-### Data structure of R Ke
+### Directory structure of R Ke
 
-### Data structure of CH Eng
+The Directory structure of R Ke we recommended is like following table:
+
+	data   
+	|---cycle 1
+	|	|---Y5.tif
+	|	|---FAM.tif
+	|	|---TXR.tif
+	|	|---Y3.tif
+	|	|---DAPI.tif
+	|
+	|---cycle 2
+	|	|---Y5.tif
+	|	|---FAM.tif
+	|	|---TXR.tif
+	|	|---Y3.tif
+	|	|---DAPI.tif
+	|
+	|---cycle 3
+	|---cycle 4
+
+### Directory structure of CH Eng
+
+The Directory structure of CH Eng we recommended is like following table:
+
+	data   
+	|---hyb1
+	|	|---pos1.tif
+	|	|---pos2.tif
+	|
+	|---hyb2
+	|	|---pos1.tif
+	|	|---pos2.tif
+	|
+	|---hyb3
+	|	|---pos1.tif
+	|	|---pos2.tif
+	|
+	|---hyb4
+	|	|---pos1.tif
+	|	|---pos2.tif
+	|
+	|---hyb4
+	|---hyb5
+	|---hyb6
+	|---hyb7
+	|---hyb8
 
 ---
 
 # Usage
+
+	python3 pyIRIS.py --ke 1 2 3 4
+	python3 pyIRIS.py --eng {1..20}/img.tif
