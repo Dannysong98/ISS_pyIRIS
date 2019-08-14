@@ -122,6 +122,7 @@ There are two result files will be generated in your present directory, the base
     |---background.tif
     
 ---
+---
 
 # DAIBC
 ###### Data Analysis of In situ sequencing Base Calling
