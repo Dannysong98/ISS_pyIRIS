@@ -103,9 +103,6 @@ The Directory construction form of CH Eng we recommended is like following table
 	|   |---pos3.tif
 	|   |---(...)
 	|
-	|---hyb4
-	|   |---(...)
-	|
 	|---hyb5
 	|   |---(...)
 	|
