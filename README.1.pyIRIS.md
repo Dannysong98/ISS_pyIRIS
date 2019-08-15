@@ -1,17 +1,17 @@
 # ISS_pyIRIS
-###### Information Refining for In situ Sequencing
+###### Information Refining for *In situ* Sequencing
 ###### (Python3 version)
 
 ---
 
-# Introduction
+## Introduction
 
-This software is used to transform the fluorescent signal of In Situ Sequencing (ISS) into base sequences (barcode sequences), as well as the quality of base and their coordinates. 
+This software is used to transform the fluorescent signal of *In Situ* Sequencing (ISS) into base sequences (barcode sequences), as well as the quality of base and their coordinates. 
 
 ---
 
-# Installation
-## The development environment passed our test
+## Installation
+### The development environment passed our test
 
 * macOS 10.14.x
 * CentOS 6.x and 7.x
@@ -23,7 +23,7 @@ This software is used to transform the fluorescent signal of In Situ Sequencing 
 
 We didn't test our software on Microsoft Windows platform.
 
-## Installing Python3 models
+### Installing Python3 models
 
 We suggest to invoke pip3 to install Python3 models, like:
 
@@ -34,20 +34,20 @@ We suggest to invoke pip3 to install Python3 models, like:
 	
 Our software don't restrict the version of numpy and scipy, but we restrict the version of opencv-python or opencv-contrib-python to version 3.4.x
 
-## The directory structure of pyIRIS
+### The directory structure of pyIRIS
 
 ---
 
-# Processable data type
+## Processable data type
 
-We prepared 2 types of strategy to parse the different techniques of in situ sequencing, which published by Rongqin Ke and Chee-Huat Linus Eng.
+We prepared 2 types of strategy to parse the different techniques of *in situ* sequencing, which published by Rongqin Ke and Chee-Huat Linus Eng.
 
 Here, Ke's data (R Ke, Nat. Methods, 2013) is the major data type for our software, in this data, the barcode are composed of 5 types of pseudo-color, representing the A, T, C, G bases and background. 
 
 In the type of Eng's data, Each image is composed of 4 channels, of which, the first 3 channels means blobs with distinction by 3 pseudo-colors and the last one means background. Then, each continuous 4 images are made a Round, also named a Cycle. So, there are 12 pseudo-colors in a Round. For example, the Eng's data (CH Eng, Nat. Methods, 2017) include 5 Rounds, 20 images, 80 channels in any of shooting region.
 
-## The directory construction form of data
-### Directory construction form of R Ke
+### The directory construction form of data
+#### Directory construction form of R Ke
 
 The Directory construction form of R Ke we recommended is like following table:
 
@@ -67,9 +67,14 @@ The Directory construction form of R Ke we recommended is like following table:
 	|   |---DAPI.tif
 	|
 	|---cycle 3
+	|   |---(...)
+	|
 	|---cycle 4
+	|   |---(...)
+	|
+	(...)
 
-### Directory construction form of CH Eng
+#### Directory construction form of CH Eng
 
 The Directory construction form of CH Eng we recommended is like following table:
 
@@ -77,35 +82,54 @@ The Directory construction form of CH Eng we recommended is like following table
 	|---hyb1
 	|   |---pos1.tif
 	|   |---pos2.tif
+	|   |---pos3.tif
+	|   |---(...)
 	|
 	|---hyb2
 	|   |---pos1.tif
 	|   |---pos2.tif
+	|   |---pos3.tif
+	|   |---(...)
 	|
 	|---hyb3
 	|   |---pos1.tif
 	|   |---pos2.tif
+	|   |---pos3.tif
+	|   |---(...)
 	|
 	|---hyb4
 	|   |---pos1.tif
 	|   |---pos2.tif
+	|   |---pos3.tif
+	|   |---(...)
 	|
 	|---hyb4
+	|   |---(...)
+	|
 	|---hyb5
+	|   |---(...)
+	|
 	|---hyb6
+	|   |---(...)
+	|
 	|---hyb7
+	|   |---(...)
+	|
 	|---hyb8
+	|   |---(...)
+	|
+	(...)
 
 ---
 
-# Usage
+## Usage
 
-According to the directory construction form which is mentioned above, you need only input the directories of cycle like following form if your data belong to Ke's:
+You should input the directories of cycle, like one of the following command if your data is consistent with **Ke's**:
 
 	python3 pyIRIS.py --ke 1 2 3 4
 	python3 pyIRIS.py --ke {1..4}
 
-You need input the the image files in each cycle like following form if your data belong to Ke's:
+You should input the the image files in each cycle, like one of the following command if your data is consistent with **Eng's**:
 
 	python3 pyIRIS.py --eng 1/pos1.tif 2/pos1.tif 3/pos1.tif 4/pos1.tif
 	python3 pyIRIS.py --eng 1/pos2.tif 2/pos2.tif 3/pos2.tif 4/pos2.tif
@@ -113,7 +137,8 @@ You need input the the image files in each cycle like following form if your dat
 	
 ---
 
-# Result
+## Result
+### The result files of pyIRIS
 
 There are two result files will be generated in your present directory, the base calling result and the background image file. Binding barcode info file, these two file would be used for following analysis of mating software, 'DAIBC'.
 
@@ -121,10 +146,19 @@ There are two result files will be generated in your present directory, the base
     |---basecalling_data.txt
     |---background.tif
     
----
----
+### The format of 'basecalling_data.txt'
 
-# DAIBC
-###### Data Analysis of In situ sequencing Base Calling
-###### (R + shiny version)
+The format of 'basecalling_data.txt' looked like following, of which, each field means 'ID', 'Barcode sequence', 'Quality of sequence', 'Coordinate of row', 'Coordinate of column', respectively.
 
+    r00566c00969    AGGC    III4    00566    00969
+    r00648c00397    NAAN    !!#!    00648    00397
+    r00432c00243    NANN    !-!!    00432    00243
+    r00484c00604    AAGC    ;E('    00484    00604
+    r00290c01129    NNGG    !!!"    00290    01129
+    r00724c00318    AAGC    =I3.    00724    00318
+    r00243c01107    AGGC    IIE'    00243    01107
+    r00777c00587    AAGC    IIB7    00777    00587
+    r00198c01151    AGGC    =2++    00198    01151
+    r00746c00342    AAGC    III>    00746    00342
+
+Here, the Values of field 4 & 5 have been transformed to be consistent with the coordinates of pixels from another result file, 'background.tif'.
