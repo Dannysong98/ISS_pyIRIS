@@ -34,8 +34,6 @@ We suggest to invoke pip3 to install Python3 models, like:
 	
 Our software don't restrict the version of numpy and scipy, but we restrict the version of opencv-python or opencv-contrib-python to version 3.4.x
 
-### The directory structure of pyIRIS
-
 ---
 
 ## Compatible data type
