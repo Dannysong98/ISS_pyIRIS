@@ -158,4 +158,4 @@ The format of 'basecalling_data.txt' looked like following, of which, each field
     r00198c01151    AGGC    =2++    00198    01151
     r00746c00342    AAGC    III>    00746    00342
 
-Here, the Values of field 4 & 5 have been transformed to be consistent with the coordinates of pixels from another result file, 'background.tif'.
+Here, the Values of 4th & 5th fields have been transformed to be consistent with the coordinates of pixels from another result file, 'background.tif'.
