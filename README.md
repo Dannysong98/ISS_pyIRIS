@@ -2,7 +2,7 @@
 ###### Information Refining for *In situ* Sequencing
 ###### (Python3 version)
 
-See README.1.pyIRIS.md for detail
+See 'README.1.pyIRIS.md' for detail
 
 ---
 
@@ -10,4 +10,4 @@ See README.1.pyIRIS.md for detail
 ###### Data Analysis of *In situ* sequencing Base Calling
 ###### (R + shiny version)
 
-See README.2.DAIBC.md for detail
+See 'README.2.DAIBC.md' for detail
