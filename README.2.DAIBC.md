@@ -1,5 +1,5 @@
 # DAIBC
-###### Data Analysis of *In situ* sequencing Base Calling
+###### Data Analysing after *In situ* sequencing Base Calling
 ###### (R + shiny version)
 
 ---
@@ -8,6 +8,8 @@
 
 This software is used to analyze the results of pyIRIS by importing barcode info file and the two result files of 
 pyIRIS.
+
+---
 
 ## The file format of imported files
 ### The format of barcode info file
@@ -30,3 +32,8 @@ and the 2nd one means gene info. **DON'T INSERT ANY SPACE CHARACTER INTO GENE IN
 ### The format of result files of pyIRIS
 
 See 'README.1.pyIRIS.md' for detail.
+
+---
+
+## Usage
+

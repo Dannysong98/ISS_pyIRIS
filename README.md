@@ -7,7 +7,7 @@ See 'README.1.pyIRIS.md' for detail
 ---
 
 # DAIBC
-###### Data Analysis of *In situ* sequencing Base Calling
+###### Data Analysing after *In situ* sequencing Base Calling
 ###### (R + shiny version)
 
 See 'README.2.DAIBC.md' for detail
