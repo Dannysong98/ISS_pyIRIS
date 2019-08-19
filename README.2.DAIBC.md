@@ -17,17 +17,7 @@ pyIRIS.
 * macOS 10.14.x
 * CentOS 6.x and 7.x
 * Ubuntu 16.04.x and 18.04.x
-* R 3.5.x (Rstudio 1.2.x or Rstudio Server) with models of
-	* shiny
-	* shinyWidgets
-	* shinythemes
-	* DT
-	* hash
-	* tiff
-	* grid
-	* ggplot2
-	* Cairo
-	* rsconnect
+* R 3.5.x (Rstudio 1.2.x or Rstudio Server)
 
 ### Installing R models
 
@@ -49,7 +39,7 @@ We suggest to install following models, like:
 We published our DAIBC on: https://yuhao819.shinyapps.io/DAIBC/
 
 ### The initial user interface of DAIBC
-![](./misc/s1.jpg)
+![](./misc/s0.png)
 
 ---
 
@@ -80,12 +70,12 @@ See 'README.1.pyIRIS.md' for detail.
 ## Usage
 ### Import barcode info file and the result files of pyIRIS
 
-![](./misc/s2.jpg)
+![](./misc/s1.png)
 
-### Choose barcode need to vision
+### Choose barcodes need to vision
 
-![](./misc/s3.jpg)
+![](./misc/s2.png)
 
 ### Adjust vision parameters for visualization
 
-![](./misc/s4.jpg)
+![](./misc/s3.png)

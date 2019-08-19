@@ -17,10 +17,7 @@ sequences), as well as the quality of base and their coordinates.
 * macOS 10.14.x
 * CentOS 6.x and 7.x
 * Ubuntu 16.04.x and 18.04.x
-* Python3 3.7.x with models of
-	* numpy
-	* scipy	
-	* opencv-python 3.x or opencv-contrib-python 3.x
+* Python3 3.7.x
 
 We didn't test our software on Microsoft Windows platform.
 
