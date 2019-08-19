@@ -83,4 +83,6 @@ See 'README.1.pyIRIS.md' for detail.
 ![](./misc/s3.png)
 
 * In control region:
-    * 
+    * 'Quality Threshold' based on phred+ 33 score system, of which, value 53 means Q20 and value 63 means Q30
+    * 'Scatter Size' means how large a blob is, of which, value 2 means the radius of blob is 2 pixels
+    * 'Scatter Luminance' means transparency of blob
