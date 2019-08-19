@@ -68,14 +68,19 @@ See 'README.1.pyIRIS.md' for detail.
 ---
 
 ## Usage
-### Import barcode info file and the result files of pyIRIS
+### Import the barcode info file and the result files of pyIRIS
 
 ![](./misc/s1.png)
 
-### Choose barcodes need to vision
+* Your need re-click the button of 'PARSE IMPORTED DATA' if any of input file has been updated
+
+### Choose barcodes which need to be imaged
 
 ![](./misc/s2.png)
 
-### Adjust vision parameters for visualization
+### Adjust parameters for visualization
 
 ![](./misc/s3.png)
+
+* In control region:
+    * 
