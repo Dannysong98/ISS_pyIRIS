@@ -73,7 +73,7 @@ def detect_blobs_Ke(f_cycle):
 
     blob_params.filterByArea = True
     blob_params.minArea = 2
-    blob_params.maxArea = 256
+    blob_params.maxArea = 196
 
     blob_params.filterByCircularity = False
     blob_params.filterByConvexity = True
@@ -244,7 +244,7 @@ def detect_blobs_Eng(f_cycle):
     blob_params.blobColor = 255
 
     blob_params.filterByArea = True
-    blob_params.minArea = 1
+    blob_params.minArea = 2
     blob_params.maxArea = 196
 
     blob_params.filterByCircularity = False
@@ -265,7 +265,7 @@ def detect_blobs_Eng(f_cycle):
 
         mask_layer[r:(r + 2), c:(c + 2)] = 255
 
-    # mask_layer = GaussianBlur(mask_layer, (5, 5), 0)
+    mask_layer = GaussianBlur(mask_layer, (5, 5), 0)
 
     blob_params.minThreshold = 1
 
