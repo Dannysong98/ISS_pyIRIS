@@ -1,8 +1,4 @@
-# ChangeLog
-
----
-
-## ChangeLog before releasing
+# ChangeLog before releasing
 
 * 2019-01-15 r001 First development version
 
@@ -49,5 +45,5 @@
 
 ---
 
-## v1.0 (r019)
+# v1.0 (r019)
 The first release version.
