@@ -79,7 +79,7 @@ def detect_blobs_Ke(f_cycle):
     blob_params.filterByConvexity = True
 
     for img in channel_list:
-        blob_params.minThreshold = mode(around(reshape(img, (img.size,))))[0][0]
+        blob_params.minThreshold = mode(around(reshape(img, (img.size,)) / 10) * 10)[0][0]
 
         mor_detector = SimpleBlobDetector.create(blob_params)
 
@@ -251,7 +251,7 @@ def detect_blobs_Eng(f_cycle):
     blob_params.filterByConvexity = True
 
     for img in channel_list:
-        blob_params.minThreshold = mode(around(reshape(img, (img.size,))))[0][0]
+        blob_params.minThreshold = mode(around(reshape(img, (img.size,)) / 10) * 10)[0][0]
 
         mor_detector = SimpleBlobDetector.create(blob_params)
 
