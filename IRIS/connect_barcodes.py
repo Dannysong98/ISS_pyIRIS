@@ -63,16 +63,16 @@ class BarcodeCube:
 
             blobs_mask[r:(r + 2), c:(c + 2)] = 255
 
-            _, contours, _ = findContours(blobs_mask, RETR_LIST, CHAIN_APPROX_NONE)
+        _, contours, _ = findContours(blobs_mask, RETR_LIST, CHAIN_APPROX_NONE)
 
-            for cnt in contours:
-                M = moments(cnt)
+        for cnt in contours:
+            M = moments(cnt)
 
-                if M['m00'] != 0:
-                    cr = abs(int(M['m01'] / M['m00']))
-                    cc = abs(int(M['m10'] / M['m00']))
+            if M['m00'] != 0:
+                cr = abs(int(M['m01'] / M['m00']))
+                cc = abs(int(M['m10'] / M['m00']))
 
-                    new_coor.add(str('r' + ('%05d' % cr) + 'c' + ('%05d' % cc)))
+                new_coor.add(str('r' + ('%05d' % cr) + 'c' + ('%05d' % cc)))
 
         self.__all_blobs_list = new_coor
 
