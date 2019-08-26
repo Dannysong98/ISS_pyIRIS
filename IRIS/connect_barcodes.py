@@ -83,7 +83,7 @@ class BarcodeCube:
 
         :return: NONE
         """
-        def _check_greyscale(f_all_blobs_list, f_bases_cube, f_adjusted_bases_cube, f_cycle_id):
+        def __check_greyscale(f_all_blobs_list, f_bases_cube, f_adjusted_bases_cube, f_cycle_id):
             """"""
             f_adjusted_bases_cube[f_cycle_id] = {}
 
@@ -118,7 +118,7 @@ class BarcodeCube:
             for cycle_id in range(0, len(self.bases_cube)):
                 self.adjusted_bases_cube.append({})
 
-                _check_greyscale(self.__all_blobs_list, self.bases_cube, self.adjusted_bases_cube, cycle_id)
+                __check_greyscale(self.__all_blobs_list, self.bases_cube, self.adjusted_bases_cube, cycle_id)
 
             if len(self.bases_cube) == 1:
                 print('There is only one cycle in this run', file=stderr)

@@ -21,7 +21,7 @@ coordinate consistent as cycle 1.
 """
 
 
-from numpy import around
+from numpy import (around, transpose, nonzero)
 from scipy.stats import binom_test
 
 
@@ -36,24 +36,25 @@ def image_model_pooling_Ke(f_image_model_A, f_image_model_T, f_image_model_C, f_
     """
     f_image_model_pool = {}
 
-    for row in range(0, len(f_image_model_A)):
-        for col in range(0, len(f_image_model_A[row])):
-            read_id = 'r' + ('%05d' % (row + 1)) + 'c' + ('%05d' % (col + 1))
+    f_image_model = f_image_model_A + f_image_model_T + f_image_model_C + f_image_model_G
 
-            if read_id not in f_image_model_pool:
-                f_image_model_pool.update({read_id: {'A': 0, 'T': 0, 'C': 0, 'G': 0}})
+    for row, col in transpose(nonzero(f_image_model)):
+        read_id = 'r' + ('%05d' % (row + 1)) + 'c' + ('%05d' % (col + 1))
 
-            if f_image_model_A[row, col] > 0:
-                f_image_model_pool[read_id]['A'] = f_image_model_A[row, col]
+        if read_id not in f_image_model_pool:
+            f_image_model_pool.update({read_id: {'A': 0, 'T': 0, 'C': 0, 'G': 0}})
 
-            if f_image_model_T[row, col] > 0:
-                f_image_model_pool[read_id]['T'] = f_image_model_T[row, col]
+        if f_image_model_A[row, col] > 0:
+            f_image_model_pool[read_id]['A'] = f_image_model_A[row, col]
 
-            if f_image_model_C[row, col] > 0:
-                f_image_model_pool[read_id]['C'] = f_image_model_C[row, col]
+        if f_image_model_T[row, col] > 0:
+            f_image_model_pool[read_id]['T'] = f_image_model_T[row, col]
 
-            if f_image_model_G[row, col] > 0:
-                f_image_model_pool[read_id]['G'] = f_image_model_G[row, col]
+        if f_image_model_C[row, col] > 0:
+            f_image_model_pool[read_id]['C'] = f_image_model_C[row, col]
+
+        if f_image_model_G[row, col] > 0:
+            f_image_model_pool[read_id]['G'] = f_image_model_G[row, col]
 
     return f_image_model_pool
 
@@ -80,51 +81,55 @@ def image_model_pooling_Eng(f_image_model_1, f_image_model_2, f_image_model_3,
     """
     f_image_model_pool = {}
 
-    for row in range(0, len(f_image_model_1)):
-        for col in range(0, len(f_image_model_1[row])):
-            read_id = 'r' + ('%05d' % (row + 1)) + 'c' + ('%05d' % (col + 1))
+    f_image_model = f_image_model_1 + f_image_model_2 + f_image_model_3 + \
+                    f_image_model_4 + f_image_model_5 + f_image_model_6 + \
+                    f_image_model_7 + f_image_model_8 + f_image_model_9 + \
+                    f_image_model_A + f_image_model_B + f_image_model_C
 
-            if read_id not in f_image_model_pool:
-                f_image_model_pool.update({read_id: {'1': 0, '2': 0, '3': 0,
-                                                     '4': 0, '5': 0, '6': 0,
-                                                     '7': 0, '8': 0, '9': 0,
-                                                     'A': 0, 'B': 0, 'C': 0}})
+    for row, col in transpose(nonzero(f_image_model)):
+        read_id = 'r' + ('%05d' % (row + 1)) + 'c' + ('%05d' % (col + 1))
 
-            if f_image_model_1[row, col] > 0:
-                f_image_model_pool[read_id]['1'] = f_image_model_1[row, col]
+        if read_id not in f_image_model_pool:
+            f_image_model_pool.update({read_id: {'1': 0, '2': 0, '3': 0,
+                                                 '4': 0, '5': 0, '6': 0,
+                                                 '7': 0, '8': 0, '9': 0,
+                                                 'A': 0, 'B': 0, 'C': 0}})
 
-            if f_image_model_2[row, col] > 0:
-                f_image_model_pool[read_id]['2'] = f_image_model_2[row, col]
+        if f_image_model_1[row, col] > 0:
+            f_image_model_pool[read_id]['1'] = f_image_model_1[row, col]
 
-            if f_image_model_3[row, col] > 0:
-                f_image_model_pool[read_id]['3'] = f_image_model_3[row, col]
+        if f_image_model_2[row, col] > 0:
+            f_image_model_pool[read_id]['2'] = f_image_model_2[row, col]
 
-            if f_image_model_4[row, col] > 0:
-                f_image_model_pool[read_id]['4'] = f_image_model_4[row, col]
+        if f_image_model_3[row, col] > 0:
+            f_image_model_pool[read_id]['3'] = f_image_model_3[row, col]
 
-            if f_image_model_5[row, col] > 0:
-                f_image_model_pool[read_id]['5'] = f_image_model_5[row, col]
+        if f_image_model_4[row, col] > 0:
+            f_image_model_pool[read_id]['4'] = f_image_model_4[row, col]
 
-            if f_image_model_6[row, col] > 0:
-                f_image_model_pool[read_id]['6'] = f_image_model_6[row, col]
+        if f_image_model_5[row, col] > 0:
+            f_image_model_pool[read_id]['5'] = f_image_model_5[row, col]
 
-            if f_image_model_7[row, col] > 0:
-                f_image_model_pool[read_id]['7'] = f_image_model_7[row, col]
+        if f_image_model_6[row, col] > 0:
+            f_image_model_pool[read_id]['6'] = f_image_model_6[row, col]
 
-            if f_image_model_8[row, col] > 0:
-                f_image_model_pool[read_id]['8'] = f_image_model_8[row, col]
+        if f_image_model_7[row, col] > 0:
+            f_image_model_pool[read_id]['7'] = f_image_model_7[row, col]
 
-            if f_image_model_9[row, col] > 0:
-                f_image_model_pool[read_id]['9'] = f_image_model_9[row, col]
+        if f_image_model_8[row, col] > 0:
+            f_image_model_pool[read_id]['8'] = f_image_model_8[row, col]
 
-            if f_image_model_A[row, col] > 0:
-                f_image_model_pool[read_id]['A'] = f_image_model_A[row, col]
+        if f_image_model_9[row, col] > 0:
+            f_image_model_pool[read_id]['9'] = f_image_model_9[row, col]
 
-            if f_image_model_B[row, col] > 0:
-                f_image_model_pool[read_id]['B'] = f_image_model_B[row, col]
+        if f_image_model_A[row, col] > 0:
+            f_image_model_pool[read_id]['A'] = f_image_model_A[row, col]
 
-            if f_image_model_C[row, col] > 0:
-                f_image_model_pool[read_id]['C'] = f_image_model_C[row, col]
+        if f_image_model_B[row, col] > 0:
+            f_image_model_pool[read_id]['B'] = f_image_model_B[row, col]
+
+        if f_image_model_C[row, col] > 0:
+            f_image_model_pool[read_id]['C'] = f_image_model_C[row, col]
 
     return f_image_model_pool
 
