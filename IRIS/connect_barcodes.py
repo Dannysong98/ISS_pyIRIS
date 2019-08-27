@@ -11,9 +11,9 @@ cycles, respectively.
 
 
 from sys import stderr
-from cv2.cv2 import (findContours, moments,
-                     RETR_LIST,
-                     CHAIN_APPROX_NONE)
+from cv2 import (findContours, moments,
+                 RETR_LIST,
+                 CHAIN_APPROX_NONE)
 from numpy import (zeros,
                    sqrt,
                    uint8)

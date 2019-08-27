@@ -19,9 +19,9 @@ recorded to be made as the measure of significance, it is also the base of calle
 """
 
 
-from cv2.cv2 import (getStructuringElement, morphologyEx, GaussianBlur,
-                     SimpleBlobDetector, SimpleBlobDetector_Params,
-                     MORPH_ELLIPSE, MORPH_TOPHAT)
+from cv2 import (getStructuringElement, morphologyEx, GaussianBlur,
+                 SimpleBlobDetector, SimpleBlobDetector_Params,
+                 MORPH_ELLIPSE, MORPH_TOPHAT)
 from numpy import (array, zeros, reshape,
                    sum, divide, floor, around,
                    float32, uint8)
