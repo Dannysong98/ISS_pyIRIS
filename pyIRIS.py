@@ -28,6 +28,7 @@ ChangeLog:  2019-01-15  r001    First development version
             2019-07-12  r017    To modify the algorithm for base cube
             2019-07-12  r018    To modify the algorithm for blob detection
             2019-08-08  r019    New development version, the prototype version
+            2019-08-27  r020    To modify the algorithm for base calling, for performance improving
 """
 
 
