@@ -25,7 +25,7 @@ from cv2.cv2 import (imread, imreadmulti,
 from numpy import (array,
                    uint8)
 
-from .register_images import register_cycles
+from ._register_images import register_cycles
 
 
 def decode_data_Ke(f_cycles):
