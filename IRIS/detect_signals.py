@@ -23,7 +23,7 @@ from cv2.cv2 import (getStructuringElement, morphologyEx, GaussianBlur,
                      SimpleBlobDetector, SimpleBlobDetector_Params,
                      MORPH_ELLIPSE, MORPH_TOPHAT)
 from numpy import (array, zeros, reshape,
-                   sum, divide, around,
+                   sum, divide, floor, around,
                    float32, uint8)
 from scipy.stats import mode
 
@@ -79,7 +79,7 @@ def detect_blobs_Ke(f_cycle):
     blob_params.filterByConvexity = True
 
     for img in channel_list:
-        blob_params.minThreshold = mode(around(reshape(img, (img.size,)) / 2) * 2)[0][0]
+        blob_params.minThreshold = mode(floor(reshape(img, (img.size,)) / 2) * 2)[0][0]
 
         mor_detector = SimpleBlobDetector.create(blob_params)
 
@@ -251,7 +251,7 @@ def detect_blobs_Eng(f_cycle):
     blob_params.filterByConvexity = True
 
     for img in channel_list:
-        blob_params.minThreshold = mode(around(reshape(img, (img.size,)) / 2) * 2)[0][0]
+        blob_params.minThreshold = mode(floor(reshape(img, (img.size,)) / 2) * 2)[0][0]
 
         mor_detector = SimpleBlobDetector.create(blob_params)
 
