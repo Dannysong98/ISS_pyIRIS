@@ -45,7 +45,8 @@ def decode_data_Ke(f_cycles):
 
     f_cycle_stack = []
 
-    f_std_cycle = array([], dtype=uint8)
+    f_std_img = array([], dtype=uint8)
+    registering_ref = array([], dtype=uint8)
 
     for cycle_id in range(0, len(f_cycles)):
         channel_A = imread('/'.join((f_cycles[cycle_id], 'Y5.tif')),   IMREAD_GRAYSCALE)
@@ -54,22 +55,23 @@ def decode_data_Ke(f_cycles):
         channel_G = imread('/'.join((f_cycles[cycle_id], 'Y3.tif')),   IMREAD_GRAYSCALE)
         channel_0 = imread('/'.join((f_cycles[cycle_id], 'DAPI.tif')), IMREAD_GRAYSCALE)
 
-        merge_cycle = addWeighted(add(add(add(channel_A, channel_T), channel_C), channel_G), 0.4, channel_0, 0.6, 0)
+        merge_cycle = addWeighted(add(add(add(channel_A, channel_T), channel_C), channel_G), 0.2, channel_0, 0.8, 0)
 
         if cycle_id == 0:
-            f_std_cycle = merge_cycle
+            registering_ref = merge_cycle
+            f_std_img = addWeighted(add(add(add(channel_A, channel_T), channel_C), channel_G), 0.5, channel_0, 0.5, 0)
 
-        trans_matrix = register_cycles(f_std_cycle, merge_cycle, 'BRISK')
+        trans_matrix = register_cycles(registering_ref, merge_cycle, 'BRISK')
 
-        adj_channel_A = warpAffine(channel_A, trans_matrix, (f_std_cycle.shape[1], f_std_cycle.shape[0]))
-        adj_channel_T = warpAffine(channel_T, trans_matrix, (f_std_cycle.shape[1], f_std_cycle.shape[0]))
-        adj_channel_C = warpAffine(channel_C, trans_matrix, (f_std_cycle.shape[1], f_std_cycle.shape[0]))
-        adj_channel_G = warpAffine(channel_G, trans_matrix, (f_std_cycle.shape[1], f_std_cycle.shape[0]))
-        adj_channel_0 = warpAffine(channel_0, trans_matrix, (f_std_cycle.shape[1], f_std_cycle.shape[0]))
+        adj_channel_A = warpAffine(channel_A, trans_matrix, (registering_ref.shape[1], registering_ref.shape[0]))
+        adj_channel_T = warpAffine(channel_T, trans_matrix, (registering_ref.shape[1], registering_ref.shape[0]))
+        adj_channel_C = warpAffine(channel_C, trans_matrix, (registering_ref.shape[1], registering_ref.shape[0]))
+        adj_channel_G = warpAffine(channel_G, trans_matrix, (registering_ref.shape[1], registering_ref.shape[0]))
+        adj_channel_0 = warpAffine(channel_0, trans_matrix, (registering_ref.shape[1], registering_ref.shape[0]))
 
         f_cycle_stack.append((adj_channel_A, adj_channel_T, adj_channel_C, adj_channel_G, adj_channel_0))
 
-    return f_cycle_stack, f_std_cycle
+    return f_cycle_stack, f_std_img
 
 
 def decode_data_Eng(f_cycles):
