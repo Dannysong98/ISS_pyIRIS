@@ -50,12 +50,12 @@ def register_cycles(f_reference_cycle, f_transform_cycle, f_detection_method=Non
         :param f_method: The detection algorithm of feature points.
         :return: A tuple including a group of feature points and their descriptions.
         """
-        blured_gray_image = GaussianBlur(f_gray_image, (5, 5), 0)
+        f_gray_image = GaussianBlur(f_gray_image, (5, 5), 0)
 
         ksize = (15, 15)
         kernel = getStructuringElement(MORPH_CROSS, ksize)
 
-        blured_gray_image = morphologyEx(blured_gray_image, MORPH_GRADIENT, kernel, iterations=2)
+        f_gray_image = morphologyEx(f_gray_image, MORPH_GRADIENT, kernel, iterations=2)
 
         det = ''
         ext = ''
@@ -73,9 +73,9 @@ def register_cycles(f_reference_cycle, f_transform_cycle, f_detection_method=Non
         else:
             print('Only BRISK and ORB would be suggested.', file=stderr)
 
-        f_key_points = det.detect(blured_gray_image)
+        f_key_points = det.detect(f_gray_image)
 
-        _, f_descriptions = ext.compute(blured_gray_image, f_key_points)
+        _, f_descriptions = ext.compute(f_gray_image, f_key_points)
 
         return f_key_points, f_descriptions
 
