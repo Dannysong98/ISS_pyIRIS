@@ -60,15 +60,15 @@ def register_cycles(f_reference_cycle, f_transform_cycle, f_detection_method=Non
         det = ''
         ext = ''
 
-        f_method = 'BRISK' if f_method is None else 'ORB'
+        f_method = 'ORB' if f_method is None else f_method
 
-        if f_method == 'BRISK':
-            det = BRISK.create()
-            ext = BRISK.create()
-
-        elif f_method == 'ORB':
+        if f_method == 'ORB':
             det = ORB.create()
             ext = ORB.create()
+
+        elif f_method == 'BRISK':
+            det = BRISK.create()
+            ext = BRISK.create()
 
         else:
             print('Only BRISK and ORB would be suggested.', file=stderr)

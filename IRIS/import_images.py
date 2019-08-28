@@ -21,7 +21,8 @@ tensor in sequence of cycles
 from sys import stderr
 from cv2 import (imread, imreadmulti, imwrite,
                  add, addWeighted, warpAffine,
-                 IMREAD_GRAYSCALE)
+                 IMREAD_GRAYSCALE,
+                 error)
 from numpy import (array,
                    uint8)
 
@@ -55,7 +56,7 @@ def decode_data_Ke(f_cycles):
         channel_T = imread('/'.join((f_cycles[cycle_id], 'FAM.tif')),  IMREAD_GRAYSCALE)
         channel_C = imread('/'.join((f_cycles[cycle_id], 'TXR.tif')),  IMREAD_GRAYSCALE)
         channel_G = imread('/'.join((f_cycles[cycle_id], 'Y3.tif')),   IMREAD_GRAYSCALE)
-        channel_0 = imread('/'.join((f_cycles[cycle_id], 'DAPI.tif')),   IMREAD_GRAYSCALE)
+        channel_0 = imread('/'.join((f_cycles[cycle_id], 'DAPI.tif')), IMREAD_GRAYSCALE)
 
         merged_img = addWeighted(add(add(add(channel_A, channel_T), channel_C), channel_G), 0.7, channel_0, 0.3, 0)
 
@@ -63,7 +64,11 @@ def decode_data_Ke(f_cycles):
             reg_ref = channel_0
             f_std_img = merged_img
 
-        trans_mat = register_cycles(reg_ref, channel_0, 'ORB')
+        try:
+            trans_mat = register_cycles(reg_ref, channel_0, 'ORB')
+
+        except error:
+            trans_mat = register_cycles(reg_ref, channel_0, 'BRISK')
 
         imwrite('debug.cycle_' + str(int(cycle_id + 1)) + '.tif', merged_img)
 
@@ -118,10 +123,17 @@ def decode_data_Eng(f_cycles):
             reg_ref = img_r1_mats[3]
             f_std_img = img_r1_mats[3]
 
-        trans_mat1 = register_cycles(reg_ref, img_r1_mats[3], 'ORB')
-        trans_mat2 = register_cycles(reg_ref, img_r2_mats[3], 'ORB')
-        trans_mat3 = register_cycles(reg_ref, img_r3_mats[3], 'ORB')
-        trans_mat4 = register_cycles(reg_ref, img_r4_mats[3], 'ORB')
+        try:
+            trans_mat1 = register_cycles(reg_ref, img_r1_mats[3], 'ORB')
+            trans_mat2 = register_cycles(reg_ref, img_r2_mats[3], 'ORB')
+            trans_mat3 = register_cycles(reg_ref, img_r3_mats[3], 'ORB')
+            trans_mat4 = register_cycles(reg_ref, img_r4_mats[3], 'ORB')
+
+        except error:
+            trans_mat1 = register_cycles(reg_ref, img_r1_mats[3], 'BRISK')
+            trans_mat2 = register_cycles(reg_ref, img_r2_mats[3], 'BRISK')
+            trans_mat3 = register_cycles(reg_ref, img_r3_mats[3], 'BRISK')
+            trans_mat4 = register_cycles(reg_ref, img_r4_mats[3], 'BRISK')
 
         imwrite('debug.round_' + str(int(cycle_id / 4 + 1)) + '.tif', merged_img1)
         imwrite('debug.round_' + str(int(cycle_id / 4 + 1)) + '.tif', merged_img2)
