@@ -112,7 +112,7 @@ def decode_data_Eng(f_cycles):
             reg_ref = merged_img
             f_std_img = merged_img
 
-        trans_mat = register_cycles(reg_ref, merged_img, 'BRISK')
+        trans_mat = register_cycles(reg_ref, merged_img, 'ORB')
 
         adj_img_mats.append(warpAffine(img_r1_mats[0], trans_mat, (reg_ref.shape[1], reg_ref.shape[0])))
         adj_img_mats.append(warpAffine(img_r1_mats[1], trans_mat, (reg_ref.shape[1], reg_ref.shape[0])))

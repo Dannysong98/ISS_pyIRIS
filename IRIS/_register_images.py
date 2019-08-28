@@ -19,7 +19,7 @@ and rotation between images, no zooming and retortion.
 from sys import stderr
 from cv2 import (GaussianBlur, getStructuringElement, morphologyEx,
                  BRISK, ORB, BFMatcher, estimateAffinePartial2D,
-                 MORPH_CROSS, MORPH_GRADIENT, MORPH_CLOSE, NORM_HAMMING, RANSAC)
+                 MORPH_CROSS, MORPH_GRADIENT, NORM_HAMMING, RANSAC)
 from numpy import (array, float32)
 
 
@@ -46,7 +46,7 @@ def register_cycles(f_reference_cycle, f_transform_cycle, f_detection_method=Non
         Input a gray scale image and one of the algorithms of detector.
         Returning the key points and their descriptions.
 
-        :param blured_gray_image: The 8-bit image.
+        :param f_gray_image: The 8-bit image.
         :param f_method: The detection algorithm of feature points.
         :return: A tuple including a group of feature points and their descriptions.
         """
@@ -108,12 +108,16 @@ def register_cycles(f_reference_cycle, f_transform_cycle, f_detection_method=Non
 
     good_matches = _get_good_matched_pairs(des1, des2)
 
-    pts_a = float32([kp1[_.queryIdx].pt for _ in good_matches]).reshape(-1, 1, 2)
-    pts_b = float32([kp2[_.trainIdx].pt for _ in good_matches]).reshape(-1, 1, 2)
+    n = 1
+    while n:
+        pts_a = float32([kp1[_.queryIdx].pt for _ in good_matches]).reshape(-1, 1, 2)
+        pts_b = float32([kp2[_.trainIdx].pt for _ in good_matches]).reshape(-1, 1, 2)
 
-    _, mask = estimateAffinePartial2D(pts_b, pts_a, RANSAC)
+        _, mask = estimateAffinePartial2D(pts_b, pts_a, RANSAC)
 
-    good_matches = [good_matches[_] for _ in range(0, mask.size) if mask[_][0] == 1]
+        good_matches = [good_matches[_] for _ in range(0, mask.size) if mask[_][0] == 1]
+
+        n = sum([mask[_][0] for _ in range(0, mask.size)]) - mask.size
 
     if len(good_matches) >= 4:
         pts_a_filtered = float32([kp1[_.queryIdx].pt for _ in good_matches]).reshape(-1, 1, 2)
