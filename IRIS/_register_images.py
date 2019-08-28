@@ -17,8 +17,8 @@ and rotation between images, no zooming and retortion.
 
 
 from sys import stderr
-from cv2 import (getStructuringElement, morphologyEx,
-                 BRISK, ORB, BFMatcher, findHomography, estimateAffinePartial2D,
+from cv2 import (GaussianBlur, getStructuringElement, morphologyEx,
+                 BRISK, ORB, BFMatcher, estimateAffinePartial2D,
                  MORPH_CROSS, MORPH_GRADIENT, MORPH_CLOSE, NORM_HAMMING, RANSAC)
 from numpy import (array, float32)
 
@@ -46,15 +46,15 @@ def register_cycles(f_reference_cycle, f_transform_cycle, f_detection_method=Non
         Input a gray scale image and one of the algorithms of detector.
         Returning the key points and their descriptions.
 
-        :param f_gray_image: The 8-bit image.
+        :param blured_gray_image: The 8-bit image.
         :param f_method: The detection algorithm of feature points.
         :return: A tuple including a group of feature points and their descriptions.
         """
         ksize = (15, 15)
         kernel = getStructuringElement(MORPH_CROSS, ksize)
 
-        f_gray_image = morphologyEx(f_gray_image, MORPH_GRADIENT, kernel, iterations=2)
-        f_gray_image = morphologyEx(f_gray_image, MORPH_CLOSE,    kernel, iterations=2)
+        blured_gray_image = GaussianBlur(f_gray_image, ksize, 0)
+        blured_gray_image = morphologyEx(blured_gray_image, MORPH_GRADIENT, kernel, iterations=2)
 
         det = ''
         ext = ''
@@ -72,9 +72,9 @@ def register_cycles(f_reference_cycle, f_transform_cycle, f_detection_method=Non
         else:
             print('Only BRISK and ORB would be suggested.', file=stderr)
 
-        f_key_points = det.detect(f_gray_image)
+        f_key_points = det.detect(blured_gray_image)
 
-        _, f_descriptions = ext.compute(f_gray_image, f_key_points)
+        _, f_descriptions = ext.compute(blured_gray_image, f_key_points)
 
         return f_key_points, f_descriptions
 
@@ -108,25 +108,21 @@ def register_cycles(f_reference_cycle, f_transform_cycle, f_detection_method=Non
 
     good_matches = _get_good_matched_pairs(des1, des2)
 
+    pts_a = float32([kp1[_.queryIdx].pt for _ in good_matches]).reshape(-1, 1, 2)
+    pts_b = float32([kp2[_.trainIdx].pt for _ in good_matches]).reshape(-1, 1, 2)
+
+    _, mask = estimateAffinePartial2D(pts_b, pts_a, RANSAC)
+
+    good_matches = [good_matches[_] for _ in range(0, mask.size) if mask[_][0] == 1]
+
     if len(good_matches) >= 4:
-        pts_a = float32([kp1[_.queryIdx].pt for _ in good_matches]).reshape(-1, 1, 2)
-        pts_b = float32([kp2[_.trainIdx].pt for _ in good_matches]).reshape(-1, 1, 2)
+        pts_a_filtered = float32([kp1[_.queryIdx].pt for _ in good_matches]).reshape(-1, 1, 2)
+        pts_b_filtered = float32([kp2[_.trainIdx].pt for _ in good_matches]).reshape(-1, 1, 2)
 
-        _, mask = findHomography(pts_b, pts_a, RANSAC)
+        f_transform_matrix, _ = estimateAffinePartial2D(pts_b_filtered, pts_a_filtered, RANSAC)
 
-        good_matches = [good_matches[_] for _ in range(0, mask.size) if mask[_][0] == 1]
-
-        if len(good_matches) >= 4:
-            pts_a_filtered = float32([kp1[_.queryIdx].pt for _ in good_matches]).reshape(-1, 1, 2)
-            pts_b_filtered = float32([kp2[_.trainIdx].pt for _ in good_matches]).reshape(-1, 1, 2)
-
-            f_transform_matrix, _ = estimateAffinePartial2D(pts_b_filtered, pts_a_filtered)
-
-            if f_transform_matrix is None:
-                print('REGISTRATION FAILED.', file=stderr)
-
-        else:
-            print('NO ENOUGH MATCHED FEATURES, REGISTRATION FAILED.', file=stderr)
+        if f_transform_matrix is None:
+            print('MATRIX GENERATION FAILED.', file=stderr)
 
     else:
         print('NO ENOUGH MATCHED FEATURES, REGISTRATION FAILED.', file=stderr)

@@ -61,24 +61,19 @@ if __name__ == '__main__':
         if argv[1] == '--ke':
             cycle_stack, std_img = import_images.decode_data_Ke(argv[2:])
 
-            for cycle_id in range(0, len(cycle_stack)):
-                called_base_box_in_one_cycle = detect_signals.detect_blobs_Ke(cycle_stack[cycle_id])
-
-                # Bases Collection and Unified Filtering #
+            for cycle in cycle_stack:
+                called_base_box_in_one_cycle = detect_signals.detect_blobs_Ke(cycle)
                 barcode_cube_obj.collect_called_bases(called_base_box_in_one_cycle)
-                barcode_cube_obj.filter_blobs_list(std_img)
 
         if argv[1] == '--eng':
             cycle_stack, std_img = import_images.decode_data_Eng(argv[2:])
 
-            for cycle_id in range(0, len(cycle_stack)):
-                called_base_box_in_one_cycle = detect_signals.detect_blobs_Eng(cycle_stack[cycle_id])
-
-                # Bases Collection and Unified Filtering #
+            for cycle in cycle_stack:
+                called_base_box_in_one_cycle = detect_signals.detect_blobs_Eng(cycle)
                 barcode_cube_obj.collect_called_bases(called_base_box_in_one_cycle)
-                barcode_cube_obj.filter_blobs_list(std_img)
 
-        # Unified Barcode Connection #
+        # Unified Filtering and Barcode Connection #
+        barcode_cube_obj.filter_blobs_list(std_img)
         barcode_cube_obj.calling_adjust()
 
         deal_with_result.write_reads_into_file(std_img, barcode_cube_obj.adjusted_bases_cube, len(cycle_stack))

@@ -45,10 +45,10 @@ def detect_blobs_Ke(f_cycle):
     channel_C = f_cycle[2]
     channel_G = f_cycle[3]
 
-    f_greyscale_model_A = zeros(channel_A.shape, dtype=float32)
-    f_greyscale_model_T = zeros(channel_T.shape, dtype=float32)
-    f_greyscale_model_C = zeros(channel_C.shape, dtype=float32)
-    f_greyscale_model_G = zeros(channel_G.shape, dtype=float32)
+    greyscale_model_A = zeros(channel_A.shape, dtype=float32)
+    greyscale_model_T = zeros(channel_T.shape, dtype=float32)
+    greyscale_model_C = zeros(channel_C.shape, dtype=float32)
+    greyscale_model_G = zeros(channel_G.shape, dtype=float32)
 
     ksize = (15, 15)
     kernel = getStructuringElement(MORPH_ELLIPSE, ksize)
@@ -147,28 +147,28 @@ def detect_blobs_Ke(f_cycle):
 
         if sum(channel_A[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
                 sum(channel_A[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144 > cut_off_A:
-            f_greyscale_model_A[r, c] = sum(channel_A[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                                        sum(channel_A[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
+            greyscale_model_A[r, c] = sum(channel_A[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
+                                      sum(channel_A[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
 
         if sum(channel_T[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
                 sum(channel_T[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144 > cut_off_T:
-            f_greyscale_model_T[r, c] = sum(channel_T[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                                        sum(channel_T[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
+            greyscale_model_T[r, c] = sum(channel_T[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
+                                      sum(channel_T[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
 
         if sum(channel_C[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
                 sum(channel_C[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144 > cut_off_C:
-            f_greyscale_model_C[r, c] = sum(channel_C[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                                        sum(channel_C[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
+            greyscale_model_C[r, c] = sum(channel_C[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
+                                      sum(channel_C[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
 
         if sum(channel_G[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
                 sum(channel_G[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144 > cut_off_G:
-            f_greyscale_model_G[r, c] = sum(channel_G[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                                        sum(channel_G[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
+            greyscale_model_G[r, c] = sum(channel_G[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
+                                      sum(channel_G[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
 
-    image_model_pool = image_model_pooling_Ke(f_greyscale_model_A,
-                                              f_greyscale_model_T,
-                                              f_greyscale_model_C,
-                                              f_greyscale_model_G)
+    image_model_pool = image_model_pooling_Ke(greyscale_model_A,
+                                              greyscale_model_T,
+                                              greyscale_model_C,
+                                              greyscale_model_G)
 
     base_box_in_one_cycle = pool2base(image_model_pool)
 
@@ -185,31 +185,31 @@ def detect_blobs_Eng(f_cycle):
     :param f_cycle: A image matrix in the 3D common data tensor.
     :return: A base box of this cycle, which store their coordinates, base and its error rate.
     """
-    channel_1 = f_cycle[0][0]
-    channel_2 = f_cycle[0][1]
-    channel_3 = f_cycle[0][2]
-    channel_4 = f_cycle[1][0]
-    channel_5 = f_cycle[1][1]
-    channel_6 = f_cycle[1][2]
-    channel_7 = f_cycle[2][0]
-    channel_8 = f_cycle[2][1]
-    channel_9 = f_cycle[2][2]
-    channel_A = f_cycle[3][0]
-    channel_B = f_cycle[3][1]
-    channel_C = f_cycle[3][2]
+    channel_1 = f_cycle[0]
+    channel_2 = f_cycle[1]
+    channel_3 = f_cycle[2]
+    channel_4 = f_cycle[3]
+    channel_5 = f_cycle[4]
+    channel_6 = f_cycle[5]
+    channel_7 = f_cycle[6]
+    channel_8 = f_cycle[7]
+    channel_9 = f_cycle[8]
+    channel_A = f_cycle[9]
+    channel_B = f_cycle[10]
+    channel_C = f_cycle[11]
 
-    f_greyscale_model_1 = zeros(channel_1.shape, dtype=float32)
-    f_greyscale_model_2 = zeros(channel_2.shape, dtype=float32)
-    f_greyscale_model_3 = zeros(channel_3.shape, dtype=float32)
-    f_greyscale_model_4 = zeros(channel_4.shape, dtype=float32)
-    f_greyscale_model_5 = zeros(channel_5.shape, dtype=float32)
-    f_greyscale_model_6 = zeros(channel_6.shape, dtype=float32)
-    f_greyscale_model_7 = zeros(channel_7.shape, dtype=float32)
-    f_greyscale_model_8 = zeros(channel_8.shape, dtype=float32)
-    f_greyscale_model_9 = zeros(channel_9.shape, dtype=float32)
-    f_greyscale_model_A = zeros(channel_A.shape, dtype=float32)
-    f_greyscale_model_B = zeros(channel_B.shape, dtype=float32)
-    f_greyscale_model_C = zeros(channel_C.shape, dtype=float32)
+    greyscale_model_1 = zeros(channel_1.shape, dtype=float32)
+    greyscale_model_2 = zeros(channel_2.shape, dtype=float32)
+    greyscale_model_3 = zeros(channel_3.shape, dtype=float32)
+    greyscale_model_4 = zeros(channel_4.shape, dtype=float32)
+    greyscale_model_5 = zeros(channel_5.shape, dtype=float32)
+    greyscale_model_6 = zeros(channel_6.shape, dtype=float32)
+    greyscale_model_7 = zeros(channel_7.shape, dtype=float32)
+    greyscale_model_8 = zeros(channel_8.shape, dtype=float32)
+    greyscale_model_9 = zeros(channel_9.shape, dtype=float32)
+    greyscale_model_A = zeros(channel_A.shape, dtype=float32)
+    greyscale_model_B = zeros(channel_B.shape, dtype=float32)
+    greyscale_model_C = zeros(channel_C.shape, dtype=float32)
 
     ksize = (15, 15)
     kernel = getStructuringElement(MORPH_ELLIPSE, ksize)
@@ -383,68 +383,68 @@ def detect_blobs_Eng(f_cycle):
 
         if sum(channel_1[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
                 sum(channel_1[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144 > cut_off_1:
-            f_greyscale_model_1[r, c] = sum(channel_1[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                                        sum(channel_1[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
+            greyscale_model_1[r, c] = sum(channel_1[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
+                                      sum(channel_1[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
 
         if sum(channel_2[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
                 sum(channel_2[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144 > cut_off_2:
-            f_greyscale_model_2[r, c] = sum(channel_2[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                                        sum(channel_2[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
+            greyscale_model_2[r, c] = sum(channel_2[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
+                                      sum(channel_2[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
 
         if sum(channel_3[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
                 sum(channel_3[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144 > cut_off_3:
-            f_greyscale_model_3[r, c] = sum(channel_3[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                                        sum(channel_3[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
+            greyscale_model_3[r, c] = sum(channel_3[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
+                                      sum(channel_3[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
 
         if sum(channel_4[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
                 sum(channel_4[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144 > cut_off_4:
-            f_greyscale_model_4[r, c] = sum(channel_4[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                                        sum(channel_4[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
+            greyscale_model_4[r, c] = sum(channel_4[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
+                                      sum(channel_4[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
 
         if sum(channel_5[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
                 sum(channel_5[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144 > cut_off_5:
-            f_greyscale_model_5[r, c] = sum(channel_5[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                                        sum(channel_5[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
+            greyscale_model_5[r, c] = sum(channel_5[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
+                                      sum(channel_5[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
 
         if sum(channel_6[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
                 sum(channel_6[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144 > cut_off_6:
-            f_greyscale_model_6[r, c] = sum(channel_6[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                                        sum(channel_6[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
+            greyscale_model_6[r, c] = sum(channel_6[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
+                                      sum(channel_6[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
 
         if sum(channel_7[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
                 sum(channel_7[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144 > cut_off_7:
-            f_greyscale_model_7[r, c] = sum(channel_7[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                                        sum(channel_7[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
+            greyscale_model_7[r, c] = sum(channel_7[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
+                                      sum(channel_7[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
 
         if sum(channel_8[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
                 sum(channel_8[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144 > cut_off_8:
-            f_greyscale_model_8[r, c] = sum(channel_8[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                                        sum(channel_8[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
+            greyscale_model_8[r, c] = sum(channel_8[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
+                                      sum(channel_8[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
 
         if sum(channel_9[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
                 sum(channel_9[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144 > cut_off_9:
-            f_greyscale_model_9[r, c] = sum(channel_9[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                                        sum(channel_9[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
+            greyscale_model_9[r, c] = sum(channel_9[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
+                                      sum(channel_9[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
 
         if sum(channel_A[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
                 sum(channel_A[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144 > cut_off_A:
-            f_greyscale_model_A[r, c] = sum(channel_A[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                                        sum(channel_A[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
+            greyscale_model_A[r, c] = sum(channel_A[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
+                                      sum(channel_A[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
 
         if sum(channel_B[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
                 sum(channel_B[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144 > cut_off_B:
-            f_greyscale_model_B[r, c] = sum(channel_B[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                                        sum(channel_B[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
+            greyscale_model_B[r, c] = sum(channel_B[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
+                                      sum(channel_B[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
 
         if sum(channel_C[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
                 sum(channel_C[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144 > cut_off_C:
-            f_greyscale_model_C[r, c] = sum(channel_C[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                                        sum(channel_C[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
+            greyscale_model_C[r, c] = sum(channel_C[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
+                                      sum(channel_C[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
 
-    image_model_pool = image_model_pooling_Eng(f_greyscale_model_1, f_greyscale_model_2, f_greyscale_model_3,
-                                               f_greyscale_model_4, f_greyscale_model_5, f_greyscale_model_6,
-                                               f_greyscale_model_7, f_greyscale_model_8, f_greyscale_model_9,
-                                               f_greyscale_model_A, f_greyscale_model_B, f_greyscale_model_C)
+    image_model_pool = image_model_pooling_Eng(greyscale_model_1, greyscale_model_2, greyscale_model_3,
+                                               greyscale_model_4, greyscale_model_5, greyscale_model_6,
+                                               greyscale_model_7, greyscale_model_8, greyscale_model_9,
+                                               greyscale_model_A, greyscale_model_B, greyscale_model_C)
 
     base_box_in_one_cycle = pool2base(image_model_pool)
 
