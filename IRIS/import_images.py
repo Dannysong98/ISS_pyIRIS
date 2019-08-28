@@ -22,7 +22,6 @@ from sys import stderr
 from cv2 import (imread, imreadmulti,
                  add, addWeighted, warpAffine,
                  IMREAD_GRAYSCALE)
-from cv2 import error
 from numpy import (array,
                    uint8)
 
