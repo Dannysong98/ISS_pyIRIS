@@ -56,13 +56,11 @@ def decode_data_Ke(f_cycles):
         channel_G = imread('/'.join((f_cycles[cycle_id], 'Y3.tif')),   IMREAD_GRAYSCALE)
         channel_0 = imread('/'.join((f_cycles[cycle_id], 'DAPI.tif')), IMREAD_GRAYSCALE)
 
-        merge_cycle = channel_0
-
         if cycle_id == 0:
-            reg_ref = merge_cycle
+            reg_ref = channel_0
             f_std_img = addWeighted(add(add(add(channel_A, channel_T), channel_C), channel_G), 0.7, channel_0, 0.3, 0)
 
-        trans_matrix = register_cycles(reg_ref, merge_cycle, 'BRISK')
+        trans_matrix = register_cycles(reg_ref, channel_0, 'BRISK')
 
         adj_channel_A = warpAffine(channel_A, trans_matrix, (f_std_img.shape[1], f_std_img.shape[0]))
         adj_channel_T = warpAffine(channel_T, trans_matrix, (f_std_img.shape[1], f_std_img.shape[0]))
@@ -108,7 +106,7 @@ def decode_data_Eng(f_cycles):
 
         if cycle_id == 0:
             reg_ref = f_img_r1_mats[3]
-            f_std_img = f_img_r1_mats[3]
+            f_std_img = add(add(f_img_r1_mats[0], f_img_r1_mats[1]), f_img_r1_mats[2])
 
         trans_mat1 = register_cycles(reg_ref, f_img_r1_mats[3], 'BRISK')
         trans_mat2 = register_cycles(reg_ref, f_img_r2_mats[3], 'BRISK')
@@ -118,22 +116,18 @@ def decode_data_Eng(f_cycles):
         adj_img_r1_mats.append(warpAffine(f_img_r1_mats[0], trans_mat1, (reg_ref.shape[1], reg_ref.shape[0])))
         adj_img_r1_mats.append(warpAffine(f_img_r1_mats[1], trans_mat1, (reg_ref.shape[1], reg_ref.shape[0])))
         adj_img_r1_mats.append(warpAffine(f_img_r1_mats[2], trans_mat1, (reg_ref.shape[1], reg_ref.shape[0])))
-        adj_img_r1_mats.append(warpAffine(f_img_r1_mats[3], trans_mat1, (reg_ref.shape[1], reg_ref.shape[0])))
 
         adj_img_r2_mats.append(warpAffine(f_img_r2_mats[0], trans_mat2, (reg_ref.shape[1], reg_ref.shape[0])))
         adj_img_r2_mats.append(warpAffine(f_img_r2_mats[1], trans_mat2, (reg_ref.shape[1], reg_ref.shape[0])))
         adj_img_r2_mats.append(warpAffine(f_img_r2_mats[2], trans_mat2, (reg_ref.shape[1], reg_ref.shape[0])))
-        adj_img_r2_mats.append(warpAffine(f_img_r2_mats[3], trans_mat2, (reg_ref.shape[1], reg_ref.shape[0])))
 
         adj_img_r3_mats.append(warpAffine(f_img_r3_mats[0], trans_mat3, (reg_ref.shape[1], reg_ref.shape[0])))
         adj_img_r3_mats.append(warpAffine(f_img_r3_mats[1], trans_mat3, (reg_ref.shape[1], reg_ref.shape[0])))
         adj_img_r3_mats.append(warpAffine(f_img_r3_mats[2], trans_mat3, (reg_ref.shape[1], reg_ref.shape[0])))
-        adj_img_r3_mats.append(warpAffine(f_img_r3_mats[3], trans_mat3, (reg_ref.shape[1], reg_ref.shape[0])))
 
         adj_img_r4_mats.append(warpAffine(f_img_r4_mats[0], trans_mat4, (reg_ref.shape[1], reg_ref.shape[0])))
         adj_img_r4_mats.append(warpAffine(f_img_r4_mats[1], trans_mat4, (reg_ref.shape[1], reg_ref.shape[0])))
         adj_img_r4_mats.append(warpAffine(f_img_r4_mats[2], trans_mat4, (reg_ref.shape[1], reg_ref.shape[0])))
-        adj_img_r4_mats.append(warpAffine(f_img_r4_mats[3], trans_mat4, (reg_ref.shape[1], reg_ref.shape[0])))
 
         f_cycle_stack.append((adj_img_r1_mats, adj_img_r2_mats, adj_img_r3_mats, adj_img_r4_mats))
 
