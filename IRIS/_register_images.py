@@ -18,7 +18,7 @@ and rotation between images, no zooming and retortion.
 
 from sys import stderr
 from cv2 import (getStructuringElement, morphologyEx,
-                 BRISK, ORB, BFMatcher, findHomography, estimateRigidTransform,
+                 BRISK, ORB, BFMatcher, findHomography, estimateAffinePartial2D,
                  MORPH_CROSS, MORPH_GRADIENT, MORPH_CLOSE, NORM_HAMMING, RANSAC)
 from numpy import (array, float32)
 
@@ -112,17 +112,24 @@ def register_cycles(f_reference_cycle, f_transform_cycle, f_detection_method=Non
         pts_a = float32([kp1[_.queryIdx].pt for _ in good_matches]).reshape(-1, 1, 2)
         pts_b = float32([kp2[_.trainIdx].pt for _ in good_matches]).reshape(-1, 1, 2)
 
-        _, mask = findHomography(pts_a, pts_b, RANSAC)
+        _, mask = findHomography(pts_b, pts_a, RANSAC)
 
         good_matches = [good_matches[_] for _ in range(0, mask.size) if mask[_][0] == 1]
 
-        pts_a_filtered = float32([kp1[_.queryIdx].pt for _ in good_matches]).reshape(-1, 1, 2)
-        pts_b_filtered = float32([kp2[_.trainIdx].pt for _ in good_matches]).reshape(-1, 1, 2)
+        if len(good_matches) >= 4:
+            pts_a_filtered = float32([kp1[_.queryIdx].pt for _ in good_matches]).reshape(-1, 1, 2)
+            pts_b_filtered = float32([kp2[_.trainIdx].pt for _ in good_matches]).reshape(-1, 1, 2)
 
-        f_transform_matrix = estimateRigidTransform(pts_b_filtered, pts_a_filtered, fullAffine=False)
+            f_transform_matrix, _ = estimateAffinePartial2D(pts_b_filtered, pts_a_filtered)
+
+            if f_transform_matrix is None:
+                print('REGISTRATION FAILED.', file=stderr)
+
+        else:
+            print('NO ENOUGH MATCHED FEATURES, REGISTRATION FAILED.', file=stderr)
 
     else:
-        print('REGISTERING ERROR.', file=stderr)
+        print('NO ENOUGH MATCHED FEATURES, REGISTRATION FAILED.', file=stderr)
 
     return f_transform_matrix
 
