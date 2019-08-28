@@ -57,15 +57,17 @@ def decode_data_Ke(f_cycles):
         channel_G = imread('/'.join((f_cycles[cycle_id], 'Y3.tif')),   IMREAD_GRAYSCALE)
         channel_0 = imread('/'.join((f_cycles[cycle_id], 'DAPI.tif')),   IMREAD_GRAYSCALE)
 
+        merged_img = addWeighted(add(add(add(channel_A, channel_T), channel_C), channel_G), 0.7, channel_0, 0.3, 0)
+
         if cycle_id == 0:
             reg_ref = channel_0
-            f_std_img = addWeighted(add(add(add(channel_A, channel_T), channel_C), channel_G), 0.7, channel_0, 0.3, 0)
-
-        imwrite('debug.cycle_' + str(int(cycle_id + 1)) + '.tif', f_std_img)
+            f_std_img = merged_img
 
         trans_mat = register_cycles(reg_ref, channel_0, 'BRISK')
 
-        debug_img = warpAffine(f_std_img, trans_mat, (reg_ref.shape[1], reg_ref.shape[0]))
+        imwrite('debug.cycle_' + str(int(cycle_id + 1)) + '.tif', merged_img)
+
+        debug_img = warpAffine(merged_img, trans_mat, (reg_ref.shape[1], reg_ref.shape[0]))
 
         imwrite('debug.cycle_' + str(int(cycle_id + 1)) + '.reg.tif', debug_img)
 
@@ -107,24 +109,29 @@ def decode_data_Eng(f_cycles):
         _, img_r3_mats = imreadmulti(f_cycles[cycle_id + 2], None, IMREAD_GRAYSCALE)
         _, img_r4_mats = imreadmulti(f_cycles[cycle_id + 3], None, IMREAD_GRAYSCALE)
 
+        merged_img1 = img_r1_mats[3]
+        merged_img2 = img_r2_mats[3]
+        merged_img3 = img_r3_mats[3]
+        merged_img4 = img_r4_mats[3]
+
         if cycle_id == 0:
             reg_ref = img_r1_mats[3]
             f_std_img = img_r1_mats[3]
-
-        imwrite('debug.round_' + str(int(cycle_id / 4 + 1)) + '.tif', f_std_img)
-        imwrite('debug.round_' + str(int(cycle_id / 4 + 1)) + '.tif', f_std_img)
-        imwrite('debug.round_' + str(int(cycle_id / 4 + 1)) + '.tif', f_std_img)
-        imwrite('debug.round_' + str(int(cycle_id / 4 + 1)) + '.tif', f_std_img)
 
         trans_mat1 = register_cycles(reg_ref, img_r1_mats[3], 'ORB')
         trans_mat2 = register_cycles(reg_ref, img_r2_mats[3], 'ORB')
         trans_mat3 = register_cycles(reg_ref, img_r3_mats[3], 'ORB')
         trans_mat4 = register_cycles(reg_ref, img_r4_mats[3], 'ORB')
 
-        debug_img1 = warpAffine(img_r1_mats[3], trans_mat1, (reg_ref.shape[1], reg_ref.shape[0]))
-        debug_img2 = warpAffine(img_r2_mats[3], trans_mat2, (reg_ref.shape[1], reg_ref.shape[0]))
-        debug_img3 = warpAffine(img_r3_mats[3], trans_mat3, (reg_ref.shape[1], reg_ref.shape[0]))
-        debug_img4 = warpAffine(img_r4_mats[3], trans_mat4, (reg_ref.shape[1], reg_ref.shape[0]))
+        imwrite('debug.round_' + str(int(cycle_id / 4 + 1)) + '.tif', merged_img1)
+        imwrite('debug.round_' + str(int(cycle_id / 4 + 1)) + '.tif', merged_img2)
+        imwrite('debug.round_' + str(int(cycle_id / 4 + 1)) + '.tif', merged_img3)
+        imwrite('debug.round_' + str(int(cycle_id / 4 + 1)) + '.tif', merged_img4)
+
+        debug_img1 = warpAffine(merged_img1, trans_mat1, (reg_ref.shape[1], reg_ref.shape[0]))
+        debug_img2 = warpAffine(merged_img2, trans_mat2, (reg_ref.shape[1], reg_ref.shape[0]))
+        debug_img3 = warpAffine(merged_img3, trans_mat3, (reg_ref.shape[1], reg_ref.shape[0]))
+        debug_img4 = warpAffine(merged_img4, trans_mat4, (reg_ref.shape[1], reg_ref.shape[0]))
 
         imwrite('debug.round_' + str(int(cycle_id / 4 + 1)) + '.reg.tif', debug_img1)
         imwrite('debug.round_' + str(int(cycle_id / 4 + 1)) + '.reg.tif', debug_img2)
