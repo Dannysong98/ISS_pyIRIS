@@ -59,6 +59,8 @@ def decode_data_Ke(f_cycles):
 
         merged_img = add(add(add(channel_A, channel_T), channel_C), channel_G)
 
+        imwrite('cycle_' + str(int(cycle_id / 4 + 1)) + '.tif', merged_img)
+
         if cycle_id == 0:
             reg_ref = merged_img
             f_std_img = addWeighted(merged_img, 0.7, channel_0, 0.3, 0)
@@ -69,6 +71,10 @@ def decode_data_Ke(f_cycles):
         adj_img_mats.append(warpAffine(channel_T, trans_mat, (f_std_img.shape[1], f_std_img.shape[0])))
         adj_img_mats.append(warpAffine(channel_C, trans_mat, (f_std_img.shape[1], f_std_img.shape[0])))
         adj_img_mats.append(warpAffine(channel_G, trans_mat, (f_std_img.shape[1], f_std_img.shape[0])))
+
+        merged_img = warpAffine(merged_img, trans_mat, (reg_ref.shape[1], reg_ref.shape[0]))
+
+        imwrite('cycle_' + str(int(cycle_id / 4 + 1)) + '.reg.tif', merged_img)
 
         f_cycle_stack.append(adj_img_mats)
 
