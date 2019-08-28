@@ -18,7 +18,7 @@ and rotation between images, no zooming and retortion.
 
 from sys import stderr
 from cv2 import (GaussianBlur, getStructuringElement, morphologyEx,
-                 BRISK, ORB, BFMatcher, estimateAffinePartial2D, findHomography,
+                 BRISK, ORB, BFMatcher, estimateAffinePartial2D,
                  MORPH_CROSS, MORPH_GRADIENT, NORM_HAMMING, RANSAC)
 from numpy import (array, float32)
 

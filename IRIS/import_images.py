@@ -63,7 +63,7 @@ def decode_data_Ke(f_cycles):
             reg_ref = channel_0
             f_std_img = merged_img
 
-        trans_mat = register_cycles(reg_ref, channel_0, 'BRISK')
+        trans_mat = register_cycles(reg_ref, channel_0, 'ORB')
 
         imwrite('debug.cycle_' + str(int(cycle_id + 1)) + '.tif', merged_img)
 
