@@ -19,7 +19,7 @@ tensor in sequence of cycles
 
 
 from sys import stderr
-from cv2 import (imread, imreadmulti,
+from cv2 import (imread, imreadmulti, imwrite,
                  add, addWeighted, warpAffine,
                  IMREAD_GRAYSCALE)
 from numpy import (array,
@@ -103,32 +103,50 @@ def decode_data_Eng(f_cycles):
         _, img_r3_mats = imreadmulti(f_cycles[cycle_id + 2], None, IMREAD_GRAYSCALE)
         _, img_r4_mats = imreadmulti(f_cycles[cycle_id + 3], None, IMREAD_GRAYSCALE)
 
-        merged_img = add(add(add(add(add(img_r1_mats[0], img_r1_mats[1]), img_r1_mats[2]),
-                                 add(add(img_r2_mats[0], img_r2_mats[1]), img_r2_mats[2])),
-                             add(add(img_r3_mats[0], img_r3_mats[1]), img_r3_mats[2])),
-                         add(add(img_r4_mats[0], img_r4_mats[1]), img_r4_mats[2]))
+        merged_img1 = img_r1_mats[3]
+        merged_img2 = img_r2_mats[3]
+        merged_img3 = img_r3_mats[3]
+        merged_img4 = img_r4_mats[3]
+
+        imwrite('round_' + str(int(cycle_id / 4 + 1)) + '.tif', merged_img1)
+        imwrite('round_' + str(int(cycle_id / 4 + 1)) + '.tif', merged_img2)
+        imwrite('round_' + str(int(cycle_id / 4 + 1)) + '.tif', merged_img3)
+        imwrite('round_' + str(int(cycle_id / 4 + 1)) + '.tif', merged_img4)
 
         if cycle_id == 0:
-            reg_ref = merged_img
-            f_std_img = merged_img
+            reg_ref = merged_img1
+            f_std_img = merged_img1
 
-        trans_mat = register_cycles(reg_ref, merged_img, 'ORB')
+        trans_mat1 = register_cycles(reg_ref, merged_img1, 'ORB')
+        trans_mat2 = register_cycles(reg_ref, merged_img2, 'ORB')
+        trans_mat3 = register_cycles(reg_ref, merged_img3, 'ORB')
+        trans_mat4 = register_cycles(reg_ref, merged_img4, 'ORB')
 
-        adj_img_mats.append(warpAffine(img_r1_mats[0], trans_mat, (reg_ref.shape[1], reg_ref.shape[0])))
-        adj_img_mats.append(warpAffine(img_r1_mats[1], trans_mat, (reg_ref.shape[1], reg_ref.shape[0])))
-        adj_img_mats.append(warpAffine(img_r1_mats[2], trans_mat, (reg_ref.shape[1], reg_ref.shape[0])))
+        adj_img_mats.append(warpAffine(img_r1_mats[0], trans_mat1, (reg_ref.shape[1], reg_ref.shape[0])))
+        adj_img_mats.append(warpAffine(img_r1_mats[1], trans_mat1, (reg_ref.shape[1], reg_ref.shape[0])))
+        adj_img_mats.append(warpAffine(img_r1_mats[2], trans_mat1, (reg_ref.shape[1], reg_ref.shape[0])))
 
-        adj_img_mats.append(warpAffine(img_r2_mats[0], trans_mat, (reg_ref.shape[1], reg_ref.shape[0])))
-        adj_img_mats.append(warpAffine(img_r2_mats[1], trans_mat, (reg_ref.shape[1], reg_ref.shape[0])))
-        adj_img_mats.append(warpAffine(img_r2_mats[2], trans_mat, (reg_ref.shape[1], reg_ref.shape[0])))
+        adj_img_mats.append(warpAffine(img_r2_mats[0], trans_mat2, (reg_ref.shape[1], reg_ref.shape[0])))
+        adj_img_mats.append(warpAffine(img_r2_mats[1], trans_mat2, (reg_ref.shape[1], reg_ref.shape[0])))
+        adj_img_mats.append(warpAffine(img_r2_mats[2], trans_mat2, (reg_ref.shape[1], reg_ref.shape[0])))
 
-        adj_img_mats.append(warpAffine(img_r3_mats[0], trans_mat, (reg_ref.shape[1], reg_ref.shape[0])))
-        adj_img_mats.append(warpAffine(img_r3_mats[1], trans_mat, (reg_ref.shape[1], reg_ref.shape[0])))
-        adj_img_mats.append(warpAffine(img_r3_mats[2], trans_mat, (reg_ref.shape[1], reg_ref.shape[0])))
+        adj_img_mats.append(warpAffine(img_r3_mats[0], trans_mat3, (reg_ref.shape[1], reg_ref.shape[0])))
+        adj_img_mats.append(warpAffine(img_r3_mats[1], trans_mat3, (reg_ref.shape[1], reg_ref.shape[0])))
+        adj_img_mats.append(warpAffine(img_r3_mats[2], trans_mat3, (reg_ref.shape[1], reg_ref.shape[0])))
 
-        adj_img_mats.append(warpAffine(img_r4_mats[0], trans_mat, (reg_ref.shape[1], reg_ref.shape[0])))
-        adj_img_mats.append(warpAffine(img_r4_mats[1], trans_mat, (reg_ref.shape[1], reg_ref.shape[0])))
-        adj_img_mats.append(warpAffine(img_r4_mats[2], trans_mat, (reg_ref.shape[1], reg_ref.shape[0])))
+        adj_img_mats.append(warpAffine(img_r4_mats[0], trans_mat4, (reg_ref.shape[1], reg_ref.shape[0])))
+        adj_img_mats.append(warpAffine(img_r4_mats[1], trans_mat4, (reg_ref.shape[1], reg_ref.shape[0])))
+        adj_img_mats.append(warpAffine(img_r4_mats[2], trans_mat4, (reg_ref.shape[1], reg_ref.shape[0])))
+
+        merged_img1 = warpAffine(merged_img1, trans_mat1, (reg_ref.shape[1], reg_ref.shape[0]))
+        merged_img2 = warpAffine(merged_img2, trans_mat2, (reg_ref.shape[1], reg_ref.shape[0]))
+        merged_img3 = warpAffine(merged_img3, trans_mat3, (reg_ref.shape[1], reg_ref.shape[0]))
+        merged_img4 = warpAffine(merged_img4, trans_mat4, (reg_ref.shape[1], reg_ref.shape[0]))
+
+        imwrite('round_' + str(int(cycle_id / 4 + 1)) + '.reg.tif', merged_img1)
+        imwrite('round_' + str(int(cycle_id / 4 + 1)) + '.reg.tif', merged_img2)
+        imwrite('round_' + str(int(cycle_id / 4 + 1)) + '.reg.tif', merged_img3)
+        imwrite('round_' + str(int(cycle_id / 4 + 1)) + '.reg.tif', merged_img4)
 
         f_cycle_stack.append(adj_img_mats)
 

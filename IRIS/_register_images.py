@@ -18,7 +18,7 @@ and rotation between images, no zooming and retortion.
 
 from sys import stderr
 from cv2 import (GaussianBlur, getStructuringElement, morphologyEx,
-                 BRISK, ORB, BFMatcher, estimateAffinePartial2D,
+                 BRISK, ORB, BFMatcher, estimateAffinePartial2D, findHomography,
                  MORPH_CROSS, MORPH_GRADIENT, NORM_HAMMING, RANSAC)
 from numpy import (array, float32)
 
@@ -50,10 +50,11 @@ def register_cycles(f_reference_cycle, f_transform_cycle, f_detection_method=Non
         :param f_method: The detection algorithm of feature points.
         :return: A tuple including a group of feature points and their descriptions.
         """
+        blured_gray_image = GaussianBlur(f_gray_image, (5, 5), 0)
+
         ksize = (15, 15)
         kernel = getStructuringElement(MORPH_CROSS, ksize)
 
-        blured_gray_image = GaussianBlur(f_gray_image, ksize, 0)
         blured_gray_image = morphologyEx(blured_gray_image, MORPH_GRADIENT, kernel, iterations=2)
 
         det = ''
