@@ -121,7 +121,7 @@ def decode_data_Eng(f_cycles):
 
         if cycle_id == 0:
             reg_ref = img_r1_mats[3]
-            f_std_img = img_r1_mats[3]
+            f_std_img = merged_img1
 
         try:
             trans_mat1 = register_cycles(reg_ref, img_r1_mats[3], 'ORB')
