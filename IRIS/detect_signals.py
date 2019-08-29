@@ -27,7 +27,7 @@ from numpy import (array, zeros, reshape,
                    float32, uint8)
 from scipy.stats import mode
 
-from ._call_bases import image_model_pooling_Ke, image_model_pooling_Eng, pool2base
+from .call_bases import image_model_pooling_Ke, image_model_pooling_Eng, pool2base
 
 
 def detect_blobs_Ke(f_cycle):
