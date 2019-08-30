@@ -20,10 +20,9 @@ tensor in sequence of cycles
 
 from sys import stderr
 from cv2 import (imread, imreadmulti, imwrite,
-                 add, addWeighted, warpAffine, convertScaleAbs,
-                 IMREAD_GRAYSCALE,
-                 error)
-from numpy import (array, mean,
+                 add, addWeighted, warpAffine,
+                 IMREAD_GRAYSCALE)
+from numpy import (array,
                    uint8)
 
 from .register_images import register_cycles
