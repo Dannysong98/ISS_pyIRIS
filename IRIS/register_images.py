@@ -50,7 +50,7 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
         :param method: The detection algorithm of feature points.
         :return: A tuple including a group of feature points and their descriptions.
         """
-        gray_image = GaussianBlur(gray_image, (5, 5), 0)
+        # gray_image = GaussianBlur(gray_image, (3, 3), 0)
 
         ksize = (15, 15)
         kernel = getStructuringElement(MORPH_CROSS, ksize)
