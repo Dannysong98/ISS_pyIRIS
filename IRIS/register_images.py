@@ -104,7 +104,7 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
 
     f_transform_matrix = array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]], dtype=float32)
 
-    # lightness rectification #
+    # Lightness Rectification #
     transform_cycle = convertScaleAbs(transform_cycle * (mean(reference_cycle) / mean(transform_cycle)))
 
     kp1, des1 = _get_key_points_and_descriptors(reference_cycle, detection_method)

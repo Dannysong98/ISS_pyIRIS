@@ -39,7 +39,7 @@ def image_model_pooling_Ke(f_image_model_A, f_image_model_T, f_image_model_C, f_
     f_image_model = f_image_model_A + f_image_model_T + f_image_model_C + f_image_model_G
 
     for row, col in transpose(nonzero(f_image_model)):
-        read_id = 'r' + ('%05d' % (row + 1)) + 'c' + ('%05d' % (col + 1))
+        read_id = 'r%05dc%05d' % (row + 1, col + 1)
 
         if read_id not in f_image_model_pool:
             f_image_model_pool.update({read_id: {'A': 0, 'T': 0, 'C': 0, 'G': 0}})
@@ -87,7 +87,7 @@ def image_model_pooling_Eng(f_image_model_1, f_image_model_2, f_image_model_3,
                     f_image_model_A + f_image_model_B + f_image_model_C
 
     for row, col in transpose(nonzero(f_image_model)):
-        read_id = 'r' + ('%05d' % (row + 1)) + 'c' + ('%05d' % (col + 1))
+        read_id = 'r%05dc%05d' % (row + 1, col + 1)
 
         if read_id not in f_image_model_pool:
             f_image_model_pool.update({read_id: {'1': 0, '2': 0, '3': 0,

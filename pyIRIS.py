@@ -74,7 +74,7 @@ if __name__ == '__main__':
                 barcode_cube_obj.collect_called_bases(called_base_box_in_one_cycle)
 
         # Unified Filtering and Barcode Connection #
-        barcode_cube_obj.filter_blobs_list(std_img)
+        barcode_cube_obj.filter_blobs_list()
         barcode_cube_obj.calling_adjust()
 
         deal_with_result.write_reads_into_file(std_img, barcode_cube_obj.adjusted_bases_cube, len(cycle_stack))

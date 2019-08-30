@@ -60,10 +60,10 @@ def decode_data_Ke(f_cycles):
         merged_img = addWeighted(add(add(add(channel_A, channel_T), channel_C), channel_G), 0.7, channel_0, 0.3, 0)
 
         if cycle_id == 0:
-            reg_ref = channel_0
+            reg_ref = merged_img
             f_std_img = merged_img
 
-        trans_mat = register_cycles(reg_ref, channel_0, 'BRISK')
+        trans_mat = register_cycles(reg_ref, merged_img, 'BRISK')
 
         imwrite('debug.cycle_' + str(int(cycle_id + 1)) + '.tif', merged_img)
 

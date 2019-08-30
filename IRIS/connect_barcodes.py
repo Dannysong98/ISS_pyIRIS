@@ -11,12 +11,7 @@ cycles, respectively.
 
 
 from sys import stderr
-from cv2 import (findContours, moments,
-                 RETR_LIST,
-                 CHAIN_APPROX_NONE)
-from numpy import (zeros,
-                   sqrt,
-                   uint8)
+from numpy import sqrt
 
 
 class BarcodeCube:
@@ -26,7 +21,7 @@ class BarcodeCube:
         A list which store the dictionary of bases in each cycle, while the 'adjusted_bases_cube' is A list which store
         the dictionary of bases in each cycle, with error rate adjusted.
         """
-        self.__all_blobs_list = set()
+        self.__all_blobs_list = []
 
         self.bases_cube = []
         self.adjusted_bases_cube = []
@@ -40,41 +35,62 @@ class BarcodeCube:
         :param called_base_in_one_cycle: The dictionary of bases in a cycle.
         :return: NONE
         """
-        self.__all_blobs_list.update([_ for _ in called_base_in_one_cycle.keys()
-                                      if 'N' not in called_base_in_one_cycle[_]])
+        self.__all_blobs_list = [_ for _ in called_base_in_one_cycle.keys() if 'N' not in called_base_in_one_cycle[_]]
         self.bases_cube.append(called_base_in_one_cycle)
 
-    def filter_blobs_list(self, f_background):
+    # def filter_blobs_list(self, f_background):
+    #     """
+    #     This method is used to filter the recorded bases in the called base list.
+    #
+    #     A new list will be generated, which store the filtered id of bases
+    #
+    #     :param f_background: The background image for ensuring the shape of mask layer.
+    #     :return: NONE
+    #     """
+    #     blobs_mask = zeros(f_background.shape, dtype=uint8)
+    #
+    #     new_coor = set()
+    #
+    #     for coor in self.__all_blobs_list:
+    #         r = int(coor[1:6].lstrip('0'))
+    #         c = int(coor[7:].lstrip('0'))
+    #
+    #         blobs_mask[r:(r + 2), c:(c + 2)] = 255
+    #
+    #     _, contours, _ = findContours(blobs_mask, RETR_LIST, CHAIN_APPROX_NONE)
+    #
+    #     for cnt in contours:
+    #         M = moments(cnt)
+    #
+    #         if M['m00'] != 0:
+    #             cr = abs(int(M['m01'] / M['m00']))
+    #             cc = abs(int(M['m10'] / M['m00']))
+    #
+    #             new_coor.add(str('r' + ('%05d' % cr) + 'c' + ('%05d' % cc)))
+    #
+    #     self.__all_blobs_list = new_coor
+
+    def filter_blobs_list(self):
         """
         This method is used to filter the recorded bases in the called base list.
 
         A new list will be generated, which store the filtered id of bases
-
-        :param f_background: The background image for ensuring the shape of mask layer.
-        :return: NONE
         """
-        blobs_mask = zeros(f_background.shape, dtype=uint8)
-
-        new_coor = set()
+        new_coor = self.__all_blobs_list
 
         for coor in self.__all_blobs_list:
             r = int(coor[1:6].lstrip('0'))
             c = int(coor[7:].lstrip('0'))
 
-            blobs_mask[r:(r + 2), c:(c + 2)] = 255
+            for row in range(r - 2, r + 4):
+                for col in range(c - 2, c + 4):
+                    if row == r and col == c:
+                        continue
 
-        _, contours, _ = findContours(blobs_mask, RETR_LIST, CHAIN_APPROX_NONE)
+                    if 'r%05dc%05d' % (row, col) in self.__all_blobs_list:
+                        new_coor.remove('r%05dc%05d' % (row, col))
 
-        for cnt in contours:
-            M = moments(cnt)
-
-            if M['m00'] != 0:
-                cr = abs(int(M['m01'] / M['m00']))
-                cc = abs(int(M['m10'] / M['m00']))
-
-                new_coor.add(str('r' + ('%05d' % cr) + 'c' + ('%05d' % cc)))
-
-        self.__all_blobs_list = new_coor
+        self.__all_blobs_list = set(new_coor)
 
     def calling_adjust(self):
         """
@@ -95,9 +111,9 @@ class BarcodeCube:
                 max_qul_base = 'N'
                 min_err_rate = float(1)
 
-                for row in range(r - 5, r + 7):
-                    for col in range(c - 5, c + 7):
-                        coor = str('r' + ('%05d' % row) + 'c' + ('%05d' % col))
+                for row in range(r - 9, r + 11):
+                    for col in range(c - 9, c + 11):
+                        coor = 'r%05dc%05d' % (row, col)
 
                         if coor in bases_cube[cycle_N]:
                             # Adjusting of Error Rate #
