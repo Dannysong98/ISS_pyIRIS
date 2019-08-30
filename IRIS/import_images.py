@@ -58,8 +58,7 @@ def decode_data_Ke(f_cycles):
         channel_G = imread('/'.join((f_cycles[cycle_id], 'Y3.tif')),   IMREAD_GRAYSCALE)
         channel_0 = imread('/'.join((f_cycles[cycle_id], 'DAPI.tif')), IMREAD_GRAYSCALE)
 
-        # merged_img = addWeighted(add(add(add(channel_A, channel_T), channel_C), channel_G), 0.3, channel_0, 0.3, 0)
-        merged_img = channel_0
+        merged_img = addWeighted(add(add(add(channel_A, channel_T), channel_C), channel_G), 0.7, channel_0, 0.3, 0)
 
         if cycle_id == 0:
             reg_ref = channel_0
