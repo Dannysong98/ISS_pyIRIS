@@ -17,25 +17,25 @@ and rotation between images, no zooming and retortion.
 
 
 from sys import stderr
-from cv2 import (GaussianBlur, getStructuringElement, morphologyEx,
+from cv2 import (convertScaleAbs, GaussianBlur, getStructuringElement, morphologyEx,
                  BRISK, ORB, BFMatcher, estimateAffinePartial2D,
                  MORPH_CROSS, MORPH_GRADIENT, NORM_HAMMING, RANSAC)
-from numpy import (array, float32)
+from numpy import (array, mean, float32)
 
 
-def register_cycles(f_reference_cycle, f_transform_cycle, f_detection_method=None):
+def register_cycles(reference_cycle, transform_cycle, detection_method=None):
     """
     For computing the transform matrix between reference image and transform image.
 
     Input reference image, transform image and one of the algorithms of detector.
     Returning transform matrix.
 
-    :param f_reference_cycle: The image that will be used to register other images.
-    :param f_transform_cycle: The image will be registered.
-    :param f_detection_method: The detection algorithm of feature points.
+    :param reference_cycle: The image that will be used to register other images.
+    :param transform_cycle: The image will be registered.
+    :param detection_method: The detection algorithm of feature points.
     :return: A transformation matrix from transformed image to reference.
     """
-    def _get_key_points_and_descriptors(f_gray_image, f_method=None):
+    def _get_key_points_and_descriptors(gray_image, method=None):
         """
         For detecting the key points and their descriptions by BRISK or ORB.
 
@@ -46,36 +46,36 @@ def register_cycles(f_reference_cycle, f_transform_cycle, f_detection_method=Non
         Input a gray scale image and one of the algorithms of detector.
         Returning the key points and their descriptions.
 
-        :param f_gray_image: The 8-bit image.
-        :param f_method: The detection algorithm of feature points.
+        :param gray_image: The 8-bit image.
+        :param method: The detection algorithm of feature points.
         :return: A tuple including a group of feature points and their descriptions.
         """
-        f_gray_image = GaussianBlur(f_gray_image, (5, 5), 0)
+        gray_image = GaussianBlur(gray_image, (9, 9), 0)
 
         ksize = (15, 15)
         kernel = getStructuringElement(MORPH_CROSS, ksize)
 
-        f_gray_image = morphologyEx(f_gray_image, MORPH_GRADIENT, kernel, iterations=2)
+        gray_image = morphologyEx(gray_image, MORPH_GRADIENT, kernel, iterations=3)
 
         det = ''
         ext = ''
 
-        f_method = 'ORB' if f_method is None else f_method
+        method = 'BRISK' if method is None else method
 
-        if f_method == 'ORB':
-            det = ORB.create()
-            ext = ORB.create()
-
-        elif f_method == 'BRISK':
+        if method == 'BRISK':
             det = BRISK.create()
             ext = BRISK.create()
+
+        elif method == 'ORB':
+            det = ORB.create()
+            ext = ORB.create()
 
         else:
             print('Only BRISK and ORB would be suggested.', file=stderr)
 
-        f_key_points = det.detect(f_gray_image)
+        f_key_points = det.detect(gray_image)
 
-        _, f_descriptions = ext.compute(f_gray_image, f_key_points)
+        _, f_descriptions = ext.compute(gray_image, f_key_points)
 
         return f_key_points, f_descriptions
 
@@ -104,8 +104,11 @@ def register_cycles(f_reference_cycle, f_transform_cycle, f_detection_method=Non
 
     f_transform_matrix = array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]], dtype=float32)
 
-    kp1, des1 = _get_key_points_and_descriptors(f_reference_cycle, f_detection_method)
-    kp2, des2 = _get_key_points_and_descriptors(f_transform_cycle, f_detection_method)
+    # lightness rectification #
+    transform_cycle = convertScaleAbs(transform_cycle * (mean(reference_cycle) / mean(transform_cycle)))
+
+    kp1, des1 = _get_key_points_and_descriptors(reference_cycle, detection_method)
+    kp2, des2 = _get_key_points_and_descriptors(transform_cycle, detection_method)
 
     good_matches = _get_good_matched_pairs(des1, des2)
 

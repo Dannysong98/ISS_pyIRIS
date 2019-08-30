@@ -31,18 +31,18 @@ class BarcodeCube:
         self.bases_cube = []
         self.adjusted_bases_cube = []
 
-    def collect_called_bases(self, f_called_base_in_one_cycle):
+    def collect_called_bases(self, called_base_in_one_cycle):
         """
         This method is used to record the called bases in each cycle.
 
         A list which store all the id of bases and A list which store the dictionary of bases in each cycle.
 
-        :param f_called_base_in_one_cycle: The dictionary of bases in a cycle.
+        :param called_base_in_one_cycle: The dictionary of bases in a cycle.
         :return: NONE
         """
-        self.__all_blobs_list.update([_ for _ in f_called_base_in_one_cycle.keys()
-                                      if 'N' not in f_called_base_in_one_cycle[_]])
-        self.bases_cube.append(f_called_base_in_one_cycle)
+        self.__all_blobs_list.update([_ for _ in called_base_in_one_cycle.keys()
+                                      if 'N' not in called_base_in_one_cycle[_]])
+        self.bases_cube.append(called_base_in_one_cycle)
 
     def filter_blobs_list(self, f_background):
         """
@@ -83,11 +83,11 @@ class BarcodeCube:
 
         :return: NONE
         """
-        def __check_greyscale(f_all_blobs_list, f_bases_cube, f_adjusted_bases_cube, f_cycle_id):
+        def __check_greyscale(all_blobs_list, bases_cube, adjusted_bases_cube, cycle_N):
             """"""
-            f_adjusted_bases_cube[f_cycle_id] = {}
+            adjusted_bases_cube[cycle_N] = {}
 
-            for ref_coordinate in f_all_blobs_list:
+            for ref_coordinate in all_blobs_list:
 
                 r = int(ref_coordinate[1:6].lstrip('0'))
                 c = int(ref_coordinate[7:].lstrip('0'))
@@ -99,9 +99,9 @@ class BarcodeCube:
                     for col in range(c - 5, c + 7):
                         coor = str('r' + ('%05d' % row) + 'c' + ('%05d' % col))
 
-                        if coor in f_bases_cube[f_cycle_id]:
+                        if coor in bases_cube[cycle_N]:
                             # Adjusting of Error Rate #
-                            error_rate = f_bases_cube[f_cycle_id][coor][1]
+                            error_rate = bases_cube[cycle_N][coor][1]
                             D = sqrt((row - r) ** 2 + (col - c) ** 2)
                             adj_err_rate = sqrt(((error_rate * D) ** 2) + (error_rate ** 2))
 
@@ -109,10 +109,10 @@ class BarcodeCube:
                                 adj_err_rate = float(1)
 
                             if adj_err_rate < min_err_rate:
-                                max_qul_base = f_bases_cube[f_cycle_id][coor][0]
+                                max_qul_base = bases_cube[cycle_N][coor][0]
                                 min_err_rate = adj_err_rate
 
-                f_adjusted_bases_cube[f_cycle_id].update({ref_coordinate: [max_qul_base, min_err_rate]})
+                adjusted_bases_cube[cycle_N].update({ref_coordinate: [max_qul_base, min_err_rate]})
 
         if len(self.bases_cube) > 0:
             for cycle_id in range(0, len(self.bases_cube)):
