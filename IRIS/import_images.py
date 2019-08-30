@@ -110,12 +110,12 @@ def decode_data_Eng(f_cycles):
         _, img_r4_mats = imreadmulti(f_cycles[cycle_id + 3], None, IMREAD_GRAYSCALE)
 
         merged_img1 = img_r1_mats[3]
-        merged_img2 = img_r2_mats[3]
-        merged_img3 = img_r3_mats[3]
-        merged_img4 = img_r4_mats[3]
+        merged_img2 = img_r1_mats[3]
+        merged_img3 = img_r1_mats[3]
+        merged_img4 = img_r1_mats[3]
 
         if cycle_id == 0:
-            reg_ref = img_r1_mats[3]
+            reg_ref = add(add(add(img_r1_mats[0], img_r1_mats[1]), img_r1_mats[2]), img_r1_mats[3])
             f_std_img = merged_img1
 
         trans_mat1 = register_cycles(reg_ref, merged_img1, 'BRISK')

@@ -236,7 +236,7 @@ def detect_blobs_Eng(f_cycle):
 
     blob_params = SimpleBlobDetector_Params()
 
-    blob_params.thresholdStep = 2
+    blob_params.thresholdStep = 1
     blob_params.minRepeatability = 2
     blob_params.minDistBetweenBlobs = 2
 
@@ -244,7 +244,7 @@ def detect_blobs_Eng(f_cycle):
     blob_params.blobColor = 255
 
     blob_params.filterByArea = True
-    blob_params.minArea = 2
+    blob_params.minArea = 1
     blob_params.maxArea = 196
 
     blob_params.filterByCircularity = False
