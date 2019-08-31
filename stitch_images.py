@@ -61,7 +61,7 @@ def trans_coor(bg, img_dirs):
     return adj_barcode_info
 
 
-def filtering(adj_barcode_info):
+def overlap_filtering(adj_barcode_info):
 
     filtered_barcode_info = {}
 
@@ -98,11 +98,11 @@ if __name__ == '__main__':
 
     if argv[1] == '--bg':
         stitched_image = imread(argv[2], IMREAD_GRAYSCALE)
-        barcode_info = filtering(trans_coor(stitched_image, argv[3:]))
+        barcode_info = overlap_filtering(trans_coor(stitched_image, argv[3:]))
 
     else:
         stitched_image = background_stitcher(argv[1:])
-        barcode_info = filtering(trans_coor(stitched_image, argv[1:]))
+        barcode_info = overlap_filtering(trans_coor(stitched_image, argv[1:]))
 
     imwrite('all_background.tif', stitched_image)
 
