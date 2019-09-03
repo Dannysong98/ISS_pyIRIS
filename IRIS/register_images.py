@@ -50,7 +50,7 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
         :param method: The detection algorithm of feature points.
         :return: A tuple including a group of feature points and their descriptions.
         """
-        # gray_image = GaussianBlur(gray_image, (3, 3), 0)
+        gray_image = GaussianBlur(gray_image, (3, 3), 0)
 
         ksize = (15, 15)
         kernel = getStructuringElement(MORPH_CROSS, ksize)
@@ -62,22 +62,22 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
 
         method = 'BRISK' if method is None else method
 
-        if method == 'BRISK':
-            det = BRISK.create()
-            ext = BRISK.create()
-
-        elif method == 'ORB':
+        if method == 'ORB':
             det = ORB.create()
             ext = ORB.create()
 
+        elif method == 'BRISK':
+            det = BRISK.create()
+            ext = BRISK.create()
+
         else:
-            print('Only BRISK and ORB would be suggested.', file=stderr)
+            print('Only ORB and BRISK would be suggested.', file=stderr)
 
-        f_key_points = det.detect(gray_image)
+        key_points = det.detect(gray_image)
 
-        _, f_descriptions = ext.compute(gray_image, f_key_points)
+        _, descriptions = ext.compute(gray_image, key_points)
 
-        return f_key_points, f_descriptions
+        return key_points, descriptions
 
     def _get_good_matched_pairs(f_description1, f_description2):
         """
@@ -97,12 +97,12 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
 
         matched_pairs = matcher.knnMatch(f_description1, f_description2, 1)
 
-        f_good_matched_pairs = [best_match_pair[0] for best_match_pair in matched_pairs if len(best_match_pair) > 0]
-        f_good_matched_pairs = sorted(f_good_matched_pairs, key=lambda x: x.distance)
+        good_matched_pairs = [best_match_pair[0] for best_match_pair in matched_pairs if len(best_match_pair) > 0]
+        good_matched_pairs = sorted(good_matched_pairs, key=lambda x: x.distance)
 
-        return f_good_matched_pairs
+        return good_matched_pairs
 
-    f_transform_matrix = array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]], dtype=float32)
+    transform_matrix = array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]], dtype=float32)
 
     # Lightness Rectification #
     transform_cycle = convertScaleAbs(transform_cycle * (mean(reference_cycle) / mean(transform_cycle)))
@@ -127,15 +127,15 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
         pts_a_filtered = float32([kp1[_.queryIdx].pt for _ in good_matches]).reshape(-1, 1, 2)
         pts_b_filtered = float32([kp2[_.trainIdx].pt for _ in good_matches]).reshape(-1, 1, 2)
 
-        f_transform_matrix, _ = estimateAffinePartial2D(pts_b_filtered, pts_a_filtered, RANSAC)
+        transform_matrix, _ = estimateAffinePartial2D(pts_b_filtered, pts_a_filtered, RANSAC)
 
-        if f_transform_matrix is None:
+        if transform_matrix is None:
             print('MATRIX GENERATION FAILED.', file=stderr)
 
     else:
         print('NO ENOUGH MATCHED FEATURES, REGISTRATION FAILED.', file=stderr)
 
-    return f_transform_matrix
+    return transform_matrix
 
 
 if __name__ == '__main__':

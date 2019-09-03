@@ -214,7 +214,6 @@ Here, the values of 4th & 5th fields have been transformed to be consistent with
 
 * 2019-08-08 r019 New development version, the prototype version
 
----
+* 2019-08-27 r020 To modify the algorithm for base calling, for performance improving
 
-### v1.0 (r019) (2019-08-08)
-The first release version.
+* 2019-08-30 r021 To add a function for lightness rectification

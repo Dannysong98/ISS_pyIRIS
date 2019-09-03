@@ -4,9 +4,9 @@
 
 from sys import (argv, exit,
                  stderr)
-from cv2 import (imread, createStitcherScans, cvtColor, imwrite,
+from cv2 import (imread, createStitcherScans, cvtColor, imwrite, convertScaleAbs,
                  IMREAD_GRAYSCALE, IMREAD_COLOR, COLOR_BGR2GRAY)
-from numpy import (array, dot,
+from numpy import (array, dot, mean,
                    uint8, uint16)
 
 from IRIS.register_images import register_cycles
@@ -18,6 +18,9 @@ def background_stitcher(img_dirs):
 
     for img_dir in img_dirs:
         imgs.append(imread(img_dir + '/background.tif', IMREAD_COLOR))
+
+    for i in range(0, len(imgs)):
+        imgs[i] = convertScaleAbs(imgs[i] * mean(imgs[0]) / mean(imgs[i]))
 
     stitcher = createStitcherScans()
     status, stitched_img = stitcher.stitch(imgs)
