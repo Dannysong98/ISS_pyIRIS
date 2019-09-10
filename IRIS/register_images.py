@@ -107,6 +107,11 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
     # Lightness Rectification #
     transform_cycle = convertScaleAbs(transform_cycle * (mean(reference_cycle) / mean(transform_cycle)))
 
+    # Fourier transformation #
+    # reference_cycle = convertScaleAbs(20 * log(abs(fftshift(fft2(reference_cycle)))))
+    # transform_cycle = convertScaleAbs(20 * log(abs(fftshift(fft2(transform_cycle)))))
+    ##########################
+
     kp1, des1 = _get_key_points_and_descriptors(reference_cycle, detection_method)
     kp2, des2 = _get_key_points_and_descriptors(transform_cycle, detection_method)
 
@@ -128,6 +133,7 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
         pts_b_filtered = float32([kp2[_.trainIdx].pt for _ in good_matches]).reshape(-1, 1, 2)
 
         transform_matrix, _ = estimateAffinePartial2D(pts_b_filtered, pts_a_filtered, RANSAC)
+        print(transform_matrix)
 
         if transform_matrix is None:
             print('MATRIX GENERATION FAILED.', file=stderr)
