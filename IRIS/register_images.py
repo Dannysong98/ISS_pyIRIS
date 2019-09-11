@@ -33,9 +33,9 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
     :param reference_cycle: The image that will be used to register other images.
     :param transform_cycle: The image will be registered.
     :param detection_method: The detection algorithm of feature points.
-    :return: A transformation matrix from transformed image to reference.
+    :return f_key_points, f_descriptions: A transformation matrix from transformed image to reference.
     """
-    def _get_key_points_and_descriptors(gray_image, method=None):
+    def __get_key_points_and_descriptors(f_gray_image, method=None):
         """
         For detecting the key points and their descriptions by BRISK or ORB.
 
@@ -46,16 +46,16 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
         Input a gray scale image and one of the algorithms of detector.
         Returning the key points and their descriptions.
 
-        :param gray_image: The 8-bit image.
+        :param f_gray_image: The 8-bit image.
         :param method: The detection algorithm of feature points.
         :return: A tuple including a group of feature points and their descriptions.
         """
-        gray_image = GaussianBlur(gray_image, (3, 3), 0)
+        f_gray_image = GaussianBlur(f_gray_image, (3, 3), 0)
 
         ksize = (15, 15)
         kernel = getStructuringElement(MORPH_CROSS, ksize)
 
-        gray_image = morphologyEx(gray_image, MORPH_GRADIENT, kernel, iterations=2)
+        f_gray_image = morphologyEx(f_gray_image, MORPH_GRADIENT, kernel, iterations=2)
 
         det = ''
         ext = ''
@@ -73,13 +73,13 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
         else:
             print('Only ORB and BRISK would be suggested.', file=stderr)
 
-        key_points = det.detect(gray_image)
+        f_key_points = det.detect(f_gray_image)
 
-        _, descriptions = ext.compute(gray_image, key_points)
+        _, f_descriptions = ext.compute(f_gray_image, f_key_points)
 
-        return key_points, descriptions
+        return f_key_points, f_descriptions
 
-    def _get_good_matched_pairs(f_description1, f_description2):
+    def __get_good_matched_pairs(f_description1, f_description2):
         """
         For finding the good matched pairs of key points.
 
@@ -91,32 +91,40 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
 
         :param f_description1: The description of feature points group 1.
         :param f_description2: The description of feature points group 2.
-        :return: The good matched pairs between those two groups of feature points.
+        :return f_good_matched_pairs: The good matched pairs between those two groups of feature points.
         """
         matcher = BFMatcher.create(normType=NORM_HAMMING, crossCheck=True)
 
         matched_pairs = matcher.knnMatch(f_description1, f_description2, 1)
 
-        good_matched_pairs = [best_match_pair[0] for best_match_pair in matched_pairs if len(best_match_pair) > 0]
-        good_matched_pairs = sorted(good_matched_pairs, key=lambda x: x.distance)
+        f_good_matched_pairs = [best_match_pair[0] for best_match_pair in matched_pairs if len(best_match_pair) > 0]
+        f_good_matched_pairs = sorted(f_good_matched_pairs, key=lambda x: x.distance)
 
-        return good_matched_pairs
+        return f_good_matched_pairs
 
     transform_matrix = array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]], dtype=float32)
 
+    ###########################
     # Lightness Rectification #
+    ###########################
     transform_cycle = convertScaleAbs(transform_cycle * (mean(reference_cycle) / mean(transform_cycle)))
+    ###########################
 
-    # Fourier transformation #
+    ####################################
+    # Fourier transformation (ABANDON) #
+    ####################################
     # reference_cycle = convertScaleAbs(20 * log(abs(fftshift(fft2(reference_cycle)))))
     # transform_cycle = convertScaleAbs(20 * log(abs(fftshift(fft2(transform_cycle)))))
-    ##########################
+    ####################################
 
-    kp1, des1 = _get_key_points_and_descriptors(reference_cycle, detection_method)
-    kp2, des2 = _get_key_points_and_descriptors(transform_cycle, detection_method)
+    kp1, des1 = __get_key_points_and_descriptors(reference_cycle, detection_method)
+    kp2, des2 = __get_key_points_and_descriptors(transform_cycle, detection_method)
 
-    good_matches = _get_good_matched_pairs(des1, des2)
+    good_matches = __get_good_matched_pairs(des1, des2)
 
+    ###########################################################################
+    # Filter the outline of paired key points, iteratively. Until no outlines #
+    ###########################################################################
     n = 1
     while n:
         pts_a = float32([kp1[_.queryIdx].pt for _ in good_matches]).reshape(-1, 1, 2)
@@ -127,13 +135,13 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
         good_matches = [good_matches[_] for _ in range(0, mask.size) if mask[_][0] == 1]
 
         n = sum([mask[_][0] for _ in range(0, mask.size)]) - mask.size
+    ############################################################################
 
     if len(good_matches) >= 4:
         pts_a_filtered = float32([kp1[_.queryIdx].pt for _ in good_matches]).reshape(-1, 1, 2)
         pts_b_filtered = float32([kp2[_.trainIdx].pt for _ in good_matches]).reshape(-1, 1, 2)
 
         transform_matrix, _ = estimateAffinePartial2D(pts_b_filtered, pts_a_filtered, RANSAC)
-        print(transform_matrix)
 
         if transform_matrix is None:
             print('MATRIX GENERATION FAILED.', file=stderr)

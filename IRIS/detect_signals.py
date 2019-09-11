@@ -62,6 +62,9 @@ def detect_blobs_Ke(f_cycle):
 
     mor_kps = []
 
+    ##########################################################
+    # Setup the parameters of preliminary detection of blobs #
+    ##########################################################
     blob_params = SimpleBlobDetector_Params()
 
     blob_params.thresholdStep = 1
@@ -77,14 +80,22 @@ def detect_blobs_Ke(f_cycle):
 
     blob_params.filterByCircularity = False
     blob_params.filterByConvexity = True
+    ##########################################################
 
     for img in channel_list:
+        #################################
+        # Setup threshold of gray-scale #
+        #################################
         blob_params.minThreshold = mode(floor(reshape(img, (img.size,)) / 2) * 2)[0][0]
+        #################################
 
         mor_detector = SimpleBlobDetector.create(blob_params)
-
         mor_kps.extend(mor_detector.detect(img))
 
+    #################################################################################################
+    # Map all the detected blobs into a new mask layer for redundant filtering, and detecting again #
+    # This step is used to ensure where can be detected blob across this cycle                      #
+    #################################################################################################
     mask_layer = zeros(channel_A.shape, dtype=uint8)
 
     for key_point in mor_kps:
@@ -105,7 +116,11 @@ def detect_blobs_Ke(f_cycle):
     diff_list_T = []
     diff_list_C = []
     diff_list_G = []
+    #################################################################################################
 
+    #########################################################################
+    # Calculate the threshold of distinction between blobs and pseudo-blobs #
+    #########################################################################
     for key_point in kps:
         r = int(key_point.pt[1])
         c = int(key_point.pt[0])
@@ -140,7 +155,11 @@ def detect_blobs_Ke(f_cycle):
     cut_off_T = int(mode(around(divide(array(diff_list_T, dtype=uint8), diff_break)))[0][0]) - diff_break
     cut_off_C = int(mode(around(divide(array(diff_list_C, dtype=uint8), diff_break)))[0][0]) - diff_break
     cut_off_G = int(mode(around(divide(array(diff_list_G, dtype=uint8), diff_break)))[0][0]) - diff_break
+    #########################################################################
 
+    ############################################################################################
+    # The coordinates of result will be used to locate the gary-scale among different channels #
+    ############################################################################################
     for key_point in kps:
         r = int(key_point.pt[1])
         c = int(key_point.pt[0])
@@ -164,6 +183,7 @@ def detect_blobs_Ke(f_cycle):
                 sum(channel_G[(r - 4):(r + 6), (c - 4):(c + 6)]) / 100 > cut_off_G:
             greyscale_model_G[r, c] = sum(channel_G[(r - 1):(r + 3), (c - 1):(c + 3)]) / 16 - \
                                       sum(channel_G[(r - 4):(r + 6), (c - 4):(c + 6)]) / 100
+    ############################################################################################
 
     image_model_pool = image_model_pooling_Ke(greyscale_model_A,
                                               greyscale_model_T,
@@ -185,6 +205,11 @@ def detect_blobs_Eng(f_cycle):
     :param f_cycle: A image matrix in the 3D common data tensor.
     :return: A base box of this cycle, which store their coordinates, base and its error rate.
     """
+    #########################################################################
+    # The barcode should be encode as 1~9 and A, B, C                       #
+    # N means nothing                                                       #
+    # This strategy of encoding can make the data compatible with Ke's data #
+    #########################################################################
     channel_1 = f_cycle[0]
     channel_2 = f_cycle[1]
     channel_3 = f_cycle[2]
@@ -197,6 +222,7 @@ def detect_blobs_Eng(f_cycle):
     channel_A = f_cycle[9]
     channel_B = f_cycle[10]
     channel_C = f_cycle[11]
+    #########################################################################
 
     greyscale_model_1 = zeros(channel_1.shape, dtype=float32)
     greyscale_model_2 = zeros(channel_2.shape, dtype=float32)

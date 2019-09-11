@@ -29,8 +29,13 @@ def write_reads_into_file(f_background, f_barcode_cube, f_barcode_length):
 
             for k in range(0, f_barcode_length):
                 if f_barcode_cube[k][j][1] is not None:
-                    # Transforming the Error Rate into the Phred+ 33 Score #
+                    ###############################################################
+                    # Transforming the error rate into the Phred+ 33 score system #
+                    # It is also transform to the Phred+ 64 score system if need  #
+                    ###############################################################
                     quality = int(-10 * log10(f_barcode_cube[k][j][1] + 0.0001)) + 33
+                    ########
+                    # quality = int(-10 * log10(f_barcode_cube[k][j][1] + 0.001)) + 64  # Alternative option
 
                     seq.append(f_barcode_cube[k][j][0])
                     qul.append(chr(quality))

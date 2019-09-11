@@ -51,17 +51,36 @@ def decode_data_Ke(f_cycles):
     for cycle_id in range(0, len(f_cycles)):
         adj_img_mats = []
 
+        ####################################
+        # Read five channels into a matrix #
+        ####################################
         channel_A = imread('/'.join((f_cycles[cycle_id], 'Y5.tif')),   IMREAD_GRAYSCALE)
         channel_T = imread('/'.join((f_cycles[cycle_id], 'FAM.tif')),  IMREAD_GRAYSCALE)
         channel_C = imread('/'.join((f_cycles[cycle_id], 'TXR.tif')),  IMREAD_GRAYSCALE)
         channel_G = imread('/'.join((f_cycles[cycle_id], 'Y3.tif')),   IMREAD_GRAYSCALE)
         channel_0 = imread('/'.join((f_cycles[cycle_id], 'DAPI.tif')), IMREAD_GRAYSCALE)
+        ####################################
 
-        merged_img = addWeighted(add(add(add(channel_A, channel_T), channel_C), channel_G), 0.7, channel_0, 0.3, 0)
+        #####################################################################################################
+        # Merge different channels from a same cycle into one matrix for following registration             #
+        # BE CARE: The parameters 'alpha' and 'beta' maybe will affect whether the registering succeed      #
+        # Sometimes, a registering succeed by only using DAPI from different cycle instead of merged images #
+        #####################################################################################################
+        alpha = 0.7
+        beta = 0.3
+
+        merged_img = addWeighted(add(add(add(channel_A, channel_T), channel_C), channel_G), alpha, channel_0, beta, 0)
+        ########
+        # merged_img = channel_0  # Alternative option
 
         if cycle_id == 0:
             reg_ref = merged_img
+
+            #####################
+            # Output background #
+            #####################
             f_std_img = merged_img
+            #####################
 
         trans_mat = register_cycles(reg_ref, merged_img, 'BRISK')
 
@@ -75,8 +94,13 @@ def decode_data_Ke(f_cycles):
         adj_img_mats.append(warpAffine(channel_T, trans_mat, (f_std_img.shape[1], f_std_img.shape[0])))
         adj_img_mats.append(warpAffine(channel_C, trans_mat, (f_std_img.shape[1], f_std_img.shape[0])))
         adj_img_mats.append(warpAffine(channel_G, trans_mat, (f_std_img.shape[1], f_std_img.shape[0])))
+        #####################################################################################################
 
+        ###################################################################################################
+        # This stacked 3D-tensor is a common data structure for following analysis and data compatibility #
+        ###################################################################################################
         f_cycle_stack.append(adj_img_mats)
+        ###################################################################################################
 
     return f_cycle_stack, f_std_img
 
@@ -160,6 +184,9 @@ def decode_data_Eng(f_cycles):
     return f_cycle_stack, f_std_img
 
 
+######################################################
+# This is a interface for Weinstein's data (ABANDON) #
+######################################################
 # def decode_data_Weinstein(f_cycles):
 #     """
 #     For parsing the technique which published on Nature Methods in 2019 by JA Weinstein.
@@ -171,6 +198,7 @@ def decode_data_Eng(f_cycles):
 #     :return:
 #     """
 #     pass
+######################################################
 
 
 if __name__ == '__main__':

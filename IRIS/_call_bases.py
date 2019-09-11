@@ -31,15 +31,37 @@ def image_model_pooling_Ke(f_image_model_A, f_image_model_T, f_image_model_C, f_
     :param f_image_model_T: Channel T in a cycle from the 3D common data tensor.
     :param f_image_model_C: Channel C in a cycle from the 3D common data tensor.
     :param f_image_model_G: Channel G in a cycle from the 3D common data tensor.
-    :return: A dictionary of blobs, all the types of base in a certain location, including the coordinates, bases and
-    their base scores.
+    :return f_image_model_pool: A dictionary of blobs, all the types of base in a certain location, including the
+    coordinates, bases and their base scores.
     """
     f_image_model_pool = {}
 
+    #################################################
+    # Collect all the coordinates of detected blobs #
+    #################################################
     f_image_model = f_image_model_A + f_image_model_T + f_image_model_C + f_image_model_G
+    #################################################
 
+    ##############################################################################################################
+    # Each coordinate stores the base scores, and the largest one is made to as the representative of this cycle #
+    # Other channels, which take non-largest base scores, will be following used to calculate the Quality of     #
+    # their coordinates                                                                                          #
+    ##############################################################################################################
     for row, col in transpose(nonzero(f_image_model)):
+        #######################################################################################################
+        # Our software just handle the image with its size smaller than 99999x99999                           #
+        # This size limit should fit most of images                                                           #
+        # You can modify this limit like following options in each place of 'read_id' for fitting your images #
+        #######################################################################################################
         read_id = 'r%05dc%05d' % (row + 1, col + 1)
+        ########
+        # read_id = 'r%06dc%06d' % (row + 1, col + 1)  # Alternative option
+        ########
+        # read_id = 'r%07dc%07d' % (row + 1, col + 1)  # Alternative option
+        ########
+        # read_id = 'r%08dc%08d' % (row + 1, col + 1)  # Alternative option
+
+        #######################################################################################################
 
         if read_id not in f_image_model_pool:
             f_image_model_pool.update({read_id: {'A': 0, 'T': 0, 'C': 0, 'G': 0}})
@@ -55,6 +77,7 @@ def image_model_pooling_Ke(f_image_model_A, f_image_model_T, f_image_model_C, f_
 
         if f_image_model_G[row, col] > 0:
             f_image_model_pool[read_id]['G'] = f_image_model_G[row, col]
+    ##############################################################################################################
 
     return f_image_model_pool
 
@@ -76,8 +99,8 @@ def image_model_pooling_Eng(f_image_model_1, f_image_model_2, f_image_model_3,
     :param f_image_model_A: Channel A in a cycle from the 3D common data tensor.
     :param f_image_model_B: Channel B in a cycle from the 3D common data tensor.
     :param f_image_model_C: Channel C in a cycle from the 3D common data tensor.
-    :return: A dictionary of blobs, all the types of base in a certain location, including the coordinate, bases and
-    their base scores.
+    :return f_image_model_pool: A dictionary of blobs, all the types of base in a certain location, including the
+    coordinate, bases and their base scores.
     """
     f_image_model_pool = {}
 
@@ -137,8 +160,8 @@ def image_model_pooling_Eng(f_image_model_1, f_image_model_2, f_image_model_3,
 def pool2base(f_image_model_pool):
     """
     :param f_image_model_pool: The dictionary of blobs, including the base and the coordinates.
-    :return: The dictionary of bases, only one representative in a certain location, including the coordinate, base and
-    its error rates.
+    :return f_base_box: The dictionary of bases, only one representative in a certain location, including the
+    coordinate, base and its error rates.
     """
     f_base_box = {}
 

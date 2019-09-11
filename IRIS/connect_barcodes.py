@@ -38,6 +38,9 @@ class BarcodeCube:
         self.__all_blobs_list = [_ for _ in called_base_in_one_cycle.keys() if 'N' not in called_base_in_one_cycle[_]]
         self.bases_cube.append(called_base_in_one_cycle)
 
+    ###############################################
+    # Old redundancy-filtering strategy (ABANDON) #
+    ###############################################
     # def filter_blobs_list(self, f_background):
     #     """
     #     This method is used to filter the recorded bases in the called base list.
@@ -69,6 +72,7 @@ class BarcodeCube:
     #             new_coor.add(str('r' + ('%05d' % cr) + 'c' + ('%05d' % cc)))
     #
     #     self.__all_blobs_list = new_coor
+    ###############################################
 
     def filter_blobs_list(self):
         """
@@ -111,15 +115,26 @@ class BarcodeCube:
                 max_qul_base = 'N'
                 min_err_rate = float(1)
 
+                ####################################################################################################
+                # It will search a 20x20 region to connect bases from cycle 1 to the last, in each ref-coordinates #
+                ####################################################################################################
                 for row in range(r - 9, r + 11):
                     for col in range(c - 9, c + 11):
                         coor = 'r%05dc%05d' % (row, col)
 
                         if coor in bases_cube[cycle_N]:
-                            # Adjusting of Error Rate #
+                            ######################################################################
+                            # Adjust of error rate of each coordinate by the Pythagorean theorem #
+                            # This function can be off if no need                                #
+                            ######################################################################
                             error_rate = bases_cube[cycle_N][coor][1]
                             D = sqrt((row - r) ** 2 + (col - c) ** 2)
+
                             adj_err_rate = sqrt(((error_rate * D) ** 2) + (error_rate ** 2))
+                            ########
+                            # adj_err_rate = error_rate    # Alternative option
+
+                            ######################################################################
 
                             if adj_err_rate > 1:
                                 adj_err_rate = float(1)
@@ -127,6 +142,7 @@ class BarcodeCube:
                             if adj_err_rate < min_err_rate:
                                 max_qul_base = bases_cube[cycle_N][coor][0]
                                 min_err_rate = adj_err_rate
+                ####################################################################################################
 
                 adjusted_bases_cube[cycle_N].update({ref_coordinate: [max_qul_base, min_err_rate]})
 
