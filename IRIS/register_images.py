@@ -55,7 +55,7 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
         ksize = (15, 15)
         kernel = getStructuringElement(MORPH_CROSS, ksize)
 
-        gray_image = morphologyEx(gray_image, MORPH_GRADIENT, kernel, iterations=3)
+        gray_image = morphologyEx(gray_image, MORPH_GRADIENT, kernel, iterations=2)
 
         det = ''
         ext = ''

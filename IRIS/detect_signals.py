@@ -53,10 +53,10 @@ def detect_blobs_Ke(f_cycle):
     ksize = (15, 15)
     kernel = getStructuringElement(MORPH_ELLIPSE, ksize)
 
-    channel_A = morphologyEx(channel_A, MORPH_TOPHAT, kernel, iterations=3)
-    channel_T = morphologyEx(channel_T, MORPH_TOPHAT, kernel, iterations=3)
-    channel_C = morphologyEx(channel_C, MORPH_TOPHAT, kernel, iterations=3)
-    channel_G = morphologyEx(channel_G, MORPH_TOPHAT, kernel, iterations=3)
+    channel_A = morphologyEx(channel_A, MORPH_TOPHAT, kernel, iterations=2)
+    channel_T = morphologyEx(channel_T, MORPH_TOPHAT, kernel, iterations=2)
+    channel_C = morphologyEx(channel_C, MORPH_TOPHAT, kernel, iterations=2)
+    channel_G = morphologyEx(channel_G, MORPH_TOPHAT, kernel, iterations=2)
 
     channel_list = (channel_A, channel_T, channel_C, channel_G)
 
