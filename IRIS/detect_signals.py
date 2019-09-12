@@ -27,7 +27,7 @@ from numpy import (array, zeros, reshape,
                    float32, uint8)
 from scipy.stats import mode
 
-from ._call_bases import image_model_pooling_Ke, image_model_pooling_Eng, pool2base
+from .call_bases import image_model_pooling_Ke, image_model_pooling_Eng, pool2base
 
 
 def detect_blobs_Ke(f_cycle):
@@ -155,8 +155,9 @@ def detect_blobs_Ke(f_cycle):
     # The step of detection could expose a massive of amount of blobs and   #
     # their location, as well as some false-positive. we calculate the      #
     # difference of gray-scale between pixel in core region and periphery   #
-    # of each blob, for counting its threshold of each channel. This        #
-    # threshold could be used to filter those blobs of false-positive       #
+    # of each blob, which named as 'base score', for counting its threshold #
+    # of each channel. This threshold could be used to filter those blobs   #
+    # of false-positive in the following step                               #
     #########################################################################
     for key_point in kps:
         r = int(key_point.pt[1])
@@ -194,9 +195,9 @@ def detect_blobs_Ke(f_cycle):
     cut_off_G = int(mode(around(divide(array(diff_list_G, dtype=uint8), diff_break)))[0][0]) - diff_break
     #########################################################################
 
-    ############################################################################################
-    # The coordinates of result will be used to locate the gary-scale among different channels #
-    ############################################################################################
+    ##############################################################################################################
+    # The coordinates of real blobs will be used to locate the difference of gary-scale among different channels #
+    ##############################################################################################################
     for key_point in kps:
         r = int(key_point.pt[1])
         c = int(key_point.pt[0])
@@ -220,7 +221,7 @@ def detect_blobs_Ke(f_cycle):
                 sum(channel_G[(r - 4):(r + 6), (c - 4):(c + 6)]) / 100 > cut_off_G:
             greyscale_model_G[r, c] = sum(channel_G[(r - 1):(r + 3), (c - 1):(c + 3)]) / 16 - \
                                       sum(channel_G[(r - 4):(r + 6), (c - 4):(c + 6)]) / 100
-    ############################################################################################
+    ##############################################################################################################
 
     image_model_pool = image_model_pooling_Ke(greyscale_model_A,
                                               greyscale_model_T,
