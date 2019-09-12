@@ -97,7 +97,10 @@ def detect_blobs_Ke(f_cycle):
     #                                                                                  #
     # Unfortunately, some genes expressing heavily at a dense region are almost        #
     # confused with impurities would to be filtered, lead to optics-identification     #
-    # failed                                                                           #
+    # failed. A known example in our debug is the gene 'pro-corazonin-like', which     #
+    # is a high expression gene at a crowded region in brain of some of insect, is     #
+    # almost detected as a low- or non-expression gene due to confusing its exp-blob   #
+    # as an impurity and filtering in our practise                                     #
     ####################################################################################
     blob_params.maxArea = 100
     ########
@@ -153,11 +156,11 @@ def detect_blobs_Ke(f_cycle):
     # should increase suddenly in its core region, compared with periphery  #
     #                                                                       #
     # The step of detection could expose a massive of amount of blobs and   #
-    # their location, as well as some false-positive. we calculate the      #
-    # difference of gray-scale between pixel in core region and periphery   #
-    # of each blob, which named as 'base score', for counting its threshold #
-    # of each channel. This threshold could be used to filter those blobs   #
-    # of false-positive in the following step                               #
+    # their location, as well as some false-positive. We calculate the      #
+    # difference of mean of gray-scale between pixel in core region and     #
+    # periphery of each blob, which named as 'base score', for counting its #
+    # threshold of each channel. This threshold could be used to filter     #
+    # those blobs of false-positive in following step                       #
     #########################################################################
     for key_point in kps:
         r = int(key_point.pt[1])
