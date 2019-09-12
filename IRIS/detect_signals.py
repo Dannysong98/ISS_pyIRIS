@@ -64,19 +64,46 @@ def detect_blobs_Ke(f_cycle):
 
     ##########################################################
     # Setup the parameters of preliminary detection of blobs #
+    # Here, some of parameters are very crucial, such as     #
+    # 'thresholdStep', 'minRepeatability', 'minArea', which  #
+    # could sorely affect the number of detected blobs. And  #
+    # more importantly, they will be modify as different     #
+    # experiment.                                            #
+    #                                                        #
+    # We prepared some cases about the different situation   #
+    # we met in the stage of debug, and we look forward to   #
+    # standardize the experiment                             #
     ##########################################################
     blob_params = SimpleBlobDetector_Params()
 
     blob_params.thresholdStep = 1
     blob_params.minRepeatability = 2
-    blob_params.minDistBetweenBlobs = 1
+    ########
+    # blob_params.thresholdStep = 2  # Alternative option
+    # blob_params.minRepeatability = 2  # Alternative option
 
+    blob_params.minDistBetweenBlobs = 2
     blob_params.filterByColor = True
     blob_params.blobColor = 255
 
     blob_params.filterByArea = True
-    blob_params.minArea = 1
+
+    blob_params.minArea = 2
+    ########
+    # blob_params.minArea = 1  # Alternative option
+
+    ####################################################################################
+    # This parameter is used for filtering those extreme large blobs, like impurities. #
+    #                                                                                  #
+    # Unfortunately, some genes expressing heavily at a dense region are almost        #
+    # confused with impurities would to be filtered, lead to optics-identification     #
+    # failed                                                                           #
+    ####################################################################################
     blob_params.maxArea = 100
+    ########
+    # blob_params.maxArea = 65  # Alternative option
+
+    ####################################################################################
 
     blob_params.filterByCircularity = False
     blob_params.filterByConvexity = True
@@ -92,10 +119,11 @@ def detect_blobs_Ke(f_cycle):
         mor_detector = SimpleBlobDetector.create(blob_params)
         mor_kps.extend(mor_detector.detect(img))
 
-    #################################################################################################
-    # Map all the detected blobs into a new mask layer for redundant filtering, and detecting again #
-    # This step is used to ensure where can be detected blob across this cycle                      #
-    #################################################################################################
+    ##############################################################################################
+    # To map all the detected blobs into a new mask layer for redundant and duplicate filtering, #
+    # and detecting this mask layer next for ensuring where can be located blob across all       #
+    # channels in this cycle                                                                     #
+    ##############################################################################################
     mask_layer = zeros(channel_A.shape, dtype=uint8)
 
     for key_point in mor_kps:
@@ -116,10 +144,19 @@ def detect_blobs_Ke(f_cycle):
     diff_list_T = []
     diff_list_C = []
     diff_list_G = []
-    #################################################################################################
+    ##############################################################################################
 
     #########################################################################
     # Calculate the threshold of distinction between blobs and pseudo-blobs #
+    #                                                                       #
+    # There is a crucial feature in each real blob, the gray-scale of pixel #
+    # should increase suddenly in its core region, compared with periphery  #
+    #                                                                       #
+    # The step of detection could expose a massive of amount of blobs and   #
+    # their location, as well as some false-positive. we calculate the      #
+    # difference of gray-scale between pixel in core region and periphery   #
+    # of each blob, for counting its threshold of each channel. This        #
+    # threshold could be used to filter those blobs of false-positive       #
     #########################################################################
     for key_point in kps:
         r = int(key_point.pt[1])
@@ -263,15 +300,24 @@ def detect_blobs_Eng(f_cycle):
     blob_params = SimpleBlobDetector_Params()
 
     blob_params.thresholdStep = 1
-    blob_params.minRepeatability = 2
-    blob_params.minDistBetweenBlobs = 1
+    blob_params.minRepeatability = 1
+    ########
+    # blob_params.thresholdStep = 1  # Alternative option
+    # blob_params.minRepeatability = 2  # Alternative option
 
+    blob_params.minDistBetweenBlobs = 1
     blob_params.filterByColor = True
     blob_params.blobColor = 255
 
     blob_params.filterByArea = True
+
     blob_params.minArea = 1
+    ########
+    # blob_params.minArea = 2  # Alternative option
+
     blob_params.maxArea = 100
+    ########
+    # blob_params.maxArea = 65  # Alternative option
 
     blob_params.filterByCircularity = False
     blob_params.filterByConvexity = True
