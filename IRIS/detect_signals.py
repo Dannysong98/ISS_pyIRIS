@@ -50,6 +50,11 @@ def detect_blobs_Ke(f_cycle):
     greyscale_model_C = zeros(channel_C.shape, dtype=float32)
     greyscale_model_G = zeros(channel_G.shape, dtype=float32)
 
+    #####################################################################################
+    # Here, A Morphological transformation, the Tophat, which is the difference between #
+    # input image and Opening of the image, under a 15x15 ELLIPSE kernel, is used to    #
+    # disappear background as much as possible, for exposing its blobs                  #
+    #####################################################################################
     ksize = (15, 15)
     kernel = getStructuringElement(MORPH_ELLIPSE, ksize)
 
@@ -57,6 +62,7 @@ def detect_blobs_Ke(f_cycle):
     channel_T = morphologyEx(channel_T, MORPH_TOPHAT, kernel, iterations=2)
     channel_C = morphologyEx(channel_C, MORPH_TOPHAT, kernel, iterations=2)
     channel_G = morphologyEx(channel_G, MORPH_TOPHAT, kernel, iterations=2)
+    #####################################################################################
 
     channel_list = (channel_A, channel_T, channel_C, channel_G)
 
@@ -76,11 +82,11 @@ def detect_blobs_Ke(f_cycle):
     ##########################################################
     blob_params = SimpleBlobDetector_Params()
 
-    blob_params.thresholdStep = 1
+    blob_params.thresholdStep = 2
     blob_params.minRepeatability = 2
     ########
-    # blob_params.thresholdStep = 2  # Alternative option
-    # blob_params.minRepeatability = 2  # Alternative option
+    # blob_params.thresholdStep = 3  # Alternative option
+    # blob_params.minRepeatability = 3  # Alternative option
 
     blob_params.minDistBetweenBlobs = 2
     blob_params.filterByColor = True
@@ -88,24 +94,24 @@ def detect_blobs_Ke(f_cycle):
 
     blob_params.filterByArea = True
 
-    blob_params.minArea = 2
+    blob_params.minArea = 1
     ########
-    # blob_params.minArea = 1  # Alternative option
+    # blob_params.minArea = 4  # Alternative option
 
     ####################################################################################
     # This parameter is used for filtering those extreme large blobs, like impurities. #
     #                                                                                  #
     # Unfortunately, some genes expressing heavily at a dense region are almost        #
     # confused with impurities would to be filtered, lead to optics-identification     #
-    # failed. A known example in our debug is the gene 'pro-corazonin-like', which     #
-    # is a high expression gene at a crowded region in brain of some of insect, is     #
-    # almost detected as a low- or non-expression gene due to confusing its exp-blob   #
-    # as an impurity and filtering in our practise                                     #
+    # failed. A known case in our practise is the gene 'pro-corazonin-like', this is a #
+    # high expression gene at a crowded region in brain of some of insects, is almost  #
+    # detected as a low- or non-expression gene due to confusing its extreme large     #
+    # blobs of expressed RNA as impurities and to be filtered subsequently             #
     ####################################################################################
-    blob_params.maxArea = 100
+    blob_params.maxArea = 65
     ########
-    # blob_params.maxArea = 65  # Alternative option
-
+    # blob_params.maxArea = 100  # Alternative option
+    # blob_params.maxArea = 145  # Alternative option
     ####################################################################################
 
     blob_params.filterByCircularity = False
@@ -303,11 +309,11 @@ def detect_blobs_Eng(f_cycle):
 
     blob_params = SimpleBlobDetector_Params()
 
-    blob_params.thresholdStep = 1
+    blob_params.thresholdStep = 2
     blob_params.minRepeatability = 1
     ########
-    # blob_params.thresholdStep = 1  # Alternative option
-    # blob_params.minRepeatability = 2  # Alternative option
+    # blob_params.thresholdStep = 3  # Alternative option
+    # blob_params.minRepeatability = 3  # Alternative option
 
     blob_params.minDistBetweenBlobs = 1
     blob_params.filterByColor = True

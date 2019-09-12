@@ -52,23 +52,29 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
         """
         f_gray_image = GaussianBlur(f_gray_image, (3, 3), 0)
 
+        ####################################################################################
+        # Here, A Morphological transformation, the Morphological gradient, which is the   #
+        # difference between dilation and erosion of an image, under a 15x15 CROSS kernel, #
+        # is used to disappear background as much as possible, for exposing its blobs      #
+        ####################################################################################
         ksize = (15, 15)
         kernel = getStructuringElement(MORPH_CROSS, ksize)
 
         f_gray_image = morphologyEx(f_gray_image, MORPH_GRADIENT, kernel, iterations=2)
+        ####################################################################################
 
         det = ''
         ext = ''
 
         method = 'BRISK' if method is None else method
 
-        if method == 'ORB':
-            det = ORB.create()
-            ext = ORB.create()
-
-        elif method == 'BRISK':
+        if method == 'BRISK':
             det = BRISK.create()
             ext = BRISK.create()
+
+        elif method == 'ORB':
+            det = ORB.create()
+            ext = ORB.create()
 
         else:
             print('Only ORB and BRISK would be suggested.', file=stderr)
@@ -135,7 +141,7 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
         good_matches = [good_matches[_] for _ in range(0, mask.size) if mask[_][0] == 1]
 
         n = sum([mask[_][0] for _ in range(0, mask.size)]) - mask.size
-    ############################################################################
+    ###########################################################################
 
     if len(good_matches) >= 4:
         pts_a_filtered = float32([kp1[_.queryIdx].pt for _ in good_matches]).reshape(-1, 1, 2)
