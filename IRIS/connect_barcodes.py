@@ -121,7 +121,7 @@ class BarcodeCube:
                 # registration is not accurate enough. Here, we choose a simple approach to solve this problem,    #
                 # we get locations of blobs from a reference image layer, then to search a NxN (e.g. 20x20) region #
                 # in those cycles that need to be connected. This approach should not only solve this problem but  #
-                # also bring some of false negative, these false negatives could be ignored in our practice        #
+                # also bring very little false negative that could be ignored in our practice                      #
                 ####################################################################################################
                 N = 9  # 20x20
                 ########
