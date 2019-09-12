@@ -143,6 +143,9 @@ def decode_data_Eng(f_cycles):
 
         if cycle_id == 0:
             reg_ref = add(add(add(img_r1_mats[0], img_r1_mats[1]), img_r1_mats[2]), img_r1_mats[3])
+            ########
+            # reg_ref = merged_img1  # Alternative option
+
             f_std_img = merged_img1
 
         trans_mat1 = register_cycles(reg_ref, merged_img1, 'BRISK')
