@@ -186,6 +186,10 @@ def decode_data_Eng(f_cycles):
 
 ######################################################
 # This is a interface for Weinstein's data (ABANDON) #
+#                                                    #
+# Anybody could write interface for our software,    #
+# for being compatible with more type of data, as    #
+# long as following our 3D common data structure     #
 ######################################################
 # def decode_data_Weinstein(f_cycles):
 #     """

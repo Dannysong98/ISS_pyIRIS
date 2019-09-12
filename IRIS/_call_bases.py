@@ -49,7 +49,7 @@ def image_model_pooling_Ke(f_image_model_A, f_image_model_T, f_image_model_C, f_
     ##############################################################################################################
     for row, col in transpose(nonzero(f_image_model)):
         #######################################################################################################
-        # Our software just handle the image with its size smaller than 99999x99999                           #
+        # Our software just handle the images no larger than 99999x99999                                      #
         # This size limit should fit most of images                                                           #
         # You can modify this limit like following options in each place of 'read_id' for fitting your images #
         #######################################################################################################
