@@ -56,9 +56,7 @@ def image_model_pooling_Ke(f_image_model_A, f_image_model_T, f_image_model_C, f_
         read_id = 'r%05dc%05d' % (row + 1, col + 1)
         ########
         # read_id = 'r%06dc%06d' % (row + 1, col + 1)  # Alternative option
-        ########
         # read_id = 'r%07dc%07d' % (row + 1, col + 1)  # Alternative option
-        ########
         # read_id = 'r%08dc%08d' % (row + 1, col + 1)  # Alternative option
 
         #######################################################################################################

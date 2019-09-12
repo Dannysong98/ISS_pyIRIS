@@ -103,12 +103,11 @@ class BarcodeCube:
 
         :return: NONE
         """
-        def __check_greyscale(all_blobs_list, bases_cube, adjusted_bases_cube, cycle_N):
+        def __check_greyscale(all_blobs_list, bases_cube, adjusted_bases_cube, cycle_serial):
             """"""
-            adjusted_bases_cube[cycle_N] = {}
+            adjusted_bases_cube[cycle_serial] = {}
 
             for ref_coordinate in all_blobs_list:
-
                 r = int(ref_coordinate[1:6].lstrip('0'))
                 c = int(ref_coordinate[7:].lstrip('0'))
 
@@ -117,34 +116,47 @@ class BarcodeCube:
 
                 ####################################################################################################
                 # It will search a 20x20 region to connect bases from cycle 1 to the last, in each ref-coordinates #
+                #                                                                                                  #
+                # Process of registration almost align all location of cycles the same, but in pixel level, this   #
+                # registration is not accurate enough. Here, we choose a simple approach to solve this problem,    #
+                # we get locations of blobs from a reference image layer, then to search a NxN (e.g. 20x20) region #
+                # in those cycles that need to be connected. This approach should not only solve this problem but  #
+                # also bring some of false negative, these false negatives could be ignored in our practice        #
                 ####################################################################################################
-                for row in range(r - 9, r + 11):
-                    for col in range(c - 9, c + 11):
+                N = 9  # 20x20
+                ########
+                # N = 1  # Alternative option, 4x4
+                # N = 2  # Alternative option, 6x6
+                # N = 4  # Alternative option, 10x10
+                ########
+                # N = n  # ((n + 1) * 2)x((n + 1) * 2)
+
+                for row in range(r - N, r + (N + 2)):
+                    for col in range(c - N, c + (N + 2)):
                         coor = 'r%05dc%05d' % (row, col)
 
-                        if coor in bases_cube[cycle_N]:
+                        if coor in bases_cube[cycle_serial]:
                             ######################################################################
                             # Adjust of error rate of each coordinate by the Pythagorean theorem #
                             # This function can be off if no need                                #
                             ######################################################################
-                            error_rate = bases_cube[cycle_N][coor][1]
+                            error_rate = bases_cube[cycle_serial][coor][1]
                             D = sqrt((row - r) ** 2 + (col - c) ** 2)
 
                             adj_err_rate = sqrt(((error_rate * D) ** 2) + (error_rate ** 2))
                             ########
-                            # adj_err_rate = error_rate    # Alternative option
-
+                            # adj_err_rate = error_rate  # Alternative option
                             ######################################################################
 
                             if adj_err_rate > 1:
                                 adj_err_rate = float(1)
 
                             if adj_err_rate < min_err_rate:
-                                max_qul_base = bases_cube[cycle_N][coor][0]
+                                max_qul_base = bases_cube[cycle_serial][coor][0]
                                 min_err_rate = adj_err_rate
                 ####################################################################################################
 
-                adjusted_bases_cube[cycle_N].update({ref_coordinate: [max_qul_base, min_err_rate]})
+                adjusted_bases_cube[cycle_serial].update({ref_coordinate: [max_qul_base, min_err_rate]})
 
         if len(self.bases_cube) > 0:
             for cycle_id in range(0, len(self.bases_cube)):

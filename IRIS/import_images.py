@@ -132,12 +132,14 @@ def decode_data_Eng(f_cycles):
         _, img_r2_mats = imreadmulti(f_cycles[cycle_id + 1], None, IMREAD_GRAYSCALE)
         _, img_r3_mats = imreadmulti(f_cycles[cycle_id + 2], None, IMREAD_GRAYSCALE)
         _, img_r4_mats = imreadmulti(f_cycles[cycle_id + 3], None, IMREAD_GRAYSCALE)
-
+        ####################################################
         # Alexa 488 channel labeled all the spots in a FOV #
+        ####################################################
         merged_img1 = img_r1_mats[3]
         merged_img2 = img_r1_mats[3]
         merged_img3 = img_r1_mats[3]
         merged_img4 = img_r1_mats[3]
+        ####################################################
 
         if cycle_id == 0:
             reg_ref = add(add(add(img_r1_mats[0], img_r1_mats[1]), img_r1_mats[2]), img_r1_mats[3])
