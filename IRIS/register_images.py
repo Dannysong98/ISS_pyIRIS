@@ -87,6 +87,13 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
         det = ''
         ext = ''
 
+        ##############################################################################################
+        # We prepare two methods of feature points detection for selectable, one is 'BRISK', and the #
+        # other is 'ORB'. In general, the algorithm 'ORB' is used as the open-source alternative of  #
+        # 'SIFT' and 'SURF', which are almost the industry standard. In our practice, 'ORB' always   #
+        # detect very fewer points than 'BRISK' and often lead to registration failed. So, we choose #
+        # the latter as our method of point detecting, in default.                                   #
+        ##############################################################################################
         method = 'BRISK' if method is None else method
 
         if method == 'BRISK':
@@ -98,7 +105,8 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
             ext = ORB.create()
 
         else:
-            print('Only ORB and BRISK would be suggested.', file=stderr)
+            print('Only ORB and BRISK could be suggested', file=stderr)
+        ##############################################################################################
 
         f_key_points = det.detect(f_gray_image)
 
