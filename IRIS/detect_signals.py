@@ -50,11 +50,11 @@ def detect_blobs_Ke(f_cycle):
     greyscale_model_C = zeros(channel_C.shape, dtype=float32)
     greyscale_model_G = zeros(channel_G.shape, dtype=float32)
 
-    #####################################################################################
-    # Here, A Morphological transformation, the Tophat, which is the difference between #
-    # input image and Opening of the image, under a 15x15 ELLIPSE kernel, is used to    #
-    # disappear background as much as possible, for exposing its blobs                  #
-    #####################################################################################
+    ###############################################################################
+    # Here, a morphological transformation, the Tophat, which is the difference   #
+    # between input image and Opening of the image, under a 15x15 ELLIPSE kernel, #
+    # is used to disappear background as much as possible, for exposing its blobs #
+    ###############################################################################
     ksize = (15, 15)
     kernel = getStructuringElement(MORPH_ELLIPSE, ksize)
 
@@ -62,7 +62,7 @@ def detect_blobs_Ke(f_cycle):
     channel_T = morphologyEx(channel_T, MORPH_TOPHAT, kernel, iterations=2)
     channel_C = morphologyEx(channel_C, MORPH_TOPHAT, kernel, iterations=2)
     channel_G = morphologyEx(channel_G, MORPH_TOPHAT, kernel, iterations=2)
-    #####################################################################################
+    ###############################################################################
 
     channel_list = (channel_A, channel_T, channel_C, channel_G)
 
