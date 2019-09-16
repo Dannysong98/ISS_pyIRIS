@@ -54,16 +54,15 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
         :param method: The detection algorithm of feature points.
         :return: A tuple including a group of feature points and their descriptions.
         """
-        ###################################################################################
-        # In order to suppress the errors better in registration, we need to reduce some  #
-        # of redundant characters in each image. Here, we merge adjacent 3 pixels (3x3)   #
-        # to blur those characters of noise-like, meanwhile, to retain those primary one. #
-        # Alternative, a Morphological transformation, the Morphological gradient, which  #
-        # is the difference between dilation and erosion of an image, under a 15x15 CROSS #
-        # kernel, is used to disappear background as much as possible, for exposing its   #
-        # blobs                                                                           #
-        ###################################################################################
-
+        ####################################################################################
+        # In order to suppress the errors better in registration, we need to reduce some   #
+        # of redundant characters in each image. Here, we merge adjacent 3 pixels (3x3)    #
+        # to blur those characters of noise-like, meanwhile, to retain those primary one.  #
+        # As a candidate, a method of morphological transformation, the Morphological      #
+        # gradient, which is the difference between dilation and erosion of an image,      #
+        # under a 15x15 CROSS kernel, is used to disappear background as much as possible, #
+        # for exposing its blobs                                                           #
+        ####################################################################################
         scale = 3
         ########
         # scale = 2  # Alternative option
@@ -72,17 +71,16 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
         f_gray_image = resize(resize(f_gray_image, (int(around(f_gray_image.shape[1] / scale)),
                                                     int(around(f_gray_image.shape[0] / scale)))),
                               (f_gray_image.shape[1], f_gray_image.shape[0]))
-
         ########
-
-        # Alternative option #
+        ###############################
+        # Block of alternative option #
+        ###############################
         # f_gray_image = GaussianBlur(f_gray_image, (3, 3), 0)
         # ksize = (15, 15)
         # kernel = getStructuringElement(MORPH_CROSS, ksize)
         # f_gray_image = morphologyEx(f_gray_image, MORPH_GRADIENT, kernel, iterations=3)
-        ######################
-
-        ###################################################################################
+        ###############################
+        ####################################################################################
 
         det = ''
         ext = ''
