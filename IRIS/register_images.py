@@ -17,14 +17,14 @@ and rotation between images, no zooming and retortion.
 
 
 from sys import stderr
-from cv2 import (convertScaleAbs, resize,
+from cv2 import (convertScaleAbs, GaussianBlur, getStructuringElement, morphologyEx,
                  BRISK, ORB, BFMatcher, estimateAffinePartial2D,
-                 NORM_HAMMING, RANSAC)
+                 MORPH_CROSS, MORPH_RECT, NORM_HAMMING, RANSAC)
+from numpy import (array, mean, float32)
 # For alternative option #
-# from cv2 import (GaussianBlur, getStructuringElement, morphologyEx,
-#                  MORPH_CROSS, MORPH_GRADIENT)
+# from cv2 import resize
+# from numpy import around
 ##########################
-from numpy import (array, mean, around, float32)
 
 
 def register_cycles(reference_cycle, transform_cycle, detection_method=None):
@@ -54,33 +54,33 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
         :param method: The detection algorithm of feature points.
         :return: A tuple including a group of feature points and their descriptions.
         """
-        ####################################################################################
-        # In order to suppress the errors better in registration, we need to reduce some   #
-        # of redundant characters in each image. Here, we merge adjacent 3 pixels (3x3)    #
-        # to blur those characters of noise-like, meanwhile, to retain those primary one.  #
-        # As a candidate, a method of morphological transformation, the Morphological      #
-        # gradient, which is the difference between dilation and erosion of an image,      #
-        # under a 15x15 CROSS kernel, is used to disappear background as much as possible, #
-        # for exposing its blobs                                                           #
-        ####################################################################################
-        scale = 3
-        ########
-        # scale = 2  # Alternative option
-        # scale = 4  # Alternative option
-
-        f_gray_image = resize(resize(f_gray_image, (int(around(f_gray_image.shape[1] / scale)),
-                                                    int(around(f_gray_image.shape[0] / scale)))),
-                              (f_gray_image.shape[1], f_gray_image.shape[0]))
+        ###############################################################################
+        # In order to suppress the errors better in registration, we need to reduce   #
+        # some of redundant characters in each image. Here, a method of morphological #
+        # transformation, the Morphological gradient, which is the difference between #
+        # dilation and erosion of an image, under a 15x15 CROSS kernel, is used to    #
+        # disappear background as much as possible, for exposing its blobs As a       #
+        # candidate, we merge adjacent 3 pixels (3x3) to blur those characters of     #
+        # noise-like, meanwhile, to retain those primary one.                         #
+        ###############################################################################
+        f_gray_image = GaussianBlur(f_gray_image, (3, 3), 0)
+        ksize = (15, 15)
+        kernel = getStructuringElement(MORPH_CROSS, ksize)
+        f_gray_image = morphologyEx(f_gray_image, MORPH_RECT, kernel, iterations=3)
         ########
         ###############################
         # Block of alternative option #
         ###############################
-        # f_gray_image = GaussianBlur(f_gray_image, (3, 3), 0)
-        # ksize = (15, 15)
-        # kernel = getStructuringElement(MORPH_CROSS, ksize)
-        # f_gray_image = morphologyEx(f_gray_image, MORPH_GRADIENT, kernel, iterations=3)
+        # scale = 3
+        ########
+        # scale = 2  # Alternative option
+        # scale = 4  # Alternative option
+        #
+        # f_gray_image = resize(resize(f_gray_image, (int(around(f_gray_image.shape[1] / scale)),
+        #                                             int(around(f_gray_image.shape[0] / scale)))),
+        #                       (f_gray_image.shape[1], f_gray_image.shape[0]))
         ###############################
-        ####################################################################################
+        ###############################################################################
 
         det = ''
         ext = ''
