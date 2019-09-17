@@ -59,9 +59,9 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
         # some of redundant characters in each image. Here, a method of morphological #
         # transformation, the Morphological gradient, which is the difference between #
         # dilation and erosion of an image, under a 15x15 CROSS kernel, is used to    #
-        # disappear background as much as possible, for exposing its blobs As a       #
+        # disappear background as much as possible, for exposing its blobs. As a      #
         # candidate, we merge adjacent 3 pixels (3x3) to blur those characters of     #
-        # noise-like, meanwhile, to retain those primary one.                         #
+        # noise-like, meanwhile, to retain those primary one                          #
         ###############################################################################
         f_gray_image = GaussianBlur(f_gray_image, (3, 3), 0)
         ksize = (15, 15)
