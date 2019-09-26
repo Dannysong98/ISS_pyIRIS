@@ -30,6 +30,7 @@ ChangeLog:  2019-01-15  r001    First development version
             2019-08-08  r019    New development version, the prototype version
             2019-08-27  r020    To modify the algorithm for base calling, for performance improving
             2019-08-30  r021    To add a function for lightness rectification
+            2019-09-26  r022    New public version
 """
 
 
