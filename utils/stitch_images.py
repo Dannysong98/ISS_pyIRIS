@@ -9,7 +9,7 @@ from cv2 import (imread, createStitcherScans, cvtColor, imwrite, convertScaleAbs
 from numpy import (array, dot, mean,
                    uint8, uint16)
 
-from IRIS.register_images import register_cycles
+from ..IRIS.register_images import register_cycles
 
 
 def background_stitcher(img_dirs):
