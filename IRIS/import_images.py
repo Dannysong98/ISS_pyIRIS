@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-This model is used to import the images and contain them into pixel-matrix.
+This model is used to import the images and contain them into a 3D matrix.
 
-We prepared 2 types of strategy to parse the different techniques of in situ sequencing, which published by R Ke,
+We prepared 2 types of strategy to parse the different techniques of in situ sequencing, which published by R Ke and
 CH Eng.
 
 Here, Ke's data (R Ke, Nat. Methods, 2013) is employed as the major data type in our software, in this data, the
@@ -95,9 +95,9 @@ def decode_data_Ke(f_cycles):
         #############################
         # For registration checking #
         #############################
-        debug_img = warpAffine(merged_img, trans_mat, (reg_ref.shape[1], reg_ref.shape[0]))
-        imwrite('debug.cycle_' + str(int(cycle_id + 1)) + '.tif', merged_img)
-        imwrite('debug.cycle_' + str(int(cycle_id + 1)) + '.reg.tif', debug_img)
+        # debug_img = warpAffine(merged_img, trans_mat, (reg_ref.shape[1], reg_ref.shape[0]))
+        # imwrite('debug.cycle_' + str(int(cycle_id + 1)) + '.tif', merged_img)
+        # imwrite('debug.cycle_' + str(int(cycle_id + 1)) + '.reg.tif', debug_img)
         #############################
 
         adj_img_mats.append(warpAffine(channel_A, trans_mat, (f_std_img.shape[1], f_std_img.shape[0])))

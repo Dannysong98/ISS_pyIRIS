@@ -19,7 +19,7 @@ and rotation between images, no zooming and retortion.
 from sys import stderr
 from cv2 import (convertScaleAbs, GaussianBlur, getStructuringElement, morphologyEx,
                  BRISK, ORB, BFMatcher, estimateAffinePartial2D,
-                 MORPH_CROSS, MORPH_RECT, NORM_HAMMING, RANSAC)
+                 MORPH_RECT, MORPH_GRADIENT, NORM_HAMMING, RANSAC)
 from numpy import (array, mean, float32)
 # For alternative option #
 # from cv2 import resize
@@ -63,10 +63,10 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
         # candidate, we merge adjacent 3 pixels (3x3) to blur those characters of     #
         # noise-like, meanwhile, to retain those primary one                          #
         ###############################################################################
-        f_gray_image = GaussianBlur(f_gray_image, (3, 3), 0)
+        f_gray_image = GaussianBlur(f_gray_image, (5, 5), 0)
         ksize = (15, 15)
-        kernel = getStructuringElement(MORPH_CROSS, ksize)
-        f_gray_image = morphologyEx(f_gray_image, MORPH_RECT, kernel, iterations=3)
+        kernel = getStructuringElement(MORPH_RECT, ksize)
+        f_gray_image = morphologyEx(f_gray_image, MORPH_GRADIENT, kernel, iterations=3)
         ########
         ###############################
         # Block of alternative option #
@@ -135,13 +135,15 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
 
         return f_good_matched_pairs
 
+    ########
+
     transform_matrix = array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]], dtype=float32)
 
-    ###########################
-    # Lightness Rectification #
-    ###########################
+    #######################################
+    # Lightness Rectification (IMPORTANT) #
+    #######################################
     transform_cycle = convertScaleAbs(transform_cycle * (mean(reference_cycle) / mean(transform_cycle)))
-    ###########################
+    #######################################
 
     ####################################
     # Fourier transformation (ABANDON) #
@@ -159,11 +161,11 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
     # Filter the outline of paired key points, iteratively. Until no outlines #
     ###########################################################################
     n = 1
-    while n:
+    while n > 0:
         pts_a = float32([kp1[_.queryIdx].pt for _ in good_matches]).reshape(-1, 1, 2)
         pts_b = float32([kp2[_.trainIdx].pt for _ in good_matches]).reshape(-1, 1, 2)
 
-        _, mask = estimateAffinePartial2D(pts_b, pts_a, RANSAC)
+        _, mask = estimateAffinePartial2D(pts_b, pts_a)
 
         good_matches = [good_matches[_] for _ in range(0, mask.size) if mask[_][0] == 1]
 
