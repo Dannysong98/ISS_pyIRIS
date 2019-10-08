@@ -19,7 +19,7 @@ and rotation between images, no zooming and retortion.
 from sys import stderr
 from cv2 import (convertScaleAbs, GaussianBlur, getStructuringElement, morphologyEx,
                  BRISK, ORB, BFMatcher, estimateAffinePartial2D,
-                 MORPH_RECT, MORPH_GRADIENT, NORM_HAMMING, RANSAC)
+                 MORPH_CROSS, MORPH_GRADIENT, NORM_HAMMING, RANSAC)
 from numpy import (array, mean, float32)
 # For alternative option #
 # from cv2 import resize
@@ -63,9 +63,9 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
         # candidate, we merge adjacent 3 pixels (3x3) to blur those characters of     #
         # noise-like, meanwhile, to retain those primary one                          #
         ###############################################################################
-        f_gray_image = GaussianBlur(f_gray_image, (5, 5), 0)
+        f_gray_image = GaussianBlur(f_gray_image, (3, 3), 0)
         ksize = (15, 15)
-        kernel = getStructuringElement(MORPH_RECT, ksize)
+        kernel = getStructuringElement(MORPH_CROSS, ksize)
         f_gray_image = morphologyEx(f_gray_image, MORPH_GRADIENT, kernel, iterations=3)
         ########
         ###############################
