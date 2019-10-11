@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 Description:    This software is used to transform the fluorescent signal of in situ sequencing (ISS) into base
-                sequences (barcode sequences), as well as the quality of base and their coordinates.
+                sequences (barcode sequences), as well as the quality of base and their coordinates in the background
+                image.
 
 Author: Hao Yu (yuhao@genomics.cn)
         Yang Zhou (zhouyang@genomics.cn)
