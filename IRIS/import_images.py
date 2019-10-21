@@ -86,6 +86,7 @@ def decode_data_Ke(f_cycles):
 
             f_std_img = addWeighted(foreground, 0.8, background, 0.6, 0)
             ########
+            # f_std_img = foreground
             # f_std_img = addWeighted(foreground, 0.5, background, 0.5, 0)  # Alternative option
             # f_std_img = addWeighted(foreground, 0.4, background, 0.8, 0)  # Alternative option
             ###################################
@@ -95,9 +96,9 @@ def decode_data_Ke(f_cycles):
         #############################
         # For registration checking #
         #############################
-        debug_img = warpAffine(merged_img, trans_mat, (reg_ref.shape[1], reg_ref.shape[0]))
-        imwrite('debug.cycle_' + str(int(cycle_id + 1)) + '.tif', merged_img)
-        imwrite('debug.cycle_' + str(int(cycle_id + 1)) + '.reg.tif', debug_img)
+        # debug_img = warpAffine(merged_img, trans_mat, (reg_ref.shape[1], reg_ref.shape[0]))
+        # imwrite('debug.cycle_' + str(int(cycle_id + 1)) + '.tif', merged_img)
+        # imwrite('debug.cycle_' + str(int(cycle_id + 1)) + '.reg.tif', debug_img)
         #############################
 
         adj_img_mats.append(warpAffine(channel_A, trans_mat, (f_std_img.shape[1], f_std_img.shape[0])))

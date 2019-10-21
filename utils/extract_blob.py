@@ -7,8 +7,8 @@ import cv2 as cv
 import numpy as np
 
 
-stocList = []
-grayList = []
+grayList1 = []
+grayList2 = []
 
 
 def generate_stochastic_coordinate(f_imgFile, f_corFile):
@@ -39,6 +39,9 @@ def extract_blob_pixel(f_imgFile, f_corFile):
         for _ in range(0, len(cor_list)):
             line = cor_list[_].split()
 
+            if 'N' in line[1]:
+                continue
+
             r1 = int(line[3])
             c1 = int(line[4])
 
@@ -51,16 +54,33 @@ def extract_blob_pixel(f_imgFile, f_corFile):
             diff_2 += np.sum(img2[(r2 - 1):(r2 + 3), (c2 - 1):(c2 + 3)]) / 16 - \
                       np.sum(img2[(r2 - 4):(r2 + 6), (c2 - 4):(c2 + 6)]) / 100
 
+            grayList1.append((diff_1, diff_2))
+
+            ########
+
+            box_1 = np.sum(img1[(r1 - 1):(r1 + 3), (c1 - 1):(c1 + 3)]) / 16 - \
+                      np.sum(img1[(r1 - 4):(r1 + 6), (c1 - 4):(c1 + 6)]) / 100
+
+            box_2 = np.sum(img2[(r2 - 1):(r2 + 3), (c2 - 1):(c2 + 3)]) / 16 - \
+                      np.sum(img2[(r2 - 4):(r2 + 6), (c2 - 4):(c2 + 6)]) / 100
+
+            grayList2.append((box_1, box_2))
+
+            ########
+
             img1[(r1 - 1):(r1 + 3), (c1 - 1):(c1 + 3)] = 0
             img2[(r2 - 1):(r2 + 3), (c2 - 1):(c2 + 3)] = 0
-
-            grayList.append((diff_1, diff_2))
 
     cv.imwrite('debug.deteDel.tif', img1)
     cv.imwrite('debug.stocDel.tif', img2)
 
     with open('debug.dete_stoc.ext.txt', 'w') as OU:
-        for _ in grayList:
+        for _ in grayList1:
+            print('%d\tdete' % (_[0]), file=OU)
+            print('%d\tstoc' % (_[1]), file=OU)
+
+    with open('debug.dete_stoc.box.txt', 'w') as OU:
+        for _ in grayList2:
             print('%d\tdete' % (_[0]), file=OU)
             print('%d\tstoc' % (_[1]), file=OU)
 
