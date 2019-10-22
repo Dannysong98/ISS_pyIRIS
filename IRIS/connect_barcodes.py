@@ -30,7 +30,7 @@ class BarcodeCube:
         """
         This method is used to record the called bases in each cycle.
 
-        A list which store all the id of bases and A list which store the dictionary of bases in each cycle.
+        A list which store all blobs' id and a list which store the dictionary of bases in each cycle.
 
         :param called_base_in_one_cycle: The dictionary of bases in a cycle.
         :return: NONE
@@ -98,8 +98,8 @@ class BarcodeCube:
 
     def calling_adjust(self):
         """
-        This method is used to connect the bases as barcodes, by anchoring the coordinates of blobs in cycle 1, and
-        search their 12x12 region in other cycles, respectively.
+        This method is used to connect bases into barcodes, by anchoring the coordinates of blobs in reference layer, and
+        search their 20x20 region in each cycle.
 
         :return: NONE
         """
@@ -115,13 +115,13 @@ class BarcodeCube:
                 min_err_rate = float(1)
 
                 ####################################################################################################
-                # It will search a 20x20 region to connect bases from cycle 1 to the last, in each ref-coordinates #
+                # It will search a 20x20 region to connect bases from each cycle in ref-coordinates #
                 #                                                                                                  #
-                # Process of registration almost align all location of cycles the same, but in pixel level, this   #
+                # Process of registration almost align all location of cycles the same, but at pixel level, this   #
                 # registration is not accurate enough. Here, we choose a simple approach to solve this problem,    #
-                # we get locations of blobs from a reference image layer, then to search a NxN (e.g. 20x20) region #
+                # we get locations of blobs from a reference image layer, then to search a NxN (20x20 by default) region #
                 # in those cycles that need to be connected. This approach should not only solve this problem but  #
-                # also bring very little false negative that could be ignored in our practice                      #
+                # also bring few false positive in output                      #
                 ####################################################################################################
                 N = 9  # 20x20
                 ########
