@@ -7,7 +7,7 @@ Each cycle is composed of at several channels, such as A, T, C and G in Ke's dat
 
 We select the channel with the highest base score against the other channels at a same
 location as the representative channel in a certain location. Base quality is calculated as follows: 
-we calcuclate p-value via a binomial test by taking the highest base score as the number of success and the second highest base score as the number of failure, and use the p-value to calculate sequence quality in a similar way as Phred score in NGS systm.
+we calcuclate p-value via a binomial test by taking the highest base score as the number of success and the second highest base score as the number of failure and treat it as error rate.
 
 """
 
@@ -146,7 +146,7 @@ def image_model_pooling_Eng(f_image_model_1, f_image_model_2, f_image_model_3,
 def pool2base(f_image_model_pool):
     """
     :param f_image_model_pool: The dictionary of blobs, including base, coordinate and base score.
-    :return f_base_box: A dictionary of blobs with its base, location and base quality
+    :return f_base_box: A dictionary of blobs with its base, location and base error rate.
     """
     f_base_box = {}
 
