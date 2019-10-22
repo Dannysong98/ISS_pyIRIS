@@ -1,23 +1,20 @@
 #!/usr/bin/env python3
 """
-This class is used to transform the detected fluorescence signal into sequence information.
+This class is used to transform the detected fluorescence signal into barcode sequence.
 
-Each cycle is composed of at least 4 channels, A, T, C and G. Sometimes, an additional in situ hybridization signal
+Each cycle is composed of at several channels, such as A, T, C and G in Ke's data structure. Sometimes, an additional in situ hybridization signal
 (DO) and nucleus staining signal (DAPI) are also provided.
 
-In our practice, we select the one taking the highest blob signal score against other 3 channels from a same
-location as the representation in a certain location. And its sequencing quality is calculated by a novel method, in
-this method, we presume that the difference between the base taking highest blob signal score and the one taking
-second higher blob signal score is positive correlation with reliability, and is no correlation with other 2 blob
-signal scores. It means the probability of error happen should approximately appear binomial distribution. We employ
-binomial test to evaluate the difference between these top two blob signal score channels, and record the p-value as
-the error rate to calculate sequence quality.
+We select the one with the highest blob base score against the other channels at a same
+location as the representative channel in a certain location. Base quality is calculated as follows: we assume that the difference between the base taking highest blob signal score and the one taking
+second highest blob base score is positive correlated with reliability, and error rate should approximately follows a binomial distribution. We perform
+binomial test to evaluate the difference between these top two blob signal score channels, and use the p-value as
+the error rate to calculate sequence quality in a similar way as Phred score in NGS systme.
 
-Besides, the coordinate of many detected blobs group which should be in a same location in pixel level among
-different cycles are different, because of the error of registration. If a difference are light enough, we still
-consider they located in a same location. Here we use pyramid shadow from a blob in cycle 1 to search 8x8 region in
+The coordinate of many detected blobs group which should be in a same location in pixel level among
+different cycles, but because of the error of registration the location might still deviate a little. Here we use pyramid shadow from a blob in cycle 1 to search 8x8 region in
 other cycle, and find the blob taking highest gray scale as the blob signal score in this cycle, and adjust its
-coordinate consistent as cycle 1.
+coordinate to be consistent with that of cycle 1.
 """
 
 
