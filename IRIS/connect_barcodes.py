@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """
-This model is used to connect the base from different cycles.
+This module is used to connect bases from different cycles in the same location.
 
-In this model, the connection is made as a class, the 'BarcodeCube', of which, three method will be employed. The method
-'collect_called_bases' is used to record the called bases in each cycle, and 'filter_blobs_list' is used to filter the
-bad or indistinguishable blobs by mapping them into a mask layer. At last, the method 'calling_adjust' is used to
-connect the bases as barcodes, by anchoring the coordinates of blobs in cycle 1, and search their 12x12 region in other
+In this module, connection is made as a class named 'BarcodeCube', of which, three method will be called. The method
+'collect_called_bases' is used to record the called bases in each cycle, and 'filter_blobs_list' is used to filter out bad or indistinguishable blobs by mapping them into a mask layer. At last, the method 'calling_adjust' is used to
+connect bases into barcodes by anchoring the coordinates of blobs to coordinates in cycle 1, and search their 12x12 region in other
 cycles, respectively.
 """
 
