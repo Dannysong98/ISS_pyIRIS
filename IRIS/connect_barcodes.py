@@ -5,8 +5,8 @@ This model is used to connect the base from different cycles.
 In this model, the connection is made as a class, the 'BarcodeCube', of which, three method will be employed. The method
 'collect_called_bases' is used to record the called bases in each cycle, and 'filter_blobs_list' is used to filter the
 bad or indistinguishable blobs by mapping them into a mask layer. At last, the method 'calling_adjust' is used to
-connect the bases as barcodes, by anchoring the coordinates of blobs in cycle 1, and search their 12x12 region in other
-cycles, respectively.
+connect the bases as barcodes, by anchoring the coordinates of blobs in reference layer, and search their 20x20 region
+in each cycle, respectively.
 """
 
 
@@ -128,6 +128,7 @@ class BarcodeCube:
                 # N = 1  # Alternative option, 4x4
                 # N = 2  # Alternative option, 6x6
                 # N = 4  # Alternative option, 10x10
+                # N = 5  # Alternative option, 12x12
                 ########
                 # N = n  # ((n + 1) * 2)x((n + 1) * 2)
 

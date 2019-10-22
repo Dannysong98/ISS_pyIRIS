@@ -39,7 +39,7 @@ def extract_blob_pixel(f_imgFile, f_corFile):
         for _ in range(0, len(cor_list)):
             line = cor_list[_].split()
 
-            if 'N' in line[1] or sum([ord(_) for _ in line[2]]) < 20:
+            if 'N' in line[1] or int(round(sum([ord(_) for _ in line[2]]) / len(line[2]))) < 20:
                 continue
 
             r1 = int(line[3])

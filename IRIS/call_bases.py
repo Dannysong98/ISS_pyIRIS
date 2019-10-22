@@ -15,9 +15,9 @@ the error rate to calculate sequence quality.
 
 Besides, the coordinate of many detected blobs group which should be in a same location in pixel level among
 different cycles are different, because of the error of registration. If a difference are light enough, we still
-consider they located in a same location. Here we use pyramid shadow from a blob in cycle 1 to search 8x8 region in
-other cycle, and find the blob taking highest gray scale as the blob signal score in this cycle, and adjust its
-coordinate consistent as cycle 1.
+consider they located in a same location. Here we use pyramid shadow from a blob in reference layer (merged blobs from
+all cycles) to search 20x20 region in other cycle, and find the blob taking highest gray scale as the blob signal score
+in this cycle, and adjust its coordinate consistent as reference layer.
 """
 
 
