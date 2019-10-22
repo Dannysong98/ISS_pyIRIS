@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 """
-This class is used to detect fluorescence signal in each signal channel.
+This class is used to detect fluorescence signal in each channel.
 
-Usually, fault of chemical reaction or taking photo in local region will trigger the generating of different quality
-fluorescence signal in a image, like low of gray scale or in distinctiveness between fluorescence signal and background.
+Usually, chemical reaction or taking photo in local region will trigger the generating of
+different quality fluorescence signal in a image, like low gray scale or indistinction between
+fluorescence signal and background.
 
-Our workflow provide a double strategy to treat these kinds of situation above. Two scale Morphological (TopHat)
-transformations are invoked to expose a majority of high quality fluorescence signal as blobs. In which, large
-scale transformator is used to expose dissociative fluorescence signal and small one used to treat the adjacent
+A Morphological transformation is called to expose a majority of high quality fluorescence signal as blobs. In this process, large
+scale transformator is used to expose dissociative fluorescence signal and small one is used to treat the adjacent
 signal as accurately as possible.
 
-When fluorescence signal exposed, a simple blob detection algorithm is invoked for blob locating. In our
-practice, not only dense fluorescence signal but also sparse blob can be detected by this parameters optimized
-algorithm, while the ambiguous one will be abandoned. After detection, for each detected blobs, the blob signal score,
-which is calculated by their gray scale in core (4x4) region being subtracted by surrounding (10x10), is recorded to be
-made as the measure of significance, it is also the base of called base quality in next step.
+When fluorescence signals are exposed, a simple blob detection algorithm is called for blob locating. In our
+practice, not only dense fluorescence signal but also sparse blob can be detected by this parameter-optimized
+algorithm, while the ambiguous ones will be abandoned. After detection, for each detected blobs, blob's base
+score, which is calculated by their gray scale in core (4x4) region being subtracted by surrounding (10x10), is
+recorded to calculate base quality in the next step.
 """
 
 
@@ -50,9 +50,8 @@ def detect_blobs_Ke(f_cycle):
     greyscale_model_G = zeros(channel_G.shape, dtype=float32)
 
     ###############################################################################
-    # Here, a morphological transformation, the Tophat, which is the difference   #
-    # between input image and Opening of the image, under a 15x15 ELLIPSE kernel, #
-    # is used to disappear background as much as possible, for exposing its blobs #
+    # Here, a morphological transformation, Tophat, under a 15x15 ELLIPSE kernel, #
+    # is used to expose blobs #
     ###############################################################################
     ksize = (15, 15)
     kernel = getStructuringElement(MORPH_ELLIPSE, ksize)
@@ -68,16 +67,16 @@ def detect_blobs_Ke(f_cycle):
     mor_kps = []
 
     ##########################################################
-    # Setup the parameters of preliminary detection of blobs #
+    # Parameters setup for preliminary blob detection        #
     # Here, some of parameters are very crucial, such as     #
     # 'thresholdStep', 'minRepeatability', 'minArea', which  #
-    # could sorely affect the number of detected blobs. And  #
-    # more importantly, they will be modify as different     #
-    # experiment.                                            #
+    # could greatly affect the number of detected blobs. And #
+    # more importantly, they would need to be modified in different     #
+    # experiments.                                            #
     #                                                        #
-    # We prepared some cases about the different situation   #
-    # we met in the stage of debug, and we look forward to   #
-    # standardize the experiment                             #
+    # We prepared some cases for the different experiments   #
+    # we met during debugging, and we look forward to   #
+    # standardize the experiments                             #
     ##########################################################
     blob_params = SimpleBlobDetector_Params()
 
@@ -98,14 +97,14 @@ def detect_blobs_Ke(f_cycle):
     # blob_params.minArea = 4  # Alternative option
 
     ####################################################################################
-    # This parameter is used for filtering those extreme large blobs, like impurities. #
+    # This parameter is used for filtering those extremely large blobs, which likly to   #
+    # results from contamination                                                       #
     #                                                                                  #
-    # Unfortunately, some genes expressing heavily at a dense region are almost        #
-    # confused with impurities would to be filtered, lead to optics-identification     #
-    # failed. A known case in our practise is the gene 'pro-corazonin-like', this is a #
-    # high expression gene at a crowded region in brain of some of insects, is almost  #
-    # detected as a low- or non-expression gene due to confusing its extreme large     #
-    # blobs of expressed RNA as impurities and to be filtered subsequently             #
+    # Unfortunately, some genes expressing highly at a dense region tend to form large #
+    # blobs thus would to be filtered, lead to optics-identification failure.          #
+    # A known case in our practise is the gene 'pro-corazonin-like', this is a highly  #
+    # expressed gene at a small region in brain of some insects, and is usually         #
+    # detected as a low- or non-expression gene in IRIS                                      #
     ####################################################################################
     blob_params.maxArea = 65
     ########
@@ -128,8 +127,8 @@ def detect_blobs_Ke(f_cycle):
         mor_kps.extend(mor_detector.detect(img))
 
     ##############################################################################################
-    # To map all the detected blobs into a new mask layer for redundant and duplicate filtering, #
-    # and detecting this mask layer next for ensuring where can be located blob across all       #
+    # To map all the detected blobs into a new mask layer for redundancy filtering,              #
+    # and detect on this mask layer again to ensure blobs' location across all       #
     # channels in this cycle                                                                     #
     ##############################################################################################
     mask_layer = zeros(channel_A.shape, dtype=uint8)
@@ -155,17 +154,16 @@ def detect_blobs_Ke(f_cycle):
     ##############################################################################################
 
     #########################################################################
-    # Calculate the threshold of distinction between blobs and pseudo-blobs #
+    # Calculate the threshold for distinction between blobs and potential pseudo-blobs #
     #                                                                       #
-    # There is a crucial feature in each real blob, the gray-scale of pixel #
-    # should increase suddenly in its core region, compared with periphery  #
+    # A crucial feature of real blob is that the gray-scale of pixel #
+    # should increase rapidly in its core region, compared with periphery  #
     #                                                                       #
-    # The step of detection could expose a massive of amount of blobs and   #
-    # their location, as well as some false-positive. We calculate the      #
-    # difference of mean of gray-scale between pixel in core region and     #
-    # periphery of each blob, which named as 'base score', for counting its #
+    # The step of detection could expose a massive amount of blobs but also include some false-positive. We calculate the      #
+    # difference of mean gray-scale between pixel in core region and     #
+    # periphery of each blob, which named as 'base score', and calculate a #
     # threshold of each channel. This threshold could be used to filter     #
-    # those blobs of false-positive in following step                       #
+    # those false-positive blobs in following step                       #
     #########################################################################
     for key_point in kps:
         r = int(key_point.pt[1])
@@ -253,8 +251,8 @@ def detect_blobs_Eng(f_cycle):
     """
     #########################################################################
     # The barcode should be encode as 1~9 and A, B, C                       #
-    # N means nothing                                                       #
-    # This strategy of encoding can make the data compatible with Ke's data #
+    # N means ambiguous base                                                       #
+    # This strategy of encoding can make the data structure compatible with Ke's data #
     #########################################################################
     channel_1 = f_cycle[0]
     channel_2 = f_cycle[1]

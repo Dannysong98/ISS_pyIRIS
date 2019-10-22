@@ -1,18 +1,16 @@
 #!/usr/bin/env python3
 """
-This model is used to register the images which contained in pixel-matrix.
+This module is used to register images which contained in pixel-matrix.
 
-The process of registration can be split into 3 parts:
-1) To detect the key points. Its results will be used in finding good matched key point pairs.
-2) To find the matched key point pairs. Then, to filter the bad matched pairs and retain good one.
-3) To compute the transform matrix, which can be used to transform the images of channel between different cycles.
+The process of registration can be split into 3 steps:
+1) Detect raw key points.
+2) Filter out bad matched key point pairs and keep the good ones.
+3) Compute transform matrix used in images registration between different cycles.
 
-Here, we used 2 algorithms for key points detecting, the one is BRISK (S Leutenegger. et al., IEEE, 2011) and the other
-is ORB (E Rublee. et al., Citeseer, 2011). The bad matched key points would be marked, and be filtered subsequently, for
-ensuring the accuracy of calculating for transform matrix.
+Here, we used two algorithms for key points detecting: BRISK (S Leutenegger. et al., IEEE, 2011) and ORB (E Rublee. et al., Citeseer, 2011). The bad matched key points would be marked, and be filtered subsequently to ensure the accuracy in transform matrix calculation
 
-The transform matrix will be used to register the images by rigid registration. It means there are only translation
-and rotation between images, no zooming and retortion.
+Transform matrices will be used to transform images by rigid registration. It means there are only translation
+and rotation between images but no zooming and retortion.
 """
 
 
@@ -35,8 +33,8 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
     Input reference image, transform image and one of the algorithms of detector.
     Returning transform matrix.
 
-    :param reference_cycle: The image that will be used to register other images.
-    :param transform_cycle: The image will be registered.
+    :param reference_cycle: Image reference that will be used to register other images.
+    :param transform_cycle: Images will be registered.
     :param detection_method: The detection algorithm of feature points.
     :return f_key_points, f_descriptions: A transformation matrix from transformed image to reference.
     """
@@ -44,25 +42,22 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
         """
         For detecting the key points and their descriptions by BRISK or ORB.
 
-        Here, we employed morphology transforming to pre-process image for exposing the key points, under a kernel of
-        5x5. A BRISK or ORB detector used to scan the image for locating the key point, and computed their descriptions
-        as well.
+        Here, we employed morphology transforming to pre-process image for exposing the key points (by a 3x3 Gaussian blur), under a kernel of 15x15. A BRISK or ORB detector used to scan the image for locating key points, and computed their descriptions.
 
         Input a gray scale image and one of the algorithms of detector.
-        Returning the key points and their descriptions.
+        Returning key points and their descriptions.
 
         :param f_gray_image: The 8-bit image.
-        :param method: The detection algorithm of feature points.
-        :return: A tuple including a group of feature points and their descriptions.
+        :param method: The detection algorithm of key points.
+        :return: A tuple including a group of key points and their descriptions.
         """
         ###############################################################################
-        # In order to suppress the errors better in registration, we need to reduce   #
-        # some of redundant characters in each image. Here, a method of morphological #
-        # transformation, the Morphological gradient, which is the difference between #
-        # dilation and erosion of an image, under a 15x15 CROSS kernel, is used to    #
-        # disappear background as much as possible, for exposing its blobs. As a      #
-        # candidate, we merge adjacent 3 pixels (3x3) to blur those characters of     #
-        # noise-like, meanwhile, to retain those primary one                          #
+        # In order to reduce the errors better in registration, we need to reduce     #
+        # some redundant features in each image. Here, a method of morphological      #
+        # transformation, Morphological gradient, the difference between              #
+        # dilation and erosion of an image, is used to expose key points under a 15x15#
+        # CROSS kernel. Alternatively, we merge adjacent 3 pixels (3x3) to blur those #
+        # characters of noise-like, meanwhile, to retain those primary one            #
         ###############################################################################
         f_gray_image = GaussianBlur(f_gray_image, (3, 3), 0)
         ksize = (15, 15)
@@ -117,7 +112,7 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
 
     def __get_good_matched_pairs(f_description1, f_description2):
         """
-        For finding the good matched pairs of key points.
+        For finding good matched key point pairs.
 
         The matched pairs of key points would be filtered to generate a group of good matched pairs.
         These good matched pairs of key points would be used to compute the transform matrix.
@@ -160,9 +155,9 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
 
     good_matches = __get_good_matched_pairs(des1, des2)
 
-    ###########################################################################
-    # Filter the outline of paired key points, iteratively. Until no outlines #
-    ###########################################################################
+    #################################################################################
+    # Filter the outline of paired key points iteratively until there's no outlines #
+    #################################################################################
     n = 1
     while n > 0:
         pts_a = float32([kp1[_.queryIdx].pt for _ in good_matches]).reshape(-1, 1, 2)

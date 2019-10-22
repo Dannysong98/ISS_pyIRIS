@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-This model is used to transform the error rate into Phred+ 33 score, then outputting the background and the reformatted
+This model is used to transform error rate into Phred+ 33 score, then output the background and the formatted
 result of base calling.
 """
 
@@ -11,8 +11,8 @@ from numpy import log10
 
 def write_reads_into_file(f_background, f_barcode_cube, f_barcode_length):
     """
-    This function is used to transform the error rate into Phred+ 33 score, then outputting the background and the
-    reformatted result of base calling.
+    This function is used to transform error rate into Phred+ 33 score, then output the background and the
+    formatted result of base calling.
 
     :param f_background: The image matrix of background.
     :param f_barcode_cube: The connected barcode, with error rate of each base.

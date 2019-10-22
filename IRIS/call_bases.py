@@ -1,23 +1,13 @@
 #!/usr/bin/env python3
 """
-This class is used to transform the detected fluorescence signal into sequence information.
+This module is used to transform detected fluorescence signals into barcode sequence.
 
-Each cycle is composed of at least 4 channels, A, T, C and G. Sometimes, an additional in situ hybridization signal
+Each cycle is composed of at several channels, such as A, T, C and G in Ke's data structure. Sometimes, an additional in situ hybridization signal
 (DO) and nucleus staining signal (DAPI) are also provided.
 
-In our practice, we select the one taking the highest blob signal score against other 3 channels from a same
-location as the representation in a certain location. And its sequencing quality is calculated by a novel method, in
-this method, we presume that the difference between the base taking highest blob signal score and the one taking
-second higher blob signal score is positive correlation with reliability, and is no correlation with other 2 blob
-signal scores. It means the probability of error happen should approximately appear binomial distribution. We employ
-binomial test to evaluate the difference between these top two blob signal score channels, and record the p-value as
-the error rate to calculate sequence quality.
-
-Besides, the coordinate of many detected blobs group which should be in a same location in pixel level among
-different cycles are different, because of the error of registration. If a difference are light enough, we still
-consider they located in a same location. Here we use pyramid shadow from a blob in reference layer (merged blobs from
-all cycles) to search 20x20 region in other cycle, and find the blob taking highest gray scale as the blob signal score
-in this cycle, and adjust its coordinate consistent as reference layer.
+We select the channel with the highest base score against the other channels at a same
+location as the representative channel in a certain location. Base quality is calculated as follows: 
+we calcuclate p-value via a binomial test by taking the highest base score as the number of success and the second highest base score as the number of failure and treat it as error rate.
 """
 
 
@@ -27,12 +17,11 @@ from scipy.stats import binom_test
 
 def image_model_pooling_Ke(f_image_model_A, f_image_model_T, f_image_model_C, f_image_model_G):
     """
-    :param f_image_model_A: Channel A in a cycle from the 3D common data tensor.
-    :param f_image_model_T: Channel T in a cycle from the 3D common data tensor.
-    :param f_image_model_C: Channel C in a cycle from the 3D common data tensor.
-    :param f_image_model_G: Channel G in a cycle from the 3D common data tensor.
-    :return f_image_model_pool: A dictionary of blobs, all the types of base in a certain location, including the
-    coordinates, bases and their base scores.
+    :param f_image_model_A: Channel A in a cycle from the 3D data matrix.
+    :param f_image_model_T: Channel T in a cycle from the 3D data matrix.
+    :param f_image_model_C: Channel C in a cycle from the 3D data matrix.
+    :param f_image_model_G: Channel G in a cycle from the 3D data matrix.
+    :return f_image_model_pool: A dictionary of blobs with its base, location and base score
     """
     f_image_model_pool = {}
 
@@ -43,13 +32,12 @@ def image_model_pooling_Ke(f_image_model_A, f_image_model_T, f_image_model_C, f_
     #################################################
 
     ##############################################################################################################
-    # Each coordinate stores the base scores, and the largest one is made to as the representative of this cycle #
-    # Other channels, which take non-largest base scores, will be following used to calculate the Quality of     #
-    # their coordinates                                                                                          #
+    # Each coordinate stores the base scores, and the largest one is made to be the representative of this cycle #
+    # the second highest base score will also be used to calculate base quality              #
     ##############################################################################################################
     for row, col in transpose(nonzero(f_image_model)):
         #######################################################################################################
-        # Our software just handle the images no larger than 99999x99999                                      #
+        # Our software could handle the images no larger than 99999x99999                                      #
         # This size limit should fit most of images                                                           #
         # You can modify this limit like following options in each place of 'read_id' for fitting your images #
         #######################################################################################################
@@ -85,20 +73,19 @@ def image_model_pooling_Eng(f_image_model_1, f_image_model_2, f_image_model_3,
                             f_image_model_7, f_image_model_8, f_image_model_9,
                             f_image_model_A, f_image_model_B, f_image_model_C):
     """
-    :param f_image_model_1: Channel 1 in a cycle from the 3D common data tensor.
-    :param f_image_model_2: Channel 2 in a cycle from the 3D common data tensor.
-    :param f_image_model_3: Channel 3 in a cycle from the 3D common data tensor.
-    :param f_image_model_4: Channel 4 in a cycle from the 3D common data tensor.
-    :param f_image_model_5: Channel 5 in a cycle from the 3D common data tensor.
-    :param f_image_model_6: Channel 6 in a cycle from the 3D common data tensor.
-    :param f_image_model_7: Channel 7 in a cycle from the 3D common data tensor.
-    :param f_image_model_8: Channel 8 in a cycle from the 3D common data tensor.
-    :param f_image_model_9: Channel 9 in a cycle from the 3D common data tensor.
-    :param f_image_model_A: Channel A in a cycle from the 3D common data tensor.
-    :param f_image_model_B: Channel B in a cycle from the 3D common data tensor.
-    :param f_image_model_C: Channel C in a cycle from the 3D common data tensor.
-    :return f_image_model_pool: A dictionary of blobs, all the types of base in a certain location, including the
-    coordinate, bases and their base scores.
+    :param f_image_model_1: Channel 1 in a cycle from the 3D data matrix.
+    :param f_image_model_2: Channel 2 in a cycle from the 3D data matrix.
+    :param f_image_model_3: Channel 3 in a cycle from the 3D data matrix.
+    :param f_image_model_4: Channel 4 in a cycle from the 3D data matrix.
+    :param f_image_model_5: Channel 5 in a cycle from the 3D data matrix.
+    :param f_image_model_6: Channel 6 in a cycle from the 3D data matrix.
+    :param f_image_model_7: Channel 7 in a cycle from the 3D data matrix.
+    :param f_image_model_8: Channel 8 in a cycle from the 3D data matrix.
+    :param f_image_model_9: Channel 9 in a cycle from the 3D data matrix.
+    :param f_image_model_A: Channel A in a cycle from the 3D data matrix.
+    :param f_image_model_B: Channel B in a cycle from the 3D data matrix.
+    :param f_image_model_C: Channel C in a cycle from the 3D data matrix.
+    :return f_image_model_pool: A dictionary of blobs with its base, location and base score.
     """
     f_image_model_pool = {}
 
@@ -157,9 +144,8 @@ def image_model_pooling_Eng(f_image_model_1, f_image_model_2, f_image_model_3,
 
 def pool2base(f_image_model_pool):
     """
-    :param f_image_model_pool: The dictionary of blobs, including the base and the coordinates.
-    :return f_base_box: The dictionary of bases, only one representative in a certain location, including the
-    coordinate, base and its error rates.
+    :param f_image_model_pool: The dictionary of blobs, including base, coordinate and base score.
+    :return f_base_box: A dictionary of blobs with its base, location and base error rate.
     """
     f_base_box = {}
 
