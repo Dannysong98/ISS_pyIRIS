@@ -2,9 +2,8 @@
 """
 This class is used to detect fluorescence signal in each signal channel.
 
-Usually, fault of chemical reaction or taking photo in local region will trigger the generating of
-different quality fluorescence signal in a image, like low of gray scale or indistinctiveness between
-fluorescence signal and background.
+Usually, fault of chemical reaction or taking photo in local region will trigger the generating of different quality
+fluorescence signal in a image, like low of gray scale or in distinctiveness between fluorescence signal and background.
 
 Our workflow provide a double strategy to treat these kinds of situation above. Two scale Morphological (TopHat)
 transformations are invoked to expose a majority of high quality fluorescence signal as blobs. In which, large
@@ -13,9 +12,9 @@ signal as accurately as possible.
 
 When fluorescence signal exposed, a simple blob detection algorithm is invoked for blob locating. In our
 practice, not only dense fluorescence signal but also sparse blob can be detected by this parameters optimized
-algorithm, while the ambiguous one will be abandoned. After detection, for each detected blobs, the blob signal
-score, which is calculated by their gray scale in core (4x4) region being divided by surrounding (10x10), is
-recorded to be made as the measure of significance, it is also the base of called base quality in next step.
+algorithm, while the ambiguous one will be abandoned. After detection, for each detected blobs, the blob signal score,
+which is calculated by their gray scale in core (4x4) region being subtracted by surrounding (10x10), is recorded to be
+made as the measure of significance, it is also the base of called base quality in next step.
 """
 
 
