@@ -11,7 +11,7 @@ In the type of Eng's data, each image is composed of 4 channels, of which, the f
 named a Cycle. So, there are 12 pseudo-colors in a Round. For example, the Eng's data (CH Eng, Nat. Methods, 2017)
 include 5 Rounds, 20 images, 80 channels in any of shooting region.
 
-Our software generate a 3D tensor? to store all the images. Each channel is made of a image matrix, and insert into this
+Our software generate a 3D matrix to store all the images. Each channel is made of a image matrix, and insert into this
 tensor in the order of cycle
 """
 
@@ -34,7 +34,7 @@ def decode_data_Ke(f_cycles):
     Returning a pixel matrix which contains all the gray scales of image pixel as well as their coordinates.
 
     :param f_cycles: The image directories in sequence of cycles, of which the different channels are stored.
-    :return: A tuple including a 3D common data tensor and a background image matrix.
+    :return: A tuple including a 3D matrix and a background image matrix.
     """
     if len(f_cycles) < 1:
         print('ERROR CYCLES', file=stderr)
@@ -203,7 +203,7 @@ def decode_data_Eng(f_cycles):
 #                                                    #
 # Anybody could write interface for our software,    #
 # for being compatible with more type of data, as    #
-# long as following our 3D common data structure     #
+# long as following our 3D data structure            #
 ######################################################
 # def decode_data_Weinstein(f_cycles):
 #     """
