@@ -128,6 +128,7 @@ class BarcodeCube:
                 # N = 1  # Alternative option, 4x4
                 # N = 2  # Alternative option, 6x6
                 # N = 4  # Alternative option, 10x10
+                # N = 5  # Alternative option, 12x12
                 ########
                 # N = n  # ((n + 1) * 2)x((n + 1) * 2)
 

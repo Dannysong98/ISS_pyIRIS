@@ -8,7 +8,6 @@ Each cycle is composed of at several channels, such as A, T, C and G in Ke's dat
 We select the channel with the highest base score against the other channels at a same
 location as the representative channel in a certain location. Base quality is calculated as follows: 
 we calcuclate p-value via a binomial test by taking the highest base score as the number of success and the second highest base score as the number of failure and treat it as error rate.
-
 """
 
 

@@ -19,6 +19,7 @@ from cv2 import (convertScaleAbs, GaussianBlur, getStructuringElement, morpholog
                  BRISK, ORB, BFMatcher, estimateAffinePartial2D,
                  MORPH_CROSS, MORPH_GRADIENT, NORM_HAMMING, RANSAC)
 from numpy import (array, mean, float32)
+
 # For alternative option #
 # from cv2 import resize
 # from numpy import around
@@ -63,6 +64,7 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
         kernel = getStructuringElement(MORPH_CROSS, ksize)
         f_gray_image = morphologyEx(f_gray_image, MORPH_GRADIENT, kernel, iterations=3)
         ########
+
         ###############################
         # Block of alternative option #
         ###############################
@@ -75,6 +77,7 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
         #                                             int(around(f_gray_image.shape[0] / scale)))),
         #                       (f_gray_image.shape[1], f_gray_image.shape[0]))
         ###############################
+
         ###############################################################################
 
         det = ''
@@ -130,7 +133,7 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
 
         return f_good_matched_pairs
 
-    ########
+    ################
 
     transform_matrix = array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]], dtype=float32)
 
