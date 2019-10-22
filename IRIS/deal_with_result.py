@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-This model is used to transform the error rate into Phred+ 33 score, then outputting the background and the reformatted
+This model is used to transform error rate into Phred+ 33 score, then output the background and the reformatted
 result of base calling.
 """
 
