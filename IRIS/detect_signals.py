@@ -2,13 +2,12 @@
 """
 This class is used to detect fluorescence signal in each channel.
 
-Usually, chemical reaction or taking photo in local region will trigger the generating of
-different quality fluorescence signal in a image, like low gray scale or indistinction between
-fluorescence signal and background.
+Usually, chemical reaction or taking photo in local region will trigger the generating of different quality
+fluorescence signal in a image, like low gray scale or indistinction between fluorescence signal and background.
 
-A Morphological transformation is called to expose a majority of high quality fluorescence signal as blobs. In this process, large
-scale transformator is used to expose dissociative fluorescence signal and small one is used to treat the adjacent
-signal as accurately as possible.
+A Morphological transformation is called to expose a majority of high quality fluorescence signal as blobs. In this
+process, large scale transformator is used to expose dissociative fluorescence signal and small one is used to treat
+the adjacent signal as accurately as possible.
 
 When fluorescence signals are exposed, a simple blob detection algorithm is called for blob locating. In our
 practice, not only dense fluorescence signal but also sparse blob can be detected by this parameter-optimized
@@ -51,7 +50,7 @@ def detect_blobs_Ke(f_cycle):
 
     ###############################################################################
     # Here, a morphological transformation, Tophat, under a 15x15 ELLIPSE kernel, #
-    # is used to expose blobs #
+    # is used to expose blobs                                                     #
     ###############################################################################
     ksize = (15, 15)
     kernel = getStructuringElement(MORPH_ELLIPSE, ksize)
@@ -71,12 +70,12 @@ def detect_blobs_Ke(f_cycle):
     # Here, some of parameters are very crucial, such as     #
     # 'thresholdStep', 'minRepeatability', 'minArea', which  #
     # could greatly affect the number of detected blobs. And #
-    # more importantly, they would need to be modified in different     #
-    # experiments.                                            #
+    # more importantly, they would need to be modified in    #
+    # different experiments.                                 #
     #                                                        #
     # We prepared some cases for the different experiments   #
-    # we met during debugging, and we look forward to   #
-    # standardize the experiments                             #
+    # we met during debugging, and we look forward to        #
+    # standardize the experiments                            #
     ##########################################################
     blob_params = SimpleBlobDetector_Params()
 
@@ -97,14 +96,14 @@ def detect_blobs_Ke(f_cycle):
     # blob_params.minArea = 4  # Alternative option
 
     ####################################################################################
-    # This parameter is used for filtering those extremely large blobs, which likly to   #
+    # This parameter is used for filtering those extremely large blobs, which likly to #
     # results from contamination                                                       #
     #                                                                                  #
     # Unfortunately, some genes expressing highly at a dense region tend to form large #
     # blobs thus would to be filtered, lead to optics-identification failure.          #
     # A known case in our practise is the gene 'pro-corazonin-like', this is a highly  #
-    # expressed gene at a small region in brain of some insects, and is usually         #
-    # detected as a low- or non-expression gene in IRIS                                      #
+    # expressed gene at a small region in brain of some insects, and is usually        #
+    # detected as a low- or non-expression gene in IRIS                                #
     ####################################################################################
     blob_params.maxArea = 65
     ########
@@ -126,11 +125,11 @@ def detect_blobs_Ke(f_cycle):
         mor_detector = SimpleBlobDetector.create(blob_params)
         mor_kps.extend(mor_detector.detect(img))
 
-    ##############################################################################################
-    # To map all the detected blobs into a new mask layer for redundancy filtering,              #
-    # and detect on this mask layer again to ensure blobs' location across all       #
-    # channels in this cycle                                                                     #
-    ##############################################################################################
+    #################################################################################
+    # To map all the detected blobs into a new mask layer for redundancy filtering, #
+    # and detect on this mask layer again to ensure blobs' location across all      #
+    # channels in this cycle                                                        #
+    #################################################################################
     mask_layer = zeros(channel_A.shape, dtype=uint8)
 
     for key_point in mor_kps:
@@ -151,19 +150,21 @@ def detect_blobs_Ke(f_cycle):
     diff_list_T = []
     diff_list_C = []
     diff_list_G = []
-    ##############################################################################################
+    #################################################################################
 
     #########################################################################
-    # Calculate the threshold for distinction between blobs and potential pseudo-blobs #
+    # Calculate the threshold for distinction between blobs and potential   #
+    # pseudo-blobs                                                          #
     #                                                                       #
-    # A crucial feature of real blob is that the gray-scale of pixel #
-    # should increase rapidly in its core region, compared with periphery  #
+    # A crucial feature of real blob is that the gray-scale of pixel        #
+    # should increase rapidly in its core region, compared with periphery   #
     #                                                                       #
-    # The step of detection could expose a massive amount of blobs but also include some false-positive. We calculate the      #
-    # difference of mean gray-scale between pixel in core region and     #
-    # periphery of each blob, which named as 'base score', and calculate a #
-    # threshold of each channel. This threshold could be used to filter     #
-    # those false-positive blobs in following step                       #
+    # The step of detection could expose a massive amount of blobs but also #
+    # include some false-positive. We calculate the difference of mean      #
+    # gray-scale between pixel in core region and periphery of each blob,   #
+    # which named as 'base score', and calculate a threshold of each        #
+    # channel. This threshold could be used to filter those false-positive  #
+    # blobs in following step                                               #
     #########################################################################
     for key_point in kps:
         r = int(key_point.pt[1])
@@ -251,8 +252,9 @@ def detect_blobs_Eng(f_cycle):
     """
     #########################################################################
     # The barcode should be encode as 1~9 and A, B, C                       #
-    # N means ambiguous base                                                       #
-    # This strategy of encoding can make the data structure compatible with Ke's data #
+    # N means ambiguous base                                                #
+    # This strategy of encoding can make the data structure compatible with #
+    # Ke's data                                                             #
     #########################################################################
     channel_1 = f_cycle[0]
     channel_2 = f_cycle[1]

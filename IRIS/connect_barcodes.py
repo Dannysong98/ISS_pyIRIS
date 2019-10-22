@@ -2,11 +2,11 @@
 """
 This module is used to connect bases from different cycles in the same location to form barcode sequence.
 
-In this model, the connection is made as a class, the 'BarcodeCube', of which, three method will be employed. The method
-'collect_called_bases' is used to record the called bases in each cycle, and 'filter_blobs_list' is used to filter the
-bad or indistinguishable blobs by mapping them into a mask layer. At last, the method 'calling_adjust' is used to
-connect the bases as barcodes, by anchoring the coordinates of blobs in reference layer, and search their 20x20 region
-in each cycle, respectively.
+In this model, the connection is made as a class, the 'BarcodeCube', of which, three method will be employed. The
+method 'collect_called_bases' is used to record the called bases in each cycle, and 'filter_blobs_list' is used to
+filter the bad or indistinguishable blobs by mapping them into a mask layer. At last, the method 'calling_adjust' is
+used to connect the bases as barcodes, by anchoring the coordinates of blobs in reference layer, and search their 20x20
+region in each cycle.
 """
 
 
@@ -98,8 +98,8 @@ class BarcodeCube:
 
     def calling_adjust(self):
         """
-        This method is used to connect bases into barcodes, by anchoring the coordinates of blobs in reference layer, and
-        search their 20x20 region in each cycle.
+        This method is used to connect bases into barcodes, by anchoring the coordinates of blobs in reference layer,
+        and search their 20x20 region in each cycle.
 
         :return: NONE
         """
@@ -114,15 +114,15 @@ class BarcodeCube:
                 max_qul_base = 'N'
                 min_err_rate = float(1)
 
-                ####################################################################################################
-                # It will search a 20x20 region to connect bases from each cycle in ref-coordinates #
-                #                                                                                                  #
-                # Process of registration almost align all location of cycles the same, but at pixel level, this   #
-                # registration is not accurate enough. Here, we choose a simple approach to solve this problem,    #
-                # we get locations of blobs from a reference image layer, then to search a NxN (20x20 by default) region #
-                # in those cycles that need to be connected. This approach should not only solve this problem but  #
-                # also bring few false positive in output                      #
-                ####################################################################################################
+                ###################################################################################################
+                # It will search a 20x20 region to connect bases from each cycle in ref-coordinates               #
+                #                                                                                                 #
+                # Process of registration almost align all location of cycles the same, but at pixel level, this  #
+                # registration is not accurate enough. Here, we choose a simple approach to solve this problem,   #
+                # we get locations of blobs from a reference image layer, then to search a NxN (20x20 by default) #
+                # region in those cycles that need to be connected. This approach should not only solve this      #
+                # problem but also bring few false positive in output                                             #
+                ###################################################################################################
                 N = 9  # 20x20
                 ########
                 # N = 1  # Alternative option, 4x4
@@ -155,7 +155,7 @@ class BarcodeCube:
                             if adj_err_rate < min_err_rate:
                                 max_qul_base = bases_cube[cycle_serial][coor][0]
                                 min_err_rate = adj_err_rate
-                ####################################################################################################
+                ###################################################################################################
 
                 adjusted_bases_cube[cycle_serial].update({ref_coordinate: [max_qul_base, min_err_rate]})
 

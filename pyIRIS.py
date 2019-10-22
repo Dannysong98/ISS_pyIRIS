@@ -47,7 +47,8 @@ if __name__ == '__main__':
     This is the entry of function in our software, of which, this process can be split three parts, images importing
     module, blob detecting module and base connecting module.
     
-    The images importing module is compatible with two types of data, which are generated from the technologies by Ke et al. 2013 and Eng et al. 2017 and 2019, respectively.
+    The images importing module is compatible with two types of data, which are generated from the technologies by 
+    Ke et al. 2013 and Eng et al. 2017 and 2019, respectively.
     
     Our software control the data importing by two options following the main command, of which, the '--ke' means to 
     process the data belonging the type of R. Ke, and the '--eng' means another type, with respective optimized 

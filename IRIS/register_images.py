@@ -7,7 +7,9 @@ The process of registration can be split into 3 steps:
 2) Filter out bad matched key point pairs and keep the good ones.
 3) Compute transform matrix used in images registration between different cycles.
 
-Here, we used two algorithms for key points detecting: BRISK (S Leutenegger. et al., IEEE, 2011) and ORB (E Rublee. et al., Citeseer, 2011). The bad matched key points would be marked, and be filtered subsequently to ensure the accuracy in transform matrix calculation
+Here, we used two algorithms for key points detecting: BRISK (S Leutenegger. et al., IEEE, 2011) and
+ORB (E Rublee. et al., Citeseer, 2011). The bad matched key points would be marked, and be filtered subsequently to
+ensure the accuracy in transform matrix calculation
 
 Transform matrices will be used to transform images by rigid registration. It means there are only translation
 and rotation between images but no zooming and retortion.
@@ -19,8 +21,9 @@ from cv2 import (convertScaleAbs, GaussianBlur, getStructuringElement, morpholog
                  BRISK, ORB, BFMatcher, estimateAffinePartial2D,
                  MORPH_CROSS, MORPH_GRADIENT, NORM_HAMMING, RANSAC)
 from numpy import (array, mean, float32)
-
+##########################
 # For alternative option #
+##########################
 # from cv2 import resize
 # from numpy import around
 ##########################
@@ -42,7 +45,9 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
         """
         For detecting the key points and their descriptions by BRISK or ORB.
 
-        Here, we employed morphology transforming to pre-process image for exposing the key points (by a 3x3 Gaussian blur), under a kernel of 15x15. A BRISK or ORB detector used to scan the image for locating key points, and computed their descriptions.
+        Here, we employed morphology transforming to pre-process image for exposing the key points
+        (by a 3x3 Gaussian blur), under a kernel of 15x15. A BRISK or ORB detector used to scan the image for locating
+        key points, and computed their descriptions.
 
         Input a gray scale image and one of the algorithms of detector.
         Returning key points and their descriptions.
@@ -55,9 +60,9 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
         # In order to reduce the errors better in registration, we need to reduce     #
         # some redundant features in each image. Here, a method of morphological      #
         # transformation, Morphological gradient, the difference between              #
-        # dilation and erosion of an image, is used to expose key points under a 15x15#
-        # CROSS kernel. Alternatively, we merge adjacent 3 pixels (3x3) to blur those #
-        # characters of noise-like, meanwhile, to retain those primary one            #
+        # dilation and erosion of an image, is used to expose key points under a      #
+        # 15x15 CROSS kernel. Alternatively, we merge adjacent 3 pixels (3x3) to blur #
+        # those characters of noise-like, meanwhile, to retain those primary one      #
         ###############################################################################
         f_gray_image = GaussianBlur(f_gray_image, (3, 3), 0)
         ksize = (15, 15)

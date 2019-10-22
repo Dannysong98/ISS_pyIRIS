@@ -2,12 +2,13 @@
 """
 This module is used to transform detected fluorescence signals into barcode sequence.
 
-Each cycle is composed of at several channels, such as A, T, C and G in Ke's data structure. Sometimes, an additional in situ hybridization signal
-(DO) and nucleus staining signal (DAPI) are also provided.
+Each cycle is composed of at several channels, such as A, T, C and G in Ke's data structure. Sometimes, an additional
+in situ hybridization signal (DO) and nucleus staining signal (DAPI) are also provided.
 
-We select the channel with the highest base score against the other channels at a same
-location as the representative channel in a certain location. Base quality is calculated as follows: 
-we calcuclate p-value via a binomial test by taking the highest base score as the number of success and the second highest base score as the number of failure and treat it as error rate.
+We select the channel with the highest base score against the other channels at a same location as the representative
+channel in a certain location. Base quality is calculated as follows: we calcuclate p-value via a binomial test by
+taking the highest base score as the number of success and the second highest base score as the number of failure and
+treat it as error rate.
 """
 
 
@@ -33,11 +34,11 @@ def image_model_pooling_Ke(f_image_model_A, f_image_model_T, f_image_model_C, f_
 
     ##############################################################################################################
     # Each coordinate stores the base scores, and the largest one is made to be the representative of this cycle #
-    # the second highest base score will also be used to calculate base quality              #
+    # the second highest base score will also be used to calculate base quality                                  #
     ##############################################################################################################
     for row, col in transpose(nonzero(f_image_model)):
         #######################################################################################################
-        # Our software could handle the images no larger than 99999x99999                                      #
+        # Our software could handle the images no larger than 99999x99999                                     #
         # This size limit should fit most of images                                                           #
         # You can modify this limit like following options in each place of 'read_id' for fitting your images #
         #######################################################################################################
