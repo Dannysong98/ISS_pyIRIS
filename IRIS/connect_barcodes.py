@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """
-This module is used to connect bases from different cycles in the same location.
+This module is used to connect bases from different cycles in the same location to form barcode sequence.
 
-In this module, connection is made as a class named 'BarcodeCube', of which, three method will be called. The method
-'collect_called_bases' is used to record the called bases in each cycle, and 'filter_blobs_list' is used to filter out bad or indistinguishable blobs by mapping them into a mask layer. At last, the method 'calling_adjust' is used to
-connect bases into barcodes by anchoring the coordinates of blobs to coordinates in cycle 1, and search their 12x12 region in other
-cycles, respectively.
+In this model, the connection is made as a class, the 'BarcodeCube', of which, three method will be employed. The method
+'collect_called_bases' is used to record the called bases in each cycle, and 'filter_blobs_list' is used to filter the
+bad or indistinguishable blobs by mapping them into a mask layer. At last, the method 'calling_adjust' is used to
+connect the bases as barcodes, by anchoring the coordinates of blobs in reference layer, and search their 20x20 region
+in each cycle, respectively.
 """
 
 
@@ -16,8 +17,8 @@ from numpy import sqrt
 class BarcodeCube:
     def __init__(self):
         """
-        This method will initialize three members, the '__all_blobs_list' store all the id of blobs, the 'bases_cube' is
-        A list which store the dictionary of bases in each cycle, while the 'adjusted_bases_cube' is A list which store
+        This method will initialize three members, '__all_blobs_list' store all blobs' id, 'bases_cube' is
+        a list stores the dictionary of bases in each cycle, and 'adjusted_bases_cube' is a list stores
         the dictionary of bases in each cycle, with error rate adjusted.
         """
         self.__all_blobs_list = []
