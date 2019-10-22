@@ -44,11 +44,10 @@ from IRIS import (import_images, detect_signals, connect_barcodes, deal_with_res
 
 if __name__ == '__main__':
     """
-    This is the entry of function in our software, of which, this process can be split three parts, the images importing
-    model, the blob detecting model and the barcode connecting model.
+    This is the entry of function in our software, of which, this process can be split three parts, images importing
+    module, blob detecting module and base connecting module.
     
-    The images importing model can be compatible with two types of data, which are conformed to the publish of 
-    Rongqin Ke in 2013, and Chee-Huat Linus Eng in 2017 and 2019, respectively.
+    The images importing module is compatible with two types of data, which are generated from the technologies by Ke et al. 2013 and Eng et al. 2017 and 2019, respectively.
     
     Our software control the data importing by two options following the main command, of which, the '--ke' means to 
     process the data belonging the type of R. Ke, and the '--eng' means another type, with respective optimized 
