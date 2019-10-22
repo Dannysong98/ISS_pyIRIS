@@ -14,7 +14,7 @@ signal as accurately as possible.
 When fluorescence signal exposed, a simple blob detection algorithm is invoked for blob locating. In our
 practice, not only dense fluorescence signal but also sparse blob can be detected by this parameters optimized
 algorithm, while the ambiguous one will be abandoned. After detection, for each detected blobs, the blob signal
-score, which is calculated by their gray scale in core (3x3) region being divided by surrounding (9x9), is
+score, which is calculated by their gray scale in core (4x4) region being divided by surrounding (10x10), is
 recorded to be made as the measure of significance, it is also the base of called base quality in next step.
 """
 
