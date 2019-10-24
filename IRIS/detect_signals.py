@@ -20,6 +20,12 @@ recorded to calculate base quality in the next step.
 from cv2 import (getStructuringElement, morphologyEx, GaussianBlur,
                  SimpleBlobDetector, SimpleBlobDetector_Params,
                  MORPH_ELLIPSE, MORPH_TOPHAT)
+##########################
+# For alternative option #
+##########################
+# from cv2 import (Laplacian, convertScaleAbs,
+#                  CV_32F)
+##########################
 from numpy import (array, zeros, reshape,
                    sum, divide, floor, around,
                    float32, uint8)
@@ -59,6 +65,17 @@ def detect_blobs_Ke(f_cycle):
     channel_T = morphologyEx(channel_T, MORPH_TOPHAT, kernel, iterations=2)
     channel_C = morphologyEx(channel_C, MORPH_TOPHAT, kernel, iterations=2)
     channel_G = morphologyEx(channel_G, MORPH_TOPHAT, kernel, iterations=2)
+    ########
+
+    ###############################
+    # Block of alternative option #
+    ###############################
+    # channel_A = convertScaleAbs(Laplacian(GaussianBlur(channel_A, (3, 3), 0), CV_32F))
+    # channel_T = convertScaleAbs(Laplacian(GaussianBlur(channel_T, (3, 3), 0), CV_32F))
+    # channel_C = convertScaleAbs(Laplacian(GaussianBlur(channel_C, (3, 3), 0), CV_32F))
+    # channel_G = convertScaleAbs(Laplacian(GaussianBlur(channel_G, (3, 3), 0), CV_32F))
+    ###############################
+
     ###############################################################################
 
     channel_list = (channel_A, channel_T, channel_C, channel_G)
@@ -298,6 +315,24 @@ def detect_blobs_Eng(f_cycle):
     channel_A = morphologyEx(channel_A, MORPH_TOPHAT, kernel)
     channel_B = morphologyEx(channel_B, MORPH_TOPHAT, kernel)
     channel_C = morphologyEx(channel_C, MORPH_TOPHAT, kernel)
+    ########
+
+    ###############################
+    # Block of alternative option #
+    ###############################
+    # channel_1 = convertScaleAbs(Laplacian(GaussianBlur(channel_1, (3, 3), 0), CV_32F))
+    # channel_2 = convertScaleAbs(Laplacian(GaussianBlur(channel_2, (3, 3), 0), CV_32F))
+    # channel_3 = convertScaleAbs(Laplacian(GaussianBlur(channel_3, (3, 3), 0), CV_32F))
+    # channel_4 = convertScaleAbs(Laplacian(GaussianBlur(channel_4, (3, 3), 0), CV_32F))
+    # channel_5 = convertScaleAbs(Laplacian(GaussianBlur(channel_5, (3, 3), 0), CV_32F))
+    # channel_6 = convertScaleAbs(Laplacian(GaussianBlur(channel_6, (3, 3), 0), CV_32F))
+    # channel_7 = convertScaleAbs(Laplacian(GaussianBlur(channel_7, (3, 3), 0), CV_32F))
+    # channel_8 = convertScaleAbs(Laplacian(GaussianBlur(channel_8, (3, 3), 0), CV_32F))
+    # channel_9 = convertScaleAbs(Laplacian(GaussianBlur(channel_9, (3, 3), 0), CV_32F))
+    # channel_A = convertScaleAbs(Laplacian(GaussianBlur(channel_A, (3, 3), 0), CV_32F))
+    # channel_B = convertScaleAbs(Laplacian(GaussianBlur(channel_B, (3, 3), 0), CV_32F))
+    # channel_C = convertScaleAbs(Laplacian(GaussianBlur(channel_C, (3, 3), 0), CV_32F))
+    ###############################
 
     channel_list = (channel_1, channel_2, channel_3,
                     channel_4, channel_5, channel_6,

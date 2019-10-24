@@ -65,6 +65,7 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
         # those characters of noise-like, meanwhile, to retain those primary one      #
         ###############################################################################
         f_gray_image = GaussianBlur(f_gray_image, (3, 3), 0)
+
         ksize = (15, 15)
         kernel = getStructuringElement(MORPH_CROSS, ksize)
         f_gray_image = morphologyEx(f_gray_image, MORPH_GRADIENT, kernel, iterations=3)
@@ -110,7 +111,7 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
         ##############################################################################################
 
         f_key_points = det.detect(f_gray_image)
-
+        
         _, f_descriptions = ext.compute(f_gray_image, f_key_points)
 
         return f_key_points, f_descriptions
