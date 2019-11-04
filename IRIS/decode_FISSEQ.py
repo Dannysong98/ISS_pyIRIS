@@ -60,8 +60,4 @@ class assembly_graph:
 
 
 if __name__ == '__main__':
-    from sys import argv
-
-    g = assembly_graph()
-    g.decode_trace(argv[1], argv[2])
-    print(g.decoded_seq)
+    pass

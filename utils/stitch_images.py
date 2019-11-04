@@ -4,6 +4,7 @@
 
 from sys import (argv, exit,
                  stderr)
+
 from cv2 import (imread, createStitcherScans, cvtColor, imwrite, convertScaleAbs,
                  IMREAD_GRAYSCALE, IMREAD_COLOR, COLOR_BGR2GRAY)
 from numpy import (array, dot, mean,

@@ -21,6 +21,8 @@ from cv2 import (convertScaleAbs, GaussianBlur, getStructuringElement, morpholog
                  BRISK, ORB, BFMatcher, estimateAffinePartial2D,
                  MORPH_CROSS, MORPH_GRADIENT, NORM_HAMMING, RANSAC)
 from numpy import (array, mean, float32)
+
+
 ##########################
 # For alternative option #
 ##########################
