@@ -8,7 +8,7 @@ from numpy import (array,
                    uint8)
 
 
-class graph:
+class assembly_graph:
     P_map = array([[1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                    [0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
                    [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0],
@@ -41,18 +41,27 @@ class graph:
         self.score = 0
         self.decoded_seq = ''
 
-    def decode_trace(self, ext, seq):
+    def decode_trace(self, start_seq, ext):
         """"""
-        self.decoded_seq = seq
+        seq_arr = [_ for _ in start_seq]
 
         for sig in ext:
-            for new_node in graph.code[sig]:
-                self.score = graph.P_map[graph.M_lab_coor[self.decoded_seq[-2:]], graph.M_lab_coor[new_node]]
+            for new_node in assembly_graph.code[sig]:
+                self.score = assembly_graph.P_map[assembly_graph.M_lab_coor[''.join(seq_arr[-2:])],
+                                                  assembly_graph.M_lab_coor[new_node]]
+
+                print(seq_arr)
 
                 if self.score == 1:
-                    self.decoded_seq += new_node[-1]
+                    seq_arr.append(new_node[-1])
                     break
+
+        self.decoded_seq = ''.join(seq_arr)
 
 
 if __name__ == '__main__':
-    pass
+    from sys import argv
+
+    g = assembly_graph()
+    g.decode_trace(argv[1], argv[2])
+    print(g.decoded_seq)
