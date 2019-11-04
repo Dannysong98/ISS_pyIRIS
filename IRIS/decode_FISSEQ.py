@@ -50,8 +50,6 @@ class assembly_graph:
                 self.score = assembly_graph.P_map[assembly_graph.M_lab_coor[''.join(seq_arr[-2:])],
                                                   assembly_graph.M_lab_coor[new_node]]
 
-                print(seq_arr)
-
                 if self.score == 1:
                     seq_arr.append(new_node[-1])
                     break
