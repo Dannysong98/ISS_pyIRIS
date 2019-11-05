@@ -38,7 +38,7 @@ def extract_blob_pixel(f_imgFile, f_corFile):
         for _ in range(0, len(cor_list)):
             line = cor_list[_].split()
 
-            if 'N' in line[1] or int(round(sum([ord(_) for _ in line[2]]) / len(line[2]))) < 20:
+            if 'N' in line[1] or int(round(sum([ord(_) for _ in line[2]]) / len(line[2]))) < 0:
                 continue
 
             r1 = int(line[3])
@@ -67,7 +67,7 @@ def extract_blob_pixel(f_imgFile, f_corFile):
 
             ########
 
-            img1[(r1 - 1):(r1 + 3), (c1 - 1):(c1 + 3)] = 0
+            img1[(r1 - 1):(r1 + 3), (c1 - 1):(c1 + 3)] = 255
             img2[(r2 - 1):(r2 + 3), (c2 - 1):(c2 + 3)] = 0
 
     cv.imwrite('debug.deteDel.tif', img1)

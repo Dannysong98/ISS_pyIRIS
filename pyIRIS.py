@@ -89,7 +89,7 @@ if __name__ == '__main__':
                 ##########################################################
                 # Use the same strategy with Ke's data in blob detection #
                 ##########################################################
-                called_base_box_in_one_cycle = detect_signals.detect_blobs_Ke(cycle)
+                called_base_box_in_one_cycle = detect_signals.detect_blobs_Lee(cycle)
                 ##########################################################
                 barcode_cube_obj.collect_called_bases(called_base_box_in_one_cycle)
 

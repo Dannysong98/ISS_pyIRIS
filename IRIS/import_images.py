@@ -263,6 +263,7 @@ def decode_data_Lee(f_cycles):
             ###################################
             f_std_img = channel_0
 
+        adj_img_mats.append(channel_0)
         adj_img_mats.append(channel_A)
         adj_img_mats.append(channel_T)
         adj_img_mats.append(channel_C)

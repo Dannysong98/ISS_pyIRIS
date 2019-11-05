@@ -7,7 +7,7 @@ from os.path import basename
 from IRIS.decode_FISSEQ import assembly_graph
 
 
-def parse_FISSEQ(file_path, start_seq):
+def parse_FISSEQ(file_path):
     """"""
     out_prefix = str(basename(file_path)).split('.')[0]
 
@@ -20,10 +20,12 @@ def parse_FISSEQ(file_path, start_seq):
                 if 'N' in ln[1]:
                     continue
 
-                g.decode_trace(start_seq, ln[1])
+                for p_base in ('AA', 'TT', 'CC', 'GG'):
+                    g.decode_trace(p_base, ln[1])
+                    qul = 'II' + ln[2]
 
-                print('%s\t%s\t%s\t%s\t%s' % (ln[0], g.decoded_seq, 'II' + ln[2], ln[3], ln[4]), file=OFH)
+                    print('%s_%s\t%s\t%s\t%s\t%s' % (ln[0], p_base, g.decoded_seq, qul, ln[3], ln[4]), file=OFH)
 
 
 if __name__ == '__main__':
-    parse_FISSEQ(argv[1], argv[2])
+    parse_FISSEQ(argv[1])
