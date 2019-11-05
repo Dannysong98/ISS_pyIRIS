@@ -19,12 +19,12 @@ recorded to calculate base quality in the next step.
 
 from cv2 import (getStructuringElement, morphologyEx, GaussianBlur,
                  SimpleBlobDetector, SimpleBlobDetector_Params,
-                 MORPH_ELLIPSE, MORPH_RECT, MORPH_TOPHAT)
+                 MORPH_ELLIPSE, MORPH_TOPHAT)
 ######################
 # Alternative option #
 ######################
-# from cv2 import (Laplacian, convertScaleAbs,
-#                  CV_32F)
+from cv2 import (Laplacian, convertScaleAbs,
+                 CV_32F)
 ######################
 from numpy import (array, zeros, reshape,
                    sum, divide, floor, around,
@@ -60,7 +60,6 @@ def detect_blobs_Ke(f_cycle):
     ###############################################################################
     ksize = (15, 15)
     kernel = getStructuringElement(MORPH_ELLIPSE, ksize)
-
     channel_A = morphologyEx(channel_A, MORPH_TOPHAT, kernel, iterations=2)
     channel_T = morphologyEx(channel_T, MORPH_TOPHAT, kernel, iterations=2)
     channel_C = morphologyEx(channel_C, MORPH_TOPHAT, kernel, iterations=2)
@@ -213,10 +212,10 @@ def detect_blobs_Ke(f_cycle):
 
     diff_break = 10
 
-    cut_off_A = int(mode(around(divide(array(diff_list_A, dtype=uint8), diff_break)))[0][0]) - diff_break
-    cut_off_T = int(mode(around(divide(array(diff_list_T, dtype=uint8), diff_break)))[0][0]) - diff_break
-    cut_off_C = int(mode(around(divide(array(diff_list_C, dtype=uint8), diff_break)))[0][0]) - diff_break
-    cut_off_G = int(mode(around(divide(array(diff_list_G, dtype=uint8), diff_break)))[0][0]) - diff_break
+    cut_off_A = int(mode(around(divide(array(diff_list_A, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
+    cut_off_T = int(mode(around(divide(array(diff_list_T, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
+    cut_off_C = int(mode(around(divide(array(diff_list_C, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
+    cut_off_G = int(mode(around(divide(array(diff_list_G, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
     #########################################################################
 
     ##############################################################################################################
@@ -480,18 +479,18 @@ def detect_blobs_Eng(f_cycle):
 
     diff_break = 10
 
-    cut_off_1 = int(mode(around(divide(array(diff_list_1, dtype=uint8), diff_break)))[0][0]) - diff_break
-    cut_off_2 = int(mode(around(divide(array(diff_list_2, dtype=uint8), diff_break)))[0][0]) - diff_break
-    cut_off_3 = int(mode(around(divide(array(diff_list_3, dtype=uint8), diff_break)))[0][0]) - diff_break
-    cut_off_4 = int(mode(around(divide(array(diff_list_4, dtype=uint8), diff_break)))[0][0]) - diff_break
-    cut_off_5 = int(mode(around(divide(array(diff_list_5, dtype=uint8), diff_break)))[0][0]) - diff_break
-    cut_off_6 = int(mode(around(divide(array(diff_list_6, dtype=uint8), diff_break)))[0][0]) - diff_break
-    cut_off_7 = int(mode(around(divide(array(diff_list_7, dtype=uint8), diff_break)))[0][0]) - diff_break
-    cut_off_8 = int(mode(around(divide(array(diff_list_8, dtype=uint8), diff_break)))[0][0]) - diff_break
-    cut_off_9 = int(mode(around(divide(array(diff_list_9, dtype=uint8), diff_break)))[0][0]) - diff_break
-    cut_off_A = int(mode(around(divide(array(diff_list_A, dtype=uint8), diff_break)))[0][0]) - diff_break
-    cut_off_B = int(mode(around(divide(array(diff_list_B, dtype=uint8), diff_break)))[0][0]) - diff_break
-    cut_off_C = int(mode(around(divide(array(diff_list_C, dtype=uint8), diff_break)))[0][0]) - diff_break
+    cut_off_1 = int(mode(around(divide(array(diff_list_1, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
+    cut_off_2 = int(mode(around(divide(array(diff_list_2, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
+    cut_off_3 = int(mode(around(divide(array(diff_list_3, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
+    cut_off_4 = int(mode(around(divide(array(diff_list_4, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
+    cut_off_5 = int(mode(around(divide(array(diff_list_5, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
+    cut_off_6 = int(mode(around(divide(array(diff_list_6, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
+    cut_off_7 = int(mode(around(divide(array(diff_list_7, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
+    cut_off_8 = int(mode(around(divide(array(diff_list_8, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
+    cut_off_9 = int(mode(around(divide(array(diff_list_9, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
+    cut_off_A = int(mode(around(divide(array(diff_list_A, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
+    cut_off_B = int(mode(around(divide(array(diff_list_B, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
+    cut_off_C = int(mode(around(divide(array(diff_list_C, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
 
     for key_point in kps:
         r = int(key_point.pt[1])
@@ -589,19 +588,18 @@ def detect_blobs_Lee(f_cycle):
     greyscale_model_G = zeros(channel_G.shape, dtype=float32)
 
     #############################################################################
-    # Here, a morphological transformation, Tophat, under a 5x5 ELLIPSE kernel, #
+    # Here, a morphological transformation, Tophat, under a 3x3 ELLIPSE kernel, #
     # is used to expose blobs                                                   #
     #############################################################################
-    ksize = (5, 5)
-    kernel = getStructuringElement(MORPH_RECT, ksize)
-
-    channel_0 = morphologyEx(channel_0, MORPH_TOPHAT, kernel, iterations=2)
+    # ksize = (3, 3)
+    # kernel = getStructuringElement(MORPH_ELLIPSE, ksize)
+    # channel_0 = morphologyEx(channel_0, MORPH_TOPHAT, kernel, iterations=2)
     ########
 
     ###############################
     # Block of alternative option #
     ###############################
-    # channel_0 = convertScaleAbs(Laplacian(GaussianBlur(channel_0, (3, 3), 0), CV_32F))
+    channel_0 = convertScaleAbs(Laplacian(GaussianBlur(channel_0, (3, 3), 0), CV_32F))
     ###############################
 
     #############################################################################
@@ -630,7 +628,7 @@ def detect_blobs_Lee(f_cycle):
     # blob_params.thresholdStep = 3  # Alternative option
     # blob_params.minRepeatability = 3  # Alternative option
 
-    blob_params.minDistBetweenBlobs = 1
+    blob_params.minDistBetweenBlobs = 2
 
     blob_params.filterByColor = True
     blob_params.blobColor = 255
@@ -658,17 +656,17 @@ def detect_blobs_Lee(f_cycle):
     ####################################################################################
 
     blob_params.filterByCircularity = True
-    blob_params.minCircularity = 0.5
+    blob_params.minCircularity = 0.4
 
     blob_params.filterByConvexity = True
-    blob_params.minConvexity = 0.6
+    blob_params.minConvexity = 0.3
     ##########################################################
 
     for img in channel_list:
         #################################
         # Setup threshold of gray-scale #
         #################################
-        blob_params.minThreshold = mode(around(reshape(img, (img.size,))))[0][0]
+        blob_params.minThreshold = mode(floor(reshape(img, (img.size,)) / 2) * 2)[0][0]
         #################################
 
         mor_detector = SimpleBlobDetector.create(blob_params)
@@ -679,7 +677,7 @@ def detect_blobs_Lee(f_cycle):
     # and detect on this mask layer again to ensure blobs' location across all      #
     # channels in this cycle                                                        #
     #################################################################################
-    mask_layer = zeros(channel_A.shape, dtype=uint8)
+    mask_layer = zeros(channel_0.shape, dtype=uint8)
 
     for key_point in mor_kps:
         r = int(key_point.pt[1])
@@ -743,12 +741,12 @@ def detect_blobs_Lee(f_cycle):
         if diff_G > 0:
             diff_list_G.append(int(around(diff_G)))
 
-    diff_break = 5
+    diff_break = 10
 
-    cut_off_A = int(mode(around(divide(array(diff_list_A, dtype=uint8), diff_break)))[0][0]) - diff_break
-    cut_off_T = int(mode(around(divide(array(diff_list_T, dtype=uint8), diff_break)))[0][0]) - diff_break
-    cut_off_C = int(mode(around(divide(array(diff_list_C, dtype=uint8), diff_break)))[0][0]) - diff_break
-    cut_off_G = int(mode(around(divide(array(diff_list_G, dtype=uint8), diff_break)))[0][0]) - diff_break
+    cut_off_A = int(mode(around(divide(array(diff_list_A, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
+    cut_off_T = int(mode(around(divide(array(diff_list_T, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
+    cut_off_C = int(mode(around(divide(array(diff_list_C, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
+    cut_off_G = int(mode(around(divide(array(diff_list_G, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
     #########################################################################
 
     ##############################################################################################################
