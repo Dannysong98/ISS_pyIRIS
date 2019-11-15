@@ -26,12 +26,31 @@ from cv2 import (getStructuringElement, morphologyEx, GaussianBlur,
 from cv2 import (Laplacian, convertScaleAbs,
                  CV_32F)
 ######################
-from numpy import (array, zeros, reshape,
-                   sum, divide, floor, around,
-                   float32, uint8)
+from numpy import (array, zeros, ones, reshape, max, abs,
+                   sum, divide, floor, around, fft,
+                   float32, uint8, bool_)
 from scipy.stats import mode
 
 from .call_bases import image_model_pooling_Ke, image_model_pooling_Eng, pool2base
+
+
+def hpf(f_img):
+    """
+    High-pass Filter
+
+    :param f_img: Input image
+    :return: Filtered image
+    """
+    row, col = f_img.shape
+
+    filter_masker = ones((row, col), dtype=bool_)
+    filter_masker[int(row / 2) - int(row * 0.05):int(row / 2) + int(row * 0.05),
+                  int(col / 2) - int(col * 0.05):int(col / 2) + int(col * 0.05)] = 0
+
+    f_img = abs(fft.ifft2(fft.ifftshift(fft.fftshift(fft.fft2(f_img)) * filter_masker)))
+    f_img = convertScaleAbs(f_img / max(f_img) * 255)
+
+    return f_img
 
 
 def detect_blobs_Ke(f_cycle):
@@ -74,6 +93,16 @@ def detect_blobs_Ke(f_cycle):
     # channel_C = convertScaleAbs(Laplacian(GaussianBlur(channel_C, (3, 3), 0), CV_32F))
     # channel_G = convertScaleAbs(Laplacian(GaussianBlur(channel_G, (3, 3), 0), CV_32F))
     ###############################
+
+    ##################################################################
+    # Block of alternative option:                                   #
+    # High-pass filter in frequency domain of Fourier transformation #
+    ##################################################################
+    # channel_A = hpf(channel_A)
+    # channel_T = hpf(channel_T)
+    # channel_C = hpf(channel_C)
+    # channel_G = hpf(channel_G)
+    ##################################################################
 
     ###############################################################################
 

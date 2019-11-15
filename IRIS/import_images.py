@@ -19,10 +19,10 @@ tensor in the order of cycle
 
 
 from sys import stderr
-from cv2 import (imread, imreadmulti, imwrite,
+from cv2 import (imread, imreadmulti, imwrite, convertScaleAbs,
                  add, addWeighted, warpAffine,
                  IMREAD_GRAYSCALE)
-from numpy import (array,
+from numpy import (array, mean,
                    uint8)
 
 from .register_images import register_cycles
@@ -65,11 +65,11 @@ def decode_data_Ke(f_cycles):
         # Merge different channels from a same cycle into one matrix for following registration #
         #                                                                                       #
         # BE CARE: The parameters 'alpha' and 'beta' maybe will affect whether the registering  #
-        # success. Sometimes, a registeration would succeed with only using DAPI from different #
+        # success. Sometimes, a registration would succeed with only using DAPI from different  #
         # cycle instead of merged images                                                        #
         #########################################################################################
-        alpha = 0.7
-        beta = 0.3
+        alpha = 0.5
+        beta = 0.7
 
         merged_img = addWeighted(add(add(add(channel_A, channel_T), channel_C), channel_G), alpha, channel_0, beta, 0)
         ########
@@ -91,20 +91,28 @@ def decode_data_Ke(f_cycles):
             # f_std_img = addWeighted(foreground, 0.4, background, 0.8, 0)  # Alternative option
             ###################################
 
+        merged_img = convertScaleAbs(merged_img * (mean(reg_ref) / mean(merged_img)))
         trans_mat = register_cycles(reg_ref, merged_img, 'BRISK')
 
         #############################
         # For registration checking #
         #############################
-        # debug_img = warpAffine(merged_img, trans_mat, (reg_ref.shape[1], reg_ref.shape[0]))
-        # imwrite('debug.cycle_' + str(int(cycle_id + 1)) + '.tif', merged_img)
-        # imwrite('debug.cycle_' + str(int(cycle_id + 1)) + '.reg.tif', debug_img)
+        debug_img = warpAffine(merged_img, trans_mat, (reg_ref.shape[1], reg_ref.shape[0]))
+
+        debug_img = uint8(debug_img)
+        imwrite('debug.cycle_' + str(int(cycle_id + 1)) + '.tif', merged_img)
+        imwrite('debug.cycle_' + str(int(cycle_id + 1)) + '.reg.tif', debug_img)
         #############################
 
-        adj_img_mats.append(warpAffine(channel_A, trans_mat, (f_std_img.shape[1], f_std_img.shape[0])))
-        adj_img_mats.append(warpAffine(channel_T, trans_mat, (f_std_img.shape[1], f_std_img.shape[0])))
-        adj_img_mats.append(warpAffine(channel_C, trans_mat, (f_std_img.shape[1], f_std_img.shape[0])))
-        adj_img_mats.append(warpAffine(channel_G, trans_mat, (f_std_img.shape[1], f_std_img.shape[0])))
+        channel_A = warpAffine(channel_A, trans_mat, (reg_ref.shape[1], reg_ref.shape[0]))
+        channel_T = warpAffine(channel_T, trans_mat, (reg_ref.shape[1], reg_ref.shape[0]))
+        channel_C = warpAffine(channel_C, trans_mat, (reg_ref.shape[1], reg_ref.shape[0]))
+        channel_G = warpAffine(channel_G, trans_mat, (reg_ref.shape[1], reg_ref.shape[0]))
+
+        adj_img_mats.append(channel_A)
+        adj_img_mats.append(channel_T)
+        adj_img_mats.append(channel_C)
+        adj_img_mats.append(channel_G)
         #########################################################################################
 
         ###################################################################################################

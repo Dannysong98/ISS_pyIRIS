@@ -145,18 +145,14 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
 
     transform_matrix = array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]], dtype=float32)
 
+    # reference_cycle = __FMT(reference_cycle)
+    # transform_cycle = __FMT(transform_cycle)
+
     #######################################
     # Lightness Rectification (IMPORTANT) #
     #######################################
     transform_cycle = convertScaleAbs(transform_cycle * (mean(reference_cycle) / mean(transform_cycle)))
     #######################################
-
-    ####################################
-    # Fourier transformation (ABANDON) #
-    ####################################
-    # reference_cycle = convertScaleAbs(20 * log(abs(fftshift(fft2(reference_cycle)))))
-    # transform_cycle = convertScaleAbs(20 * log(abs(fftshift(fft2(transform_cycle)))))
-    ####################################
 
     kp1, des1 = __get_key_points_and_descriptors(reference_cycle, detection_method)
     kp2, des2 = __get_key_points_and_descriptors(transform_cycle, detection_method)
