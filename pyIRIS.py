@@ -54,7 +54,7 @@ if __name__ == '__main__':
     process the data belonging the type of R. Ke, and the '--eng' means another type, with respective optimized 
     parameters.
     """
-    if len(argv) > 2 and ('--ke' in argv[1] or '--eng' in argv[1] or '--lee' in argv[1]):
+    if len(argv) > 2 and ('--ke' in argv[1] or '--eng' in argv[1] or '--lee' in argv[1] or '--chen' in argv[1]):
         cycle_stack = []
         std_img = array([], dtype=uint8)
         called_base_box_in_one_cycle = {}
@@ -86,11 +86,22 @@ if __name__ == '__main__':
             cycle_stack, std_img = import_images.decode_data_Lee(argv[2:])
 
             for cycle in cycle_stack:
-                ##########################################################
-                # Use the same strategy with Ke's data in blob detection #
-                ##########################################################
+                #############################################################
+                # Use the similar strategy with Ke's data in blob detection #
+                #############################################################
                 called_base_box_in_one_cycle = detect_signals.detect_blobs_Lee(cycle)
-                ##########################################################
+                #############################################################
+                barcode_cube_obj.collect_called_bases(called_base_box_in_one_cycle)
+
+        if argv[1] == '--chen':
+            cycle_stack, std_img = import_images.decode_data_Chen(argv[2:])
+
+            for cycle in cycle_stack:
+                #############################################################
+                # Use the similar strategy with Ke's data in blob detection #
+                #############################################################
+                called_base_box_in_one_cycle = detect_signals.detect_blobs_Chen(cycle)
+                #############################################################
                 barcode_cube_obj.collect_called_bases(called_base_box_in_one_cycle)
 
         #############################################################

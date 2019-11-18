@@ -31,7 +31,7 @@ from numpy import (array, zeros, ones, reshape, max, abs,
                    float32, uint8, bool_)
 from scipy.stats import mode
 
-from .call_bases import image_model_pooling_Ke, image_model_pooling_Eng, pool2base
+from .call_bases import image_model_pooling_Ke, image_model_pooling_Eng, image_model_pooling_Chen, pool2base, pool2base2
 
 
 def hpf(f_img):
@@ -812,6 +812,175 @@ def detect_blobs_Lee(f_cycle):
                                               greyscale_model_G)
 
     base_box_in_one_cycle = pool2base(image_model_pool)
+
+    return base_box_in_one_cycle
+
+
+def detect_blobs_Chen(f_cycle):
+    """
+    For detect the fluorescence signal.
+
+    Input registered image from different channels.
+    Returning the grey scale model.
+
+    :param f_cycle: A image matrix in the 3D common data tensor.
+    :return: A base box of this cycle, which store their coordinates, base and its error rate.
+    """
+    channel_0 = f_cycle[0]
+
+    greyscale_model_0 = zeros(channel_0.shape, dtype=float32)
+
+    ###############################################################################
+    # Here, a morphological transformation, Tophat, under a 15x15 ELLIPSE kernel, #
+    # is used to expose blobs                                                     #
+    ###############################################################################
+    ksize = (15, 15)
+    kernel = getStructuringElement(MORPH_ELLIPSE, ksize)
+    channel_0 = morphologyEx(channel_0, MORPH_TOPHAT, kernel, iterations=2)
+    ########
+
+    ##################################################################
+    # Block of alternative option:                                   #
+    # High-pass filter in frequency domain of Fourier transformation #
+    ##################################################################
+    # channel_0 = hpf(channel_0)
+    ##################################################################
+
+    ###############################################################################
+
+    channel_list = (channel_0,)
+
+    mor_kps = []
+
+    ##########################################################
+    # Parameters setup for preliminary blob detection        #
+    # Here, some of parameters are very crucial, such as     #
+    # 'thresholdStep', 'minRepeatability', 'minArea', which  #
+    # could greatly affect the number of detected blobs. And #
+    # more importantly, they would need to be modified in    #
+    # different experiments.                                 #
+    #                                                        #
+    # We prepared some cases for the different experiments   #
+    # we met during debugging, and we look forward to        #
+    # standardize the experiments                            #
+    ##########################################################
+    blob_params = SimpleBlobDetector_Params()
+
+    blob_params.thresholdStep = 2
+    blob_params.minRepeatability = 2
+    ########
+    # blob_params.thresholdStep = 3  # Alternative option
+    # blob_params.minRepeatability = 3  # Alternative option
+
+    blob_params.minDistBetweenBlobs = 2
+    blob_params.filterByColor = True
+    blob_params.blobColor = 255
+
+    ####################################################################################
+    # This parameter is used for filtering those extremely large blobs, which likely   #
+    # to results from contamination                                                    #
+    #                                                                                  #
+    # Unfortunately, some genes expressing highly at a dense region tend to form large #
+    # blobs thus would to be filtered, lead to optics-identification failure.          #
+    # A known case in our practise is the gene 'pro-corazonin-like', this is a highly  #
+    # expressed gene at a small region in brain of some insects, and is usually        #
+    # detected as a low- or non-expression gene in IRIS                                #
+    ####################################################################################
+    blob_params.filterByArea = True
+
+    blob_params.minArea = 1
+    ########
+    # blob_params.minArea = 4  # Alternative option
+
+    blob_params.maxArea = 65
+    ########
+    # blob_params.maxArea = 100  # Alternative option
+    # blob_params.maxArea = 145  # Alternative option
+    ####################################################################################
+
+    blob_params.filterByCircularity = False
+    blob_params.filterByConvexity = True
+    ##########################################################
+
+    for img in channel_list:
+        #################################
+        # Setup threshold of gray-scale #
+        #################################
+        blob_params.minThreshold = mode(floor(reshape(img, (img.size,)) / 2) * 2)[0][0]
+        #################################
+
+        mor_detector = SimpleBlobDetector.create(blob_params)
+        mor_kps.extend(mor_detector.detect(img))
+
+    #################################################################################
+    # To map all the detected blobs into a new mask layer for redundancy filtering, #
+    # and detect on this mask layer again to ensure blobs' location across all      #
+    # channels in this cycle                                                        #
+    #################################################################################
+    mask_layer = zeros(channel_0.shape, dtype=uint8)
+
+    for key_point in mor_kps:
+        r = int(key_point.pt[1])
+        c = int(key_point.pt[0])
+
+        mask_layer[r:(r + 2), c:(c + 2)] = 255
+
+    mask_layer = GaussianBlur(mask_layer, (5, 5), 0)
+
+    blob_params.minThreshold = 1
+
+    detector = SimpleBlobDetector.create(blob_params)
+
+    kps = detector.detect(mask_layer)
+
+    diff_list_0 = []
+    #################################################################################
+
+    #########################################################################
+    # Calculate the threshold for distinction between blobs and potential   #
+    # pseudo-blobs                                                          #
+    #                                                                       #
+    # A crucial feature of real blob is that the gray-scale of pixel        #
+    # should increase rapidly in its core region, compared with periphery   #
+    #                                                                       #
+    # The step of detection could expose a massive amount of blobs but also #
+    # include some false-positive. We calculate the difference of mean      #
+    # gray-scale between pixel in core region and periphery of each blob,   #
+    # which named as 'base score', and calculate a threshold of each        #
+    # channel. This threshold could be used to filter those false-positive  #
+    # blobs in following step                                               #
+    #########################################################################
+    for key_point in kps:
+        r = int(key_point.pt[1])
+        c = int(key_point.pt[0])
+
+        diff_0 = sum(channel_0[(r - 1):(r + 3), (c - 1):(c + 3)]) / 16 - \
+                 sum(channel_0[(r - 4):(r + 6), (c - 4):(c + 6)]) / 100
+
+        if diff_0 > 0:
+            diff_list_0.append(int(around(diff_0)))
+
+    diff_break = 10
+
+    cut_off_0 = int(mode(around(divide(array(diff_list_0, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
+    #########################################################################
+
+    ##############################################################################################################
+    # The coordinates of real blobs will be used to locate the difference of gary-scale among different channels #
+    ##############################################################################################################
+    for key_point in kps:
+        r = int(key_point.pt[1])
+        c = int(key_point.pt[0])
+
+        if sum(channel_0[(r - 1):(r + 3), (c - 1):(c + 3)]) / 16 - \
+                sum(channel_0[(r - 4):(r + 6), (c - 4):(c + 6)]) / 100 > cut_off_0:
+            greyscale_model_0[r, c] = sum(channel_0[(r - 1):(r + 3), (c - 1):(c + 3)]) / 16 - \
+                                      sum(channel_0[(r - 4):(r + 6), (c - 4):(c + 6)]) / 100
+    ##############################################################################################################
+
+    image_model_pool = image_model_pooling_Chen(greyscale_model_0)
+
+    base_box_in_one_cycle = pool2base2(image_model_pool)
 
     return base_box_in_one_cycle
 
