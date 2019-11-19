@@ -18,7 +18,7 @@ and rotation between images but no zooming and retortion.
 
 from sys import stderr
 from cv2 import (convertScaleAbs, GaussianBlur, getStructuringElement, morphologyEx,
-                 BRISK, ORB, BFMatcher, estimateAffinePartial2D,
+                 BRISK, ORB, BFMatcher, estimateAffinePartial2D, bitwise_not,
                  MORPH_CROSS, MORPH_GRADIENT, NORM_HAMMING, RANSAC)
 from numpy import (array, mean, float32)
 
@@ -154,8 +154,8 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
     transform_cycle = convertScaleAbs(transform_cycle * (mean(reference_cycle) / mean(transform_cycle)))
     #######################################
 
-    kp1, des1 = __get_key_points_and_descriptors(reference_cycle, detection_method)
-    kp2, des2 = __get_key_points_and_descriptors(transform_cycle, detection_method)
+    kp1, des1 = __get_key_points_and_descriptors(bitwise_not(reference_cycle), detection_method)
+    kp2, des2 = __get_key_points_and_descriptors(bitwise_not(transform_cycle), detection_method)
 
     good_matches = __get_good_matched_pairs(des1, des2)
 

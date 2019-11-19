@@ -86,22 +86,14 @@ if __name__ == '__main__':
             cycle_stack, std_img = import_images.decode_data_Lee(argv[2:])
 
             for cycle in cycle_stack:
-                #############################################################
-                # Use the similar strategy with Ke's data in blob detection #
-                #############################################################
                 called_base_box_in_one_cycle = detect_signals.detect_blobs_Lee(cycle)
-                #############################################################
                 barcode_cube_obj.collect_called_bases(called_base_box_in_one_cycle)
 
         if argv[1] == '--chen':
             cycle_stack, std_img = import_images.decode_data_Chen(argv[2:])
 
             for cycle in cycle_stack:
-                #############################################################
-                # Use the similar strategy with Ke's data in blob detection #
-                #############################################################
                 called_base_box_in_one_cycle = detect_signals.detect_blobs_Chen(cycle)
-                #############################################################
                 barcode_cube_obj.collect_called_bases(called_base_box_in_one_cycle)
 
         #############################################################
