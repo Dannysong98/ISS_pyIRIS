@@ -68,12 +68,17 @@ def decode_data_Ke(f_cycles):
         # success. Sometimes, a registration would succeed with only using DAPI from different  #
         # cycle instead of merged images                                                        #
         #########################################################################################
-        alpha = 0.5
-        beta = 0.7
-
-        merged_img = addWeighted(add(add(add(channel_A, channel_T), channel_C), channel_G), alpha, channel_0, beta, 0)
+        merged_img = channel_0
         ########
-        # merged_img = channel_0  # Alternative option
+
+        ###############################
+        # Block of alternative option #
+        ###############################
+        # alpha = 0.5
+        # beta = 0.7
+        #
+        # merged_img = addWeighted(add(add(add(channel_A, channel_T), channel_C), channel_G), alpha, channel_0, beta, 0)
+        ###############################
 
         if cycle_id == 0:
             reg_ref = merged_img
@@ -84,7 +89,7 @@ def decode_data_Ke(f_cycles):
             foreground = add(add(add(channel_A, channel_T), channel_C), channel_G)
             background = channel_0
 
-            f_std_img = addWeighted(foreground, 0.8, background, 0.6, 0)
+            f_std_img = addWeighted(foreground, 0.6, background, 0.4, 0)
             ########
             # f_std_img = foreground
             # f_std_img = addWeighted(foreground, 0.5, background, 0.5, 0)  # Alternative option
@@ -265,11 +270,15 @@ def decode_data_Lee(f_cycles):
         ##############################################
 
         if cycle_id == 0:
+            # reg_ref = channel_0
+
             ###################################
             # Output background independently #
             ###################################
             f_std_img = channel_0
             ###################################
+
+        # trans_mat = register_cycles(reg_ref, merged_img, 'BRISK')  # Don't need registration
 
         adj_img_mats.append(channel_0)
         adj_img_mats.append(channel_A)
@@ -323,11 +332,15 @@ def decode_data_Chen(f_cycles):
         merged_img = channel_0
 
         if cycle_id == 0:
+            # reg_ref = channel_0
+
             ###################################
             # Output background independently #
             ###################################
             f_std_img = channel_0
             ###################################
+
+        # trans_mat = register_cycles(reg_ref, merged_img, 'BRISK')  # Don't need registration
 
         ########################
         # For merging checking #
