@@ -26,9 +26,7 @@ from cv2 import (getStructuringElement, morphologyEx, GaussianBlur,
 from cv2 import (Laplacian, convertScaleAbs,
                  CV_32F)
 ######################
-from numpy import (array, zeros, ones, reshape, max, abs,
-                   sum, divide, floor, around, fft,
-                   float32, uint8, bool_)
+from numpy import (array, zeros, ones, reshape, max, abs, sum, divide, floor, around, fft, float32, uint8, bool_)
 from scipy.stats import mode
 
 from .call_bases import image_model_pooling_Ke, image_model_pooling_Eng, image_model_pooling_Chen, pool2base, pool2base2
@@ -44,8 +42,8 @@ def hpf(f_img):
     row, col = f_img.shape
 
     filter_masker = ones((row, col), dtype=bool_)
-    filter_masker[int(row / 2) - int(row * 0.05):int(row / 2) + int(row * 0.05),
-                  int(col / 2) - int(col * 0.05):int(col / 2) + int(col * 0.05)] = 0
+    filter_masker[int(row / 2) - int(row * 0.1):int(row / 2) + int(row * 0.1),
+                  int(col / 2) - int(col * 0.1):int(col / 2) + int(col * 0.1)] = 0
 
     f_img = abs(fft.ifft2(fft.ifftshift(fft.fftshift(fft.fft2(f_img)) * filter_masker)))
     f_img = convertScaleAbs(f_img / max(f_img) * 255)

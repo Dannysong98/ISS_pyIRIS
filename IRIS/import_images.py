@@ -22,8 +22,7 @@ from sys import stderr
 from cv2 import (imread, imreadmulti, imwrite,
                  add, addWeighted, warpAffine,
                  IMREAD_GRAYSCALE)
-from numpy import (array,
-                   uint8)
+from numpy import (array, uint8)
 
 from .register_images import register_cycles
 

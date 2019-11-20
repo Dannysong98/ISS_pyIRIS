@@ -36,8 +36,7 @@ ChangeLog:  2019-01-15  r001    First development version
 
 
 from sys import (argv, stderr)
-from numpy import (array,
-                   uint8)
+from numpy import (array, uint8)
 
 from IRIS import (import_images, detect_signals, connect_barcodes, deal_with_result)
 
