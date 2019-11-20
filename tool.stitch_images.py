@@ -2,15 +2,12 @@
 """"""
 
 
-from sys import (argv, exit,
-                 stderr)
-
+from sys import (argv, exit, path, stderr)
 from cv2 import (imread, createStitcherScans, cvtColor, imwrite, convertScaleAbs,
                  IMREAD_GRAYSCALE, IMREAD_COLOR, COLOR_BGR2GRAY)
-from numpy import (array, dot, mean,
-                   uint8, uint16)
+from numpy import (array, dot, mean, uint8, uint16)
 
-from ..IRIS.register_images import register_cycles
+from IRIS.register_images import register_cycles
 
 
 def background_stitcher(img_dirs):
