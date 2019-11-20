@@ -2,8 +2,8 @@
 """"""
 
 
-from sys import (argv, exit, path, stderr)
-from cv2 import (imread, createStitcherScans, cvtColor, imwrite, convertScaleAbs,
+from sys import (argv, exit, stderr)
+from cv2 import (imread, createStitcherScans, cvtColor, imwrite, convertScaleAbs, bitwise_not,
                  IMREAD_GRAYSCALE, IMREAD_COLOR, COLOR_BGR2GRAY)
 from numpy import (array, dot, mean, uint8, uint16)
 
@@ -19,12 +19,14 @@ def background_stitcher(img_dirs):
 
     for i in range(0, len(imgs)):
         imgs[i] = convertScaleAbs(imgs[i] * mean(imgs[0]) / mean(imgs[i]))
+        imgs[i] = bitwise_not(imgs[i])
 
     stitcher = createStitcherScans()
     status, stitched_img = stitcher.stitch(imgs)
 
     if status == 0:
         stitched_img = cvtColor(stitched_img, COLOR_BGR2GRAY)
+        stitched_img = bitwise_not(stitched_img)
         return stitched_img
 
     else:
@@ -37,7 +39,8 @@ def trans_coor(bg, img_dirs):
     adj_barcode_info = {}
 
     for img_dir in img_dirs:
-        mat = register_cycles(bg, imread(img_dir + '/background.tif', IMREAD_GRAYSCALE), 'BRISK')
+        # mat = register_cycles(bg, imread(img_dir + '/background.tif', IMREAD_GRAYSCALE), 'BRISK')
+        mat = register_cycles(bg, imread(img_dir + '/debug.cycle_1.reg.tif', IMREAD_GRAYSCALE), 'BRISK')
 
         with open(img_dir + '/basecalling_data.txt', 'rt') as IN:
             for ln in IN:
