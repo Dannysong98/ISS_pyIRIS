@@ -68,12 +68,12 @@ def decode_data_Ke(f_cycles):
         # success. Sometimes, a registration would succeed with only using DAPI from different  #
         # cycle instead of merged images                                                        #
         #########################################################################################
-        # alpha = 0.5
-        # beta = 0.7
-        #
-        # merged_img = addWeighted(add(add(add(channel_A, channel_T), channel_C), channel_G), alpha, channel_0, beta, 0)
+        alpha = 0.5
+        beta = 0.7
+
+        merged_img = addWeighted(add(add(add(channel_A, channel_T), channel_C), channel_G), alpha, channel_0, beta, 0)
         ########
-        merged_img = channel_0  # Alternative option
+        # merged_img = channel_0  # Alternative option
 
         if cycle_id == 0:
             reg_ref = merged_img
@@ -269,6 +269,7 @@ def decode_data_Lee(f_cycles):
             # Output background independently #
             ###################################
             f_std_img = channel_0
+            ###################################
 
         adj_img_mats.append(channel_0)
         adj_img_mats.append(channel_A)
@@ -316,9 +317,8 @@ def decode_data_Chen(f_cycles):
         #########################################################################################
         # Merge different channels from a same cycle into one matrix for following registration #
         #                                                                                       #
-        # BE CARE: The parameters 'alpha' and 'beta' maybe will affect whether the registering  #
-        # success. Sometimes, a registration would succeed with only using DAPI from different  #
-        # cycle instead of merged images                                                        #
+        # A registration would succeed with only using DAPI from different cycle instead of     #
+        # merged images                                                                         #
         #########################################################################################
         merged_img = channel_0
 

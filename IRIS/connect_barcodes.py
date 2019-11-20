@@ -130,7 +130,7 @@ class BarcodeCube:
                 # N = 4  # Alternative option, 10x10
                 # N = 5  # Alternative option, 12x12
                 ########
-                # N = n  # ((n + 1) * 2)x((n + 1) * 2)
+                # N = n  # Alternative option, ((n + 1) * 2)x((n + 1) * 2)
 
                 for row in range(r - N, r + (N + 2)):
                     for col in range(c - N, c + (N + 2)):

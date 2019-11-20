@@ -145,9 +145,6 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
 
     transform_matrix = array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]], dtype=float32)
 
-    # reference_cycle = __FMT(reference_cycle)
-    # transform_cycle = __FMT(transform_cycle)
-
     #######################################
     # Lightness Rectification (IMPORTANT) #
     #######################################
