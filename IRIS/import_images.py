@@ -74,7 +74,7 @@ def decode_data_Ke(f_cycles):
         # Block of alternative option #
         ###############################
         # alpha = 0.5
-        # beta = 0.7
+        # beta = 0.6
         #
         # merged_img = addWeighted(add(add(add(channel_A, channel_T), channel_C), channel_G), alpha, channel_0, beta, 0)
         ###############################
@@ -88,14 +88,14 @@ def decode_data_Ke(f_cycles):
             foreground = add(add(add(channel_A, channel_T), channel_C), channel_G)
             background = channel_0
 
-            f_std_img = addWeighted(foreground, 0.6, background, 0.4, 0)
+            f_std_img = addWeighted(foreground, 0.5, background, 0.6, 0)
             ########
             # f_std_img = foreground
             # f_std_img = addWeighted(foreground, 0.5, background, 0.5, 0)  # Alternative option
             # f_std_img = addWeighted(foreground, 0.4, background, 0.8, 0)  # Alternative option
             ###################################
 
-        trans_mat = register_cycles(reg_ref, merged_img, 'BRISK')
+        trans_mat = register_cycles(reg_ref, merged_img, 'ORB')
 
         #############################
         # For registration checking #
@@ -103,7 +103,7 @@ def decode_data_Ke(f_cycles):
         debug_img = warpAffine(merged_img, trans_mat, (reg_ref.shape[1], reg_ref.shape[0]))
 
         debug_img = uint8(debug_img)
-        imwrite('debug.cycle_' + str(int(cycle_id + 1)) + '.tif', merged_img)
+        # imwrite('debug.cycle_' + str(int(cycle_id + 1)) + '.tif', merged_img)
         imwrite('debug.cycle_' + str(int(cycle_id + 1)) + '.reg.tif', debug_img)
         #############################
 
