@@ -1,5 +1,5 @@
 ## DESCIRPTION ##
-#   This Web App is used to analyse the result of ISS Base Calling
+#   This Web App is used to appear the result of ISS Base Calling
 #################
 
 ## AUTHOR ##
@@ -29,9 +29,9 @@ library(rsconnect)
 ui <- fixedPage(
     theme=shinytheme('lumen'),
     
-    titlePanel('DAIBC', 'Data Analysing after ISS Base Calling'),
+    titlePanel('DAIBC', 'Data Appearance after ISS Base Calling'),
     
-    h5('Data Analysing after ISS Base Calling'),
+    h5('Data Appearance after ISS Base Calling'),
 
     sidebarPanel(
         fixedRow(
