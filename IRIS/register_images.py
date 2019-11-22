@@ -85,33 +85,18 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
 
         ###############################################################################
         # Block of alternative option:                                                #
+        #                                                                             #
         # In order to reduce the errors better in registration, we need to reduce     #
         # some redundant features in each image. Here, a method of morphological      #
         # transformation, Morphological gradient, the difference between              #
         # dilation and erosion of an image, is used to expose key points under a      #
-        # 15x15 rectangle kernel. Alternatively, we merge adjacent 3 pixels (3x3) to  #
-        # blur those characters of noise-like, meanwhile, to retain those primary one #
+        # 15x15 rectangle kernel, after a Gaussian blur (3x3 kernel).                 #
         ###############################################################################
         # f_gray_image = GaussianBlur(f_gray_image, (3, 3), 0)
         #
         # ksize = (15, 15)
         # kernel = getStructuringElement(MORPH_RECT, ksize)
         # f_gray_image = morphologyEx(f_gray_image, MORPH_GRADIENT, kernel, iterations=2)
-        ########
-
-        ###############################
-        # Block of alternative option #
-        ###############################
-        # scale = 3
-        ########
-        # scale = 2  # Alternative option
-        # scale = 4  # Alternative option
-        #
-        # f_gray_image = resize(resize(f_gray_image, (int(around(f_gray_image.shape[1] / scale)),
-        #                                             int(around(f_gray_image.shape[0] / scale)))),
-        #                       (f_gray_image.shape[1], f_gray_image.shape[0]))
-        ###############################
-
         ###############################################################################
 
         det = ''
