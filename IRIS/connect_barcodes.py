@@ -11,7 +11,7 @@ region in each cycle.
 
 
 from sys import stderr
-from numpy import sqrt
+# from numpy import sqrt  # Alternative option
 
 
 class BarcodeCube:
@@ -147,11 +147,20 @@ class BarcodeCube:
                             # This function can be off if no need                                #
                             ######################################################################
                             error_rate = bases_cube[cycle_serial][coor][1]
-                            D = sqrt((row - r) ** 2 + (col - c) ** 2)
 
-                            adj_err_rate = sqrt(((error_rate * D) ** 2) + (error_rate ** 2))
+                            adj_err_rate = error_rate
                             ########
-                            # adj_err_rate = error_rate  # Alternative option
+
+                            ############################################################
+                            # Block of alternative option                              #
+                            #                                                          #
+                            # If the search region is so large you set, we suggest you #
+                            # to adjust the error rate based on Pascal's Triangle      #
+                            ############################################################
+                            # D = sqrt((row - r) ** 2 + (col - c) ** 2)
+                            # adj_err_rate = sqrt(((error_rate * D) ** 2) + (error_rate ** 2))
+                            ############################################################
+
                             ######################################################################
 
                             if adj_err_rate > 1:

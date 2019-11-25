@@ -794,7 +794,7 @@ def detect_blobs_Chen(f_cycle):
     ########
 
     ##################################################################
-    # Block of alternative option:                                   #
+    # Block of alternative option                                    #
     # High-pass filter in frequency domain of Fourier transformation #
     ##################################################################
     # channel_0 = hpf(channel_0)

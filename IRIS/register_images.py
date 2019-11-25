@@ -84,7 +84,7 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
         #################################################################
 
         ###############################################################################
-        # Block of alternative option:                                                #
+        # Block of alternative option                                                 #
         #                                                                             #
         # In order to reduce the errors better in registration, we need to reduce     #
         # some redundant features in each image. Here, a method of morphological      #
@@ -93,7 +93,6 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
         # 15x15 rectangle kernel, after a Gaussian blur (3x3 kernel).                 #
         ###############################################################################
         # f_gray_image = GaussianBlur(f_gray_image, (3, 3), 0)
-        #
         # ksize = (15, 15)
         # kernel = getStructuringElement(MORPH_RECT, ksize)
         # f_gray_image = morphologyEx(f_gray_image, MORPH_GRADIENT, kernel, iterations=2)

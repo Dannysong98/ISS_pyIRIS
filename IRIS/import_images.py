@@ -75,7 +75,6 @@ def decode_data_Ke(f_cycles):
         ###############################
         # alpha = 0.5
         # beta = 0.6
-        #
         # merged_img = addWeighted(add(add(add(channel_A, channel_T), channel_C), channel_G), alpha, channel_0, beta, 0)
         ###############################
 
