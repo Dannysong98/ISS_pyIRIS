@@ -359,7 +359,6 @@ def detect_blobs_Eng(f_cycle):
         blob_params.minThreshold = mode(floor(reshape(img, (img.size,)) / 2) * 2)[0][0]
 
         mor_detector = SimpleBlobDetector.create(blob_params)
-
         mor_kps.extend(mor_detector.detect(img))
 
     mask_layer = zeros(channel_1.shape, dtype=uint8)
