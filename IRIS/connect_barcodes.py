@@ -26,18 +26,19 @@ class BarcodeCube:
         self.bases_cube = []
         self.adjusted_bases_cube = []
 
-        #######################
-        # Setup search region #
-        #######################
+        #####################################################################################################
+        # Setup search region                                                                               #
+        # The more large you setup, the more well in TPR and correlation with FPKM, but less number of blob #
+        #####################################################################################################
         self.__search_region = 2
         ########
+        # self.__search_region = 0  # Alternative option, 2x2
         # self.__search_region = 1  # Alternative option, 4x4
-        # self.__search_region = 2  # Alternative option, 6x6
         # self.__search_region = 3  # Alternative option, 8x8
         # self.__search_region = 4  # Alternative option, 10x10
         ########
         # self.__search_region = n  # Alternative option, ((n + 1) * 2)x((n + 1) * 2)
-        #######################
+        #####################################################################################################
 
     def collect_called_bases(self, called_base_in_one_cycle):
         """
