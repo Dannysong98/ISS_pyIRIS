@@ -94,7 +94,7 @@ def detect_blobs_Ke(f_cycle):
     # blob_params.thresholdStep = 3  # Alternative option
     # blob_params.minRepeatability = 3  # Alternative option
 
-    blob_params.minDistBetweenBlobs = 2
+    blob_params.minDistBetweenBlobs = 3
     blob_params.filterByColor = True
     blob_params.blobColor = 255
 
@@ -114,7 +114,7 @@ def detect_blobs_Ke(f_cycle):
     ########
     # blob_params.minArea = 4  # Alternative option
 
-    blob_params.maxArea = 100
+    blob_params.maxArea = 121
     ########
     # blob_params.maxArea = 65  # Alternative option
     # blob_params.maxArea = 145  # Alternative option
@@ -614,7 +614,7 @@ def detect_blobs_Lee(f_cycle):
     # blob_params.thresholdStep = 3  # Alternative option
     # blob_params.minRepeatability = 3  # Alternative option
 
-    blob_params.minDistBetweenBlobs = 2
+    blob_params.minDistBetweenBlobs = 3
 
     blob_params.filterByColor = True
     blob_params.blobColor = 255
@@ -826,7 +826,7 @@ def detect_blobs_Chen(f_cycle):
     # blob_params.thresholdStep = 3  # Alternative option
     # blob_params.minRepeatability = 3  # Alternative option
 
-    blob_params.minDistBetweenBlobs = 2
+    blob_params.minDistBetweenBlobs = 3
     blob_params.filterByColor = True
     blob_params.blobColor = 255
 
@@ -846,7 +846,7 @@ def detect_blobs_Chen(f_cycle):
     ########
     # blob_params.minArea = 4  # Alternative option
 
-    blob_params.maxArea = 65
+    blob_params.maxArea = 121
     ########
     # blob_params.maxArea = 100  # Alternative option
     # blob_params.maxArea = 145  # Alternative option
