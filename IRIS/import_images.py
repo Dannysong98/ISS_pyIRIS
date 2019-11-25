@@ -171,10 +171,10 @@ def decode_data_Eng(f_cycles):
 
             f_std_img = merged_img1
 
-        trans_mat1 = register_cycles(reg_ref, merged_img1, 'BRISK')
-        trans_mat2 = register_cycles(reg_ref, merged_img2, 'BRISK')
-        trans_mat3 = register_cycles(reg_ref, merged_img3, 'BRISK')
-        trans_mat4 = register_cycles(reg_ref, merged_img4, 'BRISK')
+        trans_mat1 = register_cycles(reg_ref, merged_img1, 'ORB')
+        trans_mat2 = register_cycles(reg_ref, merged_img2, 'ORB')
+        trans_mat3 = register_cycles(reg_ref, merged_img3, 'ORB')
+        trans_mat4 = register_cycles(reg_ref, merged_img4, 'ORB')
 
         imwrite('debug.round_' + str(int(cycle_id / 4 + 1)) + '.tif', merged_img1)
         imwrite('debug.round_' + str(int(cycle_id / 4 + 1)) + '.tif', merged_img2)
