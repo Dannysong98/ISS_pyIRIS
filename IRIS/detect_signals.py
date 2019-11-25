@@ -17,9 +17,9 @@ recorded to calculate base quality in the next step.
 """
 
 
-from cv2 import (getStructuringElement, morphologyEx, GaussianBlur, Laplacian, convertScaleAbs, threshold,
+from cv2 import (getStructuringElement, morphologyEx, GaussianBlur, Laplacian, convertScaleAbs,
                  SimpleBlobDetector, SimpleBlobDetector_Params,
-                 THRESH_BINARY, MORPH_ELLIPSE, MORPH_TOPHAT, CV_32F)
+                 MORPH_ELLIPSE, MORPH_TOPHAT, CV_32F)
 from numpy import (array, zeros, reshape, sum, divide, floor, around, float32, uint8)
 from scipy.stats import mode
 
@@ -114,9 +114,9 @@ def detect_blobs_Ke(f_cycle):
     ########
     # blob_params.minArea = 4  # Alternative option
 
-    blob_params.maxArea = 121
+    blob_params.maxArea = 65
     ########
-    # blob_params.maxArea = 65  # Alternative option
+    # blob_params.maxArea = 121  # Alternative option
     # blob_params.maxArea = 145  # Alternative option
     ####################################################################################
 
@@ -146,8 +146,6 @@ def detect_blobs_Ke(f_cycle):
         c = int(key_point.pt[0])
 
         mask_layer[r:(r + 2), c:(c + 2)] = 255
-
-    _, mask_layer = threshold(mask_layer, 1, 255, THRESH_BINARY)
 
     detector = SimpleBlobDetector.create(blob_params)
     kps = detector.detect(mask_layer)
@@ -348,9 +346,9 @@ def detect_blobs_Eng(f_cycle):
     ########
     # blob_params.minArea = 2  # Alternative option
 
-    blob_params.maxArea = 100
+    blob_params.maxArea = 65
     ########
-    # blob_params.maxArea = 65  # Alternative option
+    # blob_params.maxArea = 100  # Alternative option
 
     blob_params.filterByCircularity = False
     blob_params.filterByConvexity = True
@@ -368,8 +366,6 @@ def detect_blobs_Eng(f_cycle):
         c = int(key_point.pt[0])
 
         mask_layer[r:(r + 2), c:(c + 2)] = 255
-
-    _, mask_layer = threshold(mask_layer, 1, 255, THRESH_BINARY)
 
     detector = SimpleBlobDetector.create(blob_params)
     kps = detector.detect(mask_layer)
@@ -635,10 +631,10 @@ def detect_blobs_Lee(f_cycle):
     ########
     # blob_params.minArea = 4  # Alternative option
 
-    blob_params.maxArea = 145
+    blob_params.maxArea = 65
     ########
-    # blob_params.maxArea = 100  # Alternative option
-    # blob_params.maxArea = 65  # Alternative option
+    # blob_params.maxArea = 121  # Alternative option
+    # blob_params.maxArea = 145  # Alternative option
     ####################################################################################
 
     blob_params.filterByCircularity = True
@@ -670,8 +666,6 @@ def detect_blobs_Lee(f_cycle):
         c = int(key_point.pt[0])
 
         mask_layer[r:(r + 2), c:(c + 2)] = 255
-
-    _, mask_layer = threshold(mask_layer, 1, 255, THRESH_BINARY)
 
     detector = SimpleBlobDetector.create(blob_params)
     kps = detector.detect(mask_layer)
@@ -846,9 +840,9 @@ def detect_blobs_Chen(f_cycle):
     ########
     # blob_params.minArea = 4  # Alternative option
 
-    blob_params.maxArea = 121
+    blob_params.maxArea = 65
     ########
-    # blob_params.maxArea = 100  # Alternative option
+    # blob_params.maxArea = 121  # Alternative option
     # blob_params.maxArea = 145  # Alternative option
     ####################################################################################
 
@@ -878,8 +872,6 @@ def detect_blobs_Chen(f_cycle):
         c = int(key_point.pt[0])
 
         mask_layer[r:(r + 2), c:(c + 2)] = 255
-
-    _, mask_layer = threshold(mask_layer, 1, 255, THRESH_BINARY)
 
     detector = SimpleBlobDetector.create(blob_params)
     kps = detector.detect(mask_layer)
