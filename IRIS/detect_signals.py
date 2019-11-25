@@ -53,10 +53,10 @@ def detect_blobs_Ke(f_cycle):
     ###############################################################################
     ksize = (15, 15)
     kernel = getStructuringElement(MORPH_ELLIPSE, ksize)
-    channel_A = morphologyEx(channel_A, MORPH_TOPHAT, kernel, iterations=2)
-    channel_T = morphologyEx(channel_T, MORPH_TOPHAT, kernel, iterations=2)
-    channel_C = morphologyEx(channel_C, MORPH_TOPHAT, kernel, iterations=2)
-    channel_G = morphologyEx(channel_G, MORPH_TOPHAT, kernel, iterations=2)
+    channel_A = morphologyEx(channel_A, MORPH_TOPHAT, kernel, iterations=3)
+    channel_T = morphologyEx(channel_T, MORPH_TOPHAT, kernel, iterations=3)
+    channel_C = morphologyEx(channel_C, MORPH_TOPHAT, kernel, iterations=3)
+    channel_G = morphologyEx(channel_G, MORPH_TOPHAT, kernel, iterations=3)
     ########
 
     ###############################
@@ -114,9 +114,9 @@ def detect_blobs_Ke(f_cycle):
     ########
     # blob_params.minArea = 4  # Alternative option
 
-    blob_params.maxArea = 65
+    blob_params.maxArea = 100
     ########
-    # blob_params.maxArea = 100  # Alternative option
+    # blob_params.maxArea = 65  # Alternative option
     # blob_params.maxArea = 145  # Alternative option
     ####################################################################################
 
@@ -147,7 +147,7 @@ def detect_blobs_Ke(f_cycle):
 
         mask_layer[r:(r + 2), c:(c + 2)] = 255
 
-    mask_layer = GaussianBlur(mask_layer, (5, 5), 0)
+    mask_layer = GaussianBlur(mask_layer, (3, 3), 0)
 
     blob_params.minThreshold = 1
 
@@ -800,7 +800,7 @@ def detect_blobs_Chen(f_cycle):
     ###############################################################################
     ksize = (15, 15)
     kernel = getStructuringElement(MORPH_ELLIPSE, ksize)
-    channel_0 = morphologyEx(channel_0, MORPH_TOPHAT, kernel, iterations=2)
+    channel_0 = morphologyEx(channel_0, MORPH_TOPHAT, kernel, iterations=3)
     ########
 
     ##################################################################
