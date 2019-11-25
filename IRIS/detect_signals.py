@@ -17,9 +17,9 @@ recorded to calculate base quality in the next step.
 """
 
 
-from cv2 import (getStructuringElement, morphologyEx, GaussianBlur, Laplacian, convertScaleAbs,
+from cv2 import (getStructuringElement, morphologyEx, GaussianBlur, Laplacian, convertScaleAbs, threshold,
                  SimpleBlobDetector, SimpleBlobDetector_Params,
-                 MORPH_ELLIPSE, MORPH_TOPHAT, CV_32F)
+                 THRESH_BINARY, MORPH_ELLIPSE, MORPH_TOPHAT, CV_32F)
 from numpy import (array, zeros, reshape, sum, divide, floor, around, float32, uint8)
 from scipy.stats import mode
 
@@ -147,12 +147,9 @@ def detect_blobs_Ke(f_cycle):
 
         mask_layer[r:(r + 2), c:(c + 2)] = 255
 
-    mask_layer = GaussianBlur(mask_layer, (3, 3), 0)
-
-    blob_params.minThreshold = 1
+    _, mask_layer = threshold(mask_layer, 1, 255, THRESH_BINARY)
 
     detector = SimpleBlobDetector.create(blob_params)
-
     kps = detector.detect(mask_layer)
 
     diff_list_A = []
@@ -373,12 +370,9 @@ def detect_blobs_Eng(f_cycle):
 
         mask_layer[r:(r + 2), c:(c + 2)] = 255
 
-    mask_layer = GaussianBlur(mask_layer, (5, 5), 0)
-
-    blob_params.minThreshold = 1
+    _, mask_layer = threshold(mask_layer, 1, 255, THRESH_BINARY)
 
     detector = SimpleBlobDetector.create(blob_params)
-
     kps = detector.detect(mask_layer)
 
     diff_list_1 = []
@@ -678,12 +672,9 @@ def detect_blobs_Lee(f_cycle):
 
         mask_layer[r:(r + 2), c:(c + 2)] = 255
 
-    blob_params.minThreshold = 1
-    blob_params.minRepeatability = 1
-    blob_params.minThreshold = 1
+    _, mask_layer = threshold(mask_layer, 1, 255, THRESH_BINARY)
 
     detector = SimpleBlobDetector.create(blob_params)
-
     kps = detector.detect(mask_layer)
 
     diff_list_A = []
@@ -889,12 +880,9 @@ def detect_blobs_Chen(f_cycle):
 
         mask_layer[r:(r + 2), c:(c + 2)] = 255
 
-    mask_layer = GaussianBlur(mask_layer, (5, 5), 0)
-
-    blob_params.minThreshold = 1
+    _, mask_layer = threshold(mask_layer, 1, 255, THRESH_BINARY)
 
     detector = SimpleBlobDetector.create(blob_params)
-
     kps = detector.detect(mask_layer)
 
     diff_list_0 = []
