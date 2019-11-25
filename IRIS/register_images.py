@@ -81,22 +81,24 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
         # Low-pass filter in frequency domain of Fourier transformation #
         #################################################################
         f_gray_image = __lpf(f_gray_image)
-        #################################################################
+        ########
 
-        ###############################################################################
-        # Block of alternative option                                                 #
-        #                                                                             #
-        # In order to reduce the errors better in registration, we need to reduce     #
-        # some redundant features in each image. Here, a method of morphological      #
-        # transformation, Morphological gradient, the difference between              #
-        # dilation and erosion of an image, is used to expose key points under a      #
-        # 15x15 rectangle kernel, after a Gaussian blur (3x3 kernel).                 #
-        ###############################################################################
+        ###########################################################################
+        # Block of alternative option                                             #
+        #                                                                         #
+        # In order to reduce the errors better in registration, we need to reduce #
+        # some redundant features in each image. Here, a method of morphological  #
+        # transformation, Morphological gradient, the difference between          #
+        # dilation and erosion of an image, is used to expose key points under a  #
+        # 15x15 rectangle kernel, after a Gaussian blur (3x3 kernel).             #
+        ###########################################################################
         # f_gray_image = GaussianBlur(f_gray_image, (3, 3), 0)
         # ksize = (15, 15)
         # kernel = getStructuringElement(MORPH_RECT, ksize)
         # f_gray_image = morphologyEx(f_gray_image, MORPH_GRADIENT, kernel, iterations=2)
-        ###############################################################################
+        ###########################################################################
+
+        #################################################################
 
         det = ''
         ext = ''
