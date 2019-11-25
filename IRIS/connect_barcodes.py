@@ -123,12 +123,13 @@ class BarcodeCube:
                 # region in those cycles that need to be connected. This approach should not only solve this      #
                 # problem but also bring few false positive in output                                             #
                 ###################################################################################################
-                N = 9  # 20x20
+                N = 3  # 8x8
                 ########
                 # N = 1  # Alternative option, 4x4
                 # N = 2  # Alternative option, 6x6
                 # N = 4  # Alternative option, 10x10
                 # N = 5  # Alternative option, 12x12
+                # N = 9  # Alternative option, 20x20
                 ########
                 # N = n  # Alternative option, ((n + 1) * 2)x((n + 1) * 2)
 
