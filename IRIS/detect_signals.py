@@ -101,6 +101,7 @@ def detect_blobs_Ke(f_cycle):
     # blob_params.minRepeatability = 3  # Alternative option
 
     blob_params.minDistBetweenBlobs = 3
+
     blob_params.filterByColor = True
     blob_params.blobColor = 255
 
@@ -349,6 +350,7 @@ def detect_blobs_Eng(f_cycle):
     # blob_params.minRepeatability = 3  # Alternative option
 
     blob_params.minDistBetweenBlobs = 2
+
     blob_params.filterByColor = True
     blob_params.blobColor = 255
 
@@ -833,6 +835,7 @@ def detect_blobs_Chen(f_cycle):
     # blob_params.minRepeatability = 3  # Alternative option
 
     blob_params.minDistBetweenBlobs = 3
+
     blob_params.filterByColor = True
     blob_params.blobColor = 255
 
