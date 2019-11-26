@@ -142,23 +142,20 @@ class BarcodeCube:
                         coor = 'r%05dc%05d' % (row, col)
 
                         if coor in bases_cube[cycle_serial]:
-                            ######################################################################
-                            # Adjust of error rate of each coordinate by the Pythagorean theorem #
-                            # This function can be off if no need                                #
-                            ######################################################################
                             error_rate = bases_cube[cycle_serial][coor][1]
 
-                            ############################################################
-                            # If the search region is so large you set, we suggest you #
-                            # to adjust the error rate based on Pascal's Triangle      #
-                            ############################################################
+                            ##############################################################
+                            # Adjust of error rate of each coordinate by the Pythagorean #
+                            # theorem. This function can be off if no need               #
+                            #
+                            # If the search region is so large you set, we suggest you   #
+                            # to adjust the error rate based on Pascal's Triangle        #
+                            ##############################################################
                             D = sqrt((row - r) ** 2 + (col - c) ** 2)
                             adj_err_rate = sqrt(((error_rate * D) ** 2) + (error_rate ** 2))
                             ########
                             # adj_err_rate = error_rate  # Alternative option
-                            ############################################################
-
-                            ######################################################################
+                            ##############################################################
 
                             if adj_err_rate > 1:
                                 adj_err_rate = float(1)
