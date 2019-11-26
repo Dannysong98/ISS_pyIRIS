@@ -17,9 +17,11 @@ recorded to calculate base quality in the next step.
 """
 
 
-from cv2 import (getStructuringElement, morphologyEx, GaussianBlur, Laplacian, convertScaleAbs,
+from cv2 import (getStructuringElement, morphologyEx,
                  SimpleBlobDetector, SimpleBlobDetector_Params,
-                 MORPH_ELLIPSE, MORPH_TOPHAT, CV_32F)
+                 MORPH_ELLIPSE, MORPH_TOPHAT)
+# from cv2 import (Laplacian, GaussianBlur, convertScaleAbs,
+#                  CV_32F)
 from numpy import (array, zeros, reshape, sum, divide, floor, around, float32, uint8)
 from scipy.stats import mode
 
@@ -573,15 +575,15 @@ def detect_blobs_Lee(f_cycle):
     # Here, a morphological transformation, Tophat, under a 3x3 ELLIPSE kernel, #
     # is used to expose blobs                                                   #
     #############################################################################
-    # ksize = (3, 3)
-    # kernel = getStructuringElement(MORPH_ELLIPSE, ksize)
-    # channel_0 = morphologyEx(channel_0, MORPH_TOPHAT, kernel, iterations=2)
+    ksize = (15, 15)
+    kernel = getStructuringElement(MORPH_ELLIPSE, ksize)
+    channel_0 = morphologyEx(channel_0, MORPH_TOPHAT, kernel, iterations=3)
     ########
 
     ###############################
     # Block of alternative option #
     ###############################
-    channel_0 = convertScaleAbs(Laplacian(GaussianBlur(channel_0, (3, 3), 0), CV_32F))
+    # channel_0 = convertScaleAbs(Laplacian(GaussianBlur(channel_0, (3, 3), 0), CV_32F))
     ###############################
 
     #############################################################################
