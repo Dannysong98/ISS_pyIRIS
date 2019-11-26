@@ -153,6 +153,12 @@ def detect_blobs_Ke(f_cycle):
 
         mask_layer[r:(r + 2), c:(c + 2)] = 255
 
+    #############################################################################################################
+    # If a Gaussian blur employed in here, these large blobs could be detected well, but high density blobs not #
+    #############################################################################################################
+    # mask_layer = GaussianBlur(mask_layer, (3, 3), 0)  # Alternative option
+    #############################################################################################################
+
     detector = SimpleBlobDetector.create(blob_params)
     kps = detector.detect(mask_layer)
 
