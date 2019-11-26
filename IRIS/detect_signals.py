@@ -120,9 +120,9 @@ def detect_blobs_Ke(f_cycle):
     ########
     # blob_params.minArea = 4  # Alternative option
 
-    blob_params.maxArea = 65
+    blob_params.maxArea = 121
     ########
-    # blob_params.maxArea = 121  # Alternative option
+    # blob_params.maxArea = 65  # Alternative option
     # blob_params.maxArea = 145  # Alternative option
     ####################################################################################
 
@@ -358,7 +358,7 @@ def detect_blobs_Eng(f_cycle):
     ########
     # blob_params.minArea = 2  # Alternative option
 
-    blob_params.maxArea = 65
+    blob_params.maxArea = 121
     ########
     # blob_params.maxArea = 100  # Alternative option
 
@@ -643,9 +643,9 @@ def detect_blobs_Lee(f_cycle):
     ########
     # blob_params.minArea = 4  # Alternative option
 
-    blob_params.maxArea = 65
+    blob_params.maxArea = 121
     ########
-    # blob_params.maxArea = 121  # Alternative option
+    # blob_params.maxArea = 65  # Alternative option
     # blob_params.maxArea = 145  # Alternative option
     ####################################################################################
 
@@ -852,9 +852,9 @@ def detect_blobs_Chen(f_cycle):
     ########
     # blob_params.minArea = 4  # Alternative option
 
-    blob_params.maxArea = 65
+    blob_params.maxArea = 121
     ########
-    # blob_params.maxArea = 121  # Alternative option
+    # blob_params.maxArea = 65  # Alternative option
     # blob_params.maxArea = 145  # Alternative option
     ####################################################################################
 
