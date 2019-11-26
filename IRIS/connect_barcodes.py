@@ -11,7 +11,9 @@ region in each cycle.
 
 
 from sys import stderr
-from numpy import sqrt
+from cv2 import (findContours, moments,
+                 RETR_LIST, CHAIN_APPROX_NONE)
+from numpy import (sqrt, zeros, uint8)
 
 
 class BarcodeCube:
@@ -51,68 +53,74 @@ class BarcodeCube:
         self.__all_blobs_list = [_ for _ in called_base_in_one_cycle.keys() if 'N' not in called_base_in_one_cycle[_]]
         self.bases_cube.append(called_base_in_one_cycle)
 
-    ###############################################
-    # Old redundancy-filtering strategy (ABANDON) #
-    ###############################################
-    # def filter_blobs_list(self, f_background):
-    #     """
-    #     This method is used to filter the recorded bases in the called base list.
-    #
-    #     A new list will be generated, which store the filtered id of bases
-    #
-    #     :param f_background: The background image for ensuring the shape of mask layer.
-    #     :return: NONE
-    #     """
-    #     blobs_mask = zeros(f_background.shape, dtype=uint8)
-    #
-    #     new_coor = set()
-    #
-    #     for coor in self.__all_blobs_list:
-    #         r = int(coor[1:6].lstrip('0'))
-    #         c = int(coor[7:].lstrip('0'))
-    #
-    #         blobs_mask[r:(r + 2), c:(c + 2)] = 255
-    #
-    #     _, contours, _ = findContours(blobs_mask, RETR_LIST, CHAIN_APPROX_NONE)
-    #
-    #     for cnt in contours:
-    #         M = moments(cnt)
-    #
-    #         if M['m00'] != 0:
-    #             cr = abs(int(M['m01'] / M['m00']))
-    #             cc = abs(int(M['m10'] / M['m00']))
-    #
-    #             new_coor.add(str('r' + ('%05d' % cr) + 'c' + ('%05d' % cc)))
-    #
-    #     self.__all_blobs_list = new_coor
-    ###############################################
-
-    def filter_blobs_list(self):
+    #################################
+    # Redundancy-filtering strategy #
+    #################################
+    def filter_blobs_list(self, f_background):
         """
         This method is used to filter the recorded bases in the called base list.
 
         A new list will be generated, which store the filtered id of bases
+
+        :param f_background: The background image for ensuring the shape of mask layer.
+        :return: NONE
         """
-        new_coor = self.__all_blobs_list
+        blobs_mask = zeros(f_background.shape, dtype=uint8)
+
+        new_coor = set()
 
         for coor in self.__all_blobs_list:
             r = int(coor[1:6].lstrip('0'))
             c = int(coor[7:].lstrip('0'))
 
-            for row in range(r - self.__search_region, r + (self.__search_region + 2)):
-                for col in range(c - self.__search_region, c + (self.__search_region + 2)):
-                    if row == r and col == c:
-                        continue
+            blobs_mask[r:(r + 2), c:(c + 2)] = 255
 
-                    if 'r%05dc%05d' % (row, col) in self.__all_blobs_list:
-                        new_coor.remove('r%05dc%05d' % (row, col))
+        _, contours, _ = findContours(blobs_mask, RETR_LIST, CHAIN_APPROX_NONE)
 
-        self.__all_blobs_list = set(new_coor)
+        for cnt in contours:
+            M = moments(cnt)
+
+            if M['m00'] != 0:
+                cr = abs(int(M['m01'] / M['m00']))
+                cc = abs(int(M['m10'] / M['m00']))
+
+                new_coor.add(str('r' + ('%05d' % cr) + 'c' + ('%05d' % cc)))
+
+        self.__all_blobs_list = new_coor
+    ########
+
+    #########################################
+    # Block of alternative option (Abandon) #
+    #########################################
+    # def filter_blobs_list(self):
+    #     """
+    #     This method is used to filter the recorded bases in the called base list.
+    #
+    #     A new list will be generated, which store the filtered id of bases
+    #     """
+    #     new_coor = self.__all_blobs_list
+    #
+    #     for coor in self.__all_blobs_list:
+    #         r = int(coor[1:6].lstrip('0'))
+    #         c = int(coor[7:].lstrip('0'))
+    #
+    #         for row in range(r - 1, r + 3):
+    #             for col in range(c - 1, c + 3):
+    #                 if row == r and col == c:
+    #                     continue
+    #
+    #                 if 'r%05dc%05d' % (row, col) in self.__all_blobs_list:
+    #                     new_coor.remove('r%05dc%05d' % (row, col))
+    #
+    #     self.__all_blobs_list = set(new_coor)
+    #########################################
+
+    #################################
 
     def calling_adjust(self):
         """
         This method is used to connect bases into barcodes, by anchoring the coordinates of blobs in reference layer,
-        and search their 6x6 region in each cycle.
+        and search their NxN region in each cycle.
 
         :return: NONE
         """
@@ -128,7 +136,7 @@ class BarcodeCube:
                 min_err_rate = float(1)
 
                 ##################################################################################################
-                # It will search a 6x6 region to connect bases from each cycle in ref-coordinates                #
+                # It will search a NxN region to connect bases from each cycle in ref-coordinates                #
                 #                                                                                                #
                 # Process of registration almost align all location of cycles the same, but at pixel level, this #
                 # registration is not accurate enough. Here, we choose a simple approach to solve this problem,  #

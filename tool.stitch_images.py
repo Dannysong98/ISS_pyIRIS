@@ -76,9 +76,8 @@ def overlap_filtering(adj_barcode_info):
         row = int(row)
         col = int(col)
 
-        N = 2
-        for r in range(row - N, row + (N + 2)):
-            for c in range(col - N, col + (N + 2)):
+        for r in range(row - 1, row + 3):
+            for c in range(col - 1, col + 3):
 
                 if r != row and c != col:
 

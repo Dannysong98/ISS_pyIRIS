@@ -23,7 +23,8 @@ from cv2 import (getStructuringElement, morphologyEx,
 ######################
 # Alternative option #
 ######################
-# from cv2 import (Laplacian, GaussianBlur, convertScaleAbs,
+from cv2 import GaussianBlur
+# from cv2 import (Laplacian, convertScaleAbs,
 #                  CV_32F)
 ######################
 from numpy import (array, zeros, reshape, sum, divide, floor, around, float32, uint8)
@@ -157,7 +158,7 @@ def detect_blobs_Ke(f_cycle):
     #############################################################################################################
     # If a Gaussian blur employed in here, these large blobs could be detected well, but high density blobs not #
     #############################################################################################################
-    # mask_layer = GaussianBlur(mask_layer, (3, 3), 0)  # Alternative option
+    mask_layer = GaussianBlur(mask_layer, (3, 3), 0)  # Alternative option
     #############################################################################################################
 
     detector = SimpleBlobDetector.create(blob_params)

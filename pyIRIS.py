@@ -100,7 +100,7 @@ if __name__ == '__main__':
         # Unified Filtering and Barcode Connection                  #
         # Start here, different types of data set are to be unified #
         #############################################################
-        barcode_cube_obj.filter_blobs_list()
+        barcode_cube_obj.filter_blobs_list(std_img)
         barcode_cube_obj.calling_adjust()
         #############################################################
 
