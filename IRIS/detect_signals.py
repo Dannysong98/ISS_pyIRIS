@@ -20,8 +20,12 @@ recorded to calculate base quality in the next step.
 from cv2 import (getStructuringElement, morphologyEx,
                  SimpleBlobDetector, SimpleBlobDetector_Params,
                  MORPH_ELLIPSE, MORPH_TOPHAT)
+######################
+# Alternative option #
+######################
 # from cv2 import (Laplacian, GaussianBlur, convertScaleAbs,
 #                  CV_32F)
+######################
 from numpy import (array, zeros, reshape, sum, divide, floor, around, float32, uint8)
 from scipy.stats import mode
 
