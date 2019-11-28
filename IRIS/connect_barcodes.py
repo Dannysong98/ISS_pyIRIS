@@ -156,7 +156,7 @@ class BarcodeCube:
                             # theorem. This function can be off if no need               #
                             #
                             # If the search region is so large you set, we suggest you   #
-                            # to adjust the error rate based on Pascal's Triangle        #
+                            # to adjust the error rate based on Pythagorean theorem      #
                             ##############################################################
                             D = sqrt((row - r) ** 2 + (col - c) ** 2)
                             adj_err_rate = sqrt(((error_rate * D) ** 2) + (error_rate ** 2))
