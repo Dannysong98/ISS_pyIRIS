@@ -30,8 +30,7 @@ from cv2 import GaussianBlur
 from numpy import (array, zeros, reshape, sum, divide, floor, around, float32, uint8)
 from scipy.stats import mode
 
-from .call_bases import (image_model_pooling_Ke, image_model_pooling_Eng, image_model_pooling_Chen,
-                         pool2base, pool2base2)
+from .call_bases import (image_model_pooling_Ke, image_model_pooling_Eng, image_model_pooling_Chen, pool2base)
 
 
 def detect_blobs_Ke(f_cycle):
@@ -939,7 +938,7 @@ def detect_blobs_Chen(f_cycle):
 
     image_model_pool = image_model_pooling_Chen(greyscale_model_0)
 
-    base_box_in_one_cycle = pool2base2(image_model_pool)
+    base_box_in_one_cycle = pool2base(image_model_pool)
 
     return base_box_in_one_cycle
 

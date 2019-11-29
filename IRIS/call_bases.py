@@ -194,27 +194,17 @@ def pool2base(f_image_model_pool):
     for read_id in f_image_model_pool:
         sorted_base = [_ for _ in sorted(f_image_model_pool[read_id].items(), key=lambda x: x[1], reverse=True)]
 
-        if sorted_base[0][1] > sorted_base[1][1]:
+        if len(sorted_base) > 1:
             error_rate = around(binom_test((sorted_base[0][1], sorted_base[1][1]), p=0.5, alternative='greater'), 4)
 
             if read_id not in f_base_box:
                 f_base_box.update({read_id: [sorted_base[0][0], error_rate]})
 
-    return f_base_box
+        else:
+            error_rate = around(binom_test((sorted_base[0][1], 0), p=0.5, alternative='greater'), 4)
 
-
-def pool2base2(f_image_model_pool):
-    """
-    :param f_image_model_pool: The dictionary of blobs, including base, coordinate and base score.
-    :return f_base_box: A dictionary of blobs with its base, location.
-    """
-    f_base_box = {}
-
-    for read_id in f_image_model_pool:
-        sorted_base = [_ for _ in sorted(f_image_model_pool[read_id].items(), key=lambda x: x[1], reverse=True)]
-
-        if read_id not in f_base_box:
-            f_base_box.update({read_id: [sorted_base[0][0], sorted_base[0][1]]})
+            if read_id not in f_base_box:
+                f_base_box.update({read_id: [sorted_base[0][0], error_rate]})
 
     return f_base_box
 
