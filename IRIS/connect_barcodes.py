@@ -49,8 +49,7 @@ class BarcodeCube:
         :param called_base_in_one_cycle: The dictionary of bases in a cycle.
         :return: NONE
         """
-        self.__all_blobs_list.extend([_ for _ in called_base_in_one_cycle.keys()
-                                      if 'N' not in called_base_in_one_cycle[_]])
+        self.__all_blobs_list.extend([_ for _ in called_base_in_one_cycle.keys()])
         self.bases_cube.append(called_base_in_one_cycle)
 
     #################################
