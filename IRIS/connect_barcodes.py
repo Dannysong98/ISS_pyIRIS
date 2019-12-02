@@ -49,8 +49,7 @@ class BarcodeCube:
         :param called_base_in_one_cycle: The dictionary of bases in a cycle.
         :return: NONE
         """
-        self.__all_blobs_list.extend(set([_ for _ in called_base_in_one_cycle.keys()
-                                          if 'N' not in called_base_in_one_cycle[_]]))
+        self.__all_blobs_list.extend(set([_ for _ in called_base_in_one_cycle.keys()]))
         self.bases_cube.append(called_base_in_one_cycle)
 
     #################################
@@ -77,6 +76,9 @@ class BarcodeCube:
 
         blobs_mask = GaussianBlur(blobs_mask, (3, 3), 0)
 
+        import cv2
+        cv2.imwrite('debug.tif', blobs_mask)
+
         blob_params = SimpleBlobDetector_Params()
 
         blob_params.thresholdStep = 1
@@ -88,7 +90,7 @@ class BarcodeCube:
 
         blob_params.filterByArea = True
         blob_params.minArea = 1
-        blob_params.maxArea = 10
+        blob_params.maxArea = 100
 
         blob_params.filterByCircularity = False
         blob_params.filterByConvexity = False
