@@ -49,7 +49,8 @@ class BarcodeCube:
         :param called_base_in_one_cycle: The dictionary of bases in a cycle.
         :return: NONE
         """
-        self.__all_blobs_list = [_ for _ in called_base_in_one_cycle.keys()]
+        self.__all_blobs_list.extend([_ for _ in called_base_in_one_cycle.keys()
+                                      if 'N' not in called_base_in_one_cycle[_]])
         self.bases_cube.append(called_base_in_one_cycle)
 
     #################################
@@ -78,8 +79,8 @@ class BarcodeCube:
 
         blob_params = SimpleBlobDetector_Params()
 
-        blob_params.thresholdStep = 2
-        blob_params.minRepeatability = 2
+        blob_params.thresholdStep = 1
+        blob_params.minRepeatability = 1
         blob_params.minDistBetweenBlobs = 1
 
         blob_params.filterByColor = True
