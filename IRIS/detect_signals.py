@@ -17,20 +17,38 @@ recorded to calculate base quality in the next step.
 """
 
 
-from cv2 import (getStructuringElement, morphologyEx,
+from cv2 import (getStructuringElement, morphologyEx, GaussianBlur, convertScaleAbs,
                  SimpleBlobDetector, SimpleBlobDetector_Params,
                  MORPH_ELLIPSE, MORPH_TOPHAT)
 ######################
 # Alternative option #
 ######################
-from cv2 import GaussianBlur
-# from cv2 import (Laplacian, convertScaleAbs,
+# from cv2 import (Laplacian,
 #                  CV_32F)
 ######################
-from numpy import (array, zeros, reshape, sum, divide, floor, around, float32, uint8)
+from numpy import (array, zeros, ones, reshape, sum, divide, floor, around, abs, max, int, float32, uint8, bool_, fft)
 from scipy.stats import mode
 
 from .call_bases import (image_model_pooling_Ke, image_model_pooling_Eng, image_model_pooling_Chen, pool2base)
+
+
+def __hpf(f_img):
+    """
+    High-pass Filter
+
+    :param f_img: Input image
+    :return: Filtered image
+    """
+    row, col = f_img.shape
+
+    masker_window = ones((row, col), dtype=bool_)
+    masker_window[int(row / 2) - int(row * 0.2):int(row / 2) + int(row * 0.2),
+                  int(col / 2) - int(col * 0.2):int(col / 2) + int(col * 0.2)] = 0
+
+    f_img = abs(fft.ifft2(fft.ifftshift(fft.fftshift(fft.fft2(f_img)) * masker_window)))
+    f_img = convertScaleAbs(f_img / max(f_img) * 255)
+
+    return f_img
 
 
 def detect_blobs_Ke(f_cycle):
@@ -157,16 +175,11 @@ def detect_blobs_Ke(f_cycle):
     #############################################################################################################
     # If a Gaussian blur employed in here, these large blobs could be detected well, but high density blobs not #
     #############################################################################################################
-    mask_layer = GaussianBlur(mask_layer, (3, 3), 0)  # Alternative option
+    mask_layer = GaussianBlur(mask_layer, (3, 3), 0)
     #############################################################################################################
 
     detector = SimpleBlobDetector.create(blob_params)
     kps = detector.detect(mask_layer)
-
-    diff_list_A = []
-    diff_list_T = []
-    diff_list_C = []
-    diff_list_G = []
     #################################################################################
 
     #########################################################################
@@ -183,6 +196,11 @@ def detect_blobs_Ke(f_cycle):
     # channel. This threshold could be used to filter those false-positive  #
     # blobs in following step                                               #
     #########################################################################
+    diff_list_A = []
+    diff_list_T = []
+    diff_list_C = []
+    diff_list_G = []
+
     for key_point in kps:
         r = int(key_point.pt[1])
         c = int(key_point.pt[0])
@@ -213,10 +231,10 @@ def detect_blobs_Ke(f_cycle):
 
     diff_break = 10
 
-    cut_off_A = int(mode(around(divide(array(diff_list_A, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
-    cut_off_T = int(mode(around(divide(array(diff_list_T, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
-    cut_off_C = int(mode(around(divide(array(diff_list_C, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
-    cut_off_G = int(mode(around(divide(array(diff_list_G, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
+    cut_off_A = int(mode(around(divide(array(diff_list_A, dtype=uint8), diff_break)))[0][0]) - diff_break
+    cut_off_T = int(mode(around(divide(array(diff_list_T, dtype=uint8), diff_break)))[0][0]) - diff_break
+    cut_off_C = int(mode(around(divide(array(diff_list_C, dtype=uint8), diff_break)))[0][0]) - diff_break
+    cut_off_G = int(mode(around(divide(array(diff_list_G, dtype=uint8), diff_break)))[0][0]) - diff_break
     #########################################################################
 
     ##############################################################################################################
@@ -792,10 +810,10 @@ def detect_blobs_Chen(f_cycle):
 
     greyscale_model_0 = zeros(channel_0.shape, dtype=float32)
 
-    ###############################################################################
-    # Here, a morphological transformation, Tophat, under a 15x15 ELLIPSE kernel, #
-    # is used to expose blobs                                                     #
-    ###############################################################################
+    #############################################################################
+    # Here, a morphological transformation, Tophat, under a 5x5 ELLIPSE kernel, #
+    # is used to expose blobs                                                   #
+    #############################################################################
     ksize = (15, 15)
     kernel = getStructuringElement(MORPH_ELLIPSE, ksize)
     channel_0 = morphologyEx(channel_0, MORPH_TOPHAT, kernel, iterations=3)
@@ -805,14 +823,15 @@ def detect_blobs_Chen(f_cycle):
     # Block of alternative option                                    #
     # High-pass filter in frequency domain of Fourier transformation #
     ##################################################################
-    # channel_0 = hpf(channel_0)
+    # channel_0 = __hpf(channel_0)
     ##################################################################
 
-    ###############################################################################
+    #############################################################################
 
     channel_list = (channel_0,)
 
-    mor_kps = []
+    mor_kps1 = []
+    mor_kps2 = []
 
     ##########################################################
     # Parameters setup for preliminary blob detection        #
@@ -834,7 +853,7 @@ def detect_blobs_Chen(f_cycle):
     # blob_params.thresholdStep = 3  # Alternative option
     # blob_params.minRepeatability = 3  # Alternative option
 
-    blob_params.minDistBetweenBlobs = 3
+    blob_params.minDistBetweenBlobs = 1
 
     blob_params.filterByColor = True
     blob_params.blobColor = 255
@@ -855,14 +874,14 @@ def detect_blobs_Chen(f_cycle):
     ########
     # blob_params.minArea = 4  # Alternative option
 
-    blob_params.maxArea = 121
+    blob_params.maxArea = 10
     ########
-    # blob_params.maxArea = 65  # Alternative option
+    # blob_params.maxArea = 121  # Alternative option
     # blob_params.maxArea = 145  # Alternative option
     ####################################################################################
 
     blob_params.filterByCircularity = False
-    blob_params.filterByConvexity = True
+    blob_params.filterByConvexity = False
     ##########################################################
 
     for img in channel_list:
@@ -872,8 +891,15 @@ def detect_blobs_Chen(f_cycle):
         blob_params.minThreshold = mode(floor(reshape(img, (img.size,)) / 2) * 2)[0][0]
         #################################
 
-        mor_detector = SimpleBlobDetector.create(blob_params)
-        mor_kps.extend(mor_detector.detect(img))
+        mor_detector1 = SimpleBlobDetector.create(blob_params)
+        mor_kps1.extend(mor_detector1.detect(img))
+
+        blob_params.filterByColor = False
+
+        mor_detector2 = SimpleBlobDetector.create(blob_params)
+        mor_kps2.extend(mor_detector2.detect(255 - img))
+
+    mor_kps = mor_kps1 + mor_kps2
 
     #################################################################################
     # To map all the detected blobs into a new mask layer for redundancy filtering, #
@@ -888,10 +914,13 @@ def detect_blobs_Chen(f_cycle):
 
         mask_layer[r:(r + 2), c:(c + 2)] = 255
 
+    mask_layer = GaussianBlur(mask_layer, (3, 3), 0)
+
+    blob_params.filterByColor = True
+    blob_params.blobColor = 255
+
     detector = SimpleBlobDetector.create(blob_params)
     kps = detector.detect(mask_layer)
-
-    diff_list_0 = []
     #################################################################################
 
     #########################################################################
@@ -908,12 +937,13 @@ def detect_blobs_Chen(f_cycle):
     # channel. This threshold could be used to filter those false-positive  #
     # blobs in following step                                               #
     #########################################################################
+    diff_list_0 = []
+
     for key_point in kps:
         r = int(key_point.pt[1])
         c = int(key_point.pt[0])
 
-        diff_0 = sum(channel_0[(r - 1):(r + 3), (c - 1):(c + 3)]) / 16 - \
-                 sum(channel_0[(r - 4):(r + 6), (c - 4):(c + 6)]) / 100
+        diff_0 = sum(channel_0[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_0[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36
 
         if diff_0 > 0:
             diff_list_0.append(int(around(diff_0)))
@@ -930,10 +960,10 @@ def detect_blobs_Chen(f_cycle):
         r = int(key_point.pt[1])
         c = int(key_point.pt[0])
 
-        if sum(channel_0[(r - 1):(r + 3), (c - 1):(c + 3)]) / 16 - \
-                sum(channel_0[(r - 4):(r + 6), (c - 4):(c + 6)]) / 100 > cut_off_0:
-            greyscale_model_0[r, c] = sum(channel_0[(r - 1):(r + 3), (c - 1):(c + 3)]) / 16 - \
-                                      sum(channel_0[(r - 4):(r + 6), (c - 4):(c + 6)]) / 100
+        if sum(channel_0[r:(r + 2), c:(c + 2)]) / 4 - \
+                sum(channel_0[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 > cut_off_0:
+            greyscale_model_0[r, c] = sum(channel_0[r:(r + 2), c:(c + 2)]) / 4 - \
+                                      sum(channel_0[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36
     ##############################################################################################################
 
     image_model_pool = image_model_pooling_Chen(greyscale_model_0)

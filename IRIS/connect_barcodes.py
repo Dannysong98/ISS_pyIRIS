@@ -11,8 +11,7 @@ region in each cycle.
 
 
 from sys import stderr
-from cv2 import (findContours, moments,
-                 RETR_LIST, CHAIN_APPROX_NONE)
+from cv2 import (SimpleBlobDetector_Params, SimpleBlobDetector, GaussianBlur)
 from numpy import (sqrt, zeros, uint8)
 
 
@@ -50,7 +49,7 @@ class BarcodeCube:
         :param called_base_in_one_cycle: The dictionary of bases in a cycle.
         :return: NONE
         """
-        self.__all_blobs_list = [_ for _ in called_base_in_one_cycle.keys() if 'N' not in called_base_in_one_cycle[_]]
+        self.__all_blobs_list = [_ for _ in called_base_in_one_cycle.keys()]
         self.bases_cube.append(called_base_in_one_cycle)
 
     #################################
@@ -75,16 +74,32 @@ class BarcodeCube:
 
             blobs_mask[r:(r + 2), c:(c + 2)] = 255
 
-        _, contours, _ = findContours(blobs_mask, RETR_LIST, CHAIN_APPROX_NONE)
+        blobs_mask = GaussianBlur(blobs_mask, (3, 3), 0)
 
-        for cnt in contours:
-            M = moments(cnt)
+        blob_params = SimpleBlobDetector_Params()
 
-            if M['m00'] != 0:
-                cr = abs(int(M['m01'] / M['m00']))
-                cc = abs(int(M['m10'] / M['m00']))
+        blob_params.thresholdStep = 2
+        blob_params.minRepeatability = 2
+        blob_params.minDistBetweenBlobs = 1
 
-                new_coor.add(str('r' + ('%05d' % cr) + 'c' + ('%05d' % cc)))
+        blob_params.filterByColor = True
+        blob_params.blobColor = 255
+
+        blob_params.filterByArea = True
+        blob_params.minArea = 1
+        blob_params.maxArea = 10
+
+        blob_params.filterByCircularity = False
+        blob_params.filterByConvexity = False
+
+        detector = SimpleBlobDetector.create(blob_params)
+        kps = detector.detect(blobs_mask)
+
+        for key_point in kps:
+            r = int(key_point.pt[1])
+            c = int(key_point.pt[0])
+
+            new_coor.add(str('r' + ('%05d' % r) + 'c' + ('%05d' % c)))
 
         self.__all_blobs_list = new_coor
     ########

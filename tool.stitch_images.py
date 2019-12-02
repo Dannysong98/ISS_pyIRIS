@@ -37,8 +37,8 @@ def trans_coor(bg, img_dirs):
     adj_barcode_info = {}
 
     for img_dir in img_dirs:
-        # mat = register_cycles(bg, imread(img_dir + '/background.tif', IMREAD_GRAYSCALE), 'BRISK')
-        mat = register_cycles(bg, imread(img_dir + '/debug.cycle_1.reg.tif', IMREAD_GRAYSCALE), 'BRISK')
+        mat = register_cycles(bg, imread(img_dir + '/background.tif', IMREAD_GRAYSCALE), 'BRISK')
+        # mat = register_cycles(bg, imread(img_dir + '/debug.cycle_1.reg.tif', IMREAD_GRAYSCALE), 'BRISK')
 
         with open(img_dir + '/basecalling_data.txt', 'rt') as IN:
             for ln in IN:
