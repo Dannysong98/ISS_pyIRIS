@@ -68,12 +68,16 @@ if __name__ == '__main__':
                 called_base_box_in_one_cycle = detect_signals.detect_blobs_Ke(cycle)
                 barcode_cube_obj.collect_called_bases(called_base_box_in_one_cycle)
 
+            barcode_cube_obj.filter_blobs_list(std_img)
+
         if argv[1] == '--eng':
             cycle_stack, std_img = import_images.decode_data_Eng(argv[2:])
 
             for cycle in cycle_stack:
                 called_base_box_in_one_cycle = detect_signals.detect_blobs_Eng(cycle)
                 barcode_cube_obj.collect_called_bases(called_base_box_in_one_cycle)
+
+            barcode_cube_obj.filter_blobs_list(std_img)
 
         #####################################
         # Handle Weinstein's data (ABANDON) #
@@ -97,10 +101,8 @@ if __name__ == '__main__':
                 barcode_cube_obj.collect_called_bases(called_base_box_in_one_cycle)
 
         #############################################################
-        # Unified Filtering and Barcode Connection                  #
         # Start here, different types of data set are to be unified #
         #############################################################
-        barcode_cube_obj.filter_blobs_list(std_img)
         barcode_cube_obj.calling_adjust()
         #############################################################
 
