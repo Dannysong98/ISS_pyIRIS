@@ -814,7 +814,7 @@ def detect_blobs_Chen(f_cycle):
     # Here, a morphological transformation, Tophat, under a 5x5 ELLIPSE kernel, #
     # is used to expose blobs                                                   #
     #############################################################################
-    ksize = (15, 15)
+    ksize = (3, 3)
     kernel = getStructuringElement(MORPH_ELLIPSE, ksize)
     channel_0 = morphologyEx(channel_0, MORPH_TOPHAT, kernel, iterations=3)
     ########
@@ -830,8 +830,7 @@ def detect_blobs_Chen(f_cycle):
 
     channel_list = (channel_0,)
 
-    mor_kps1 = []
-    mor_kps2 = []
+    mor_kps = []
 
     ##########################################################
     # Parameters setup for preliminary blob detection        #
@@ -847,13 +846,13 @@ def detect_blobs_Chen(f_cycle):
     ##########################################################
     blob_params = SimpleBlobDetector_Params()
 
-    blob_params.thresholdStep = 5
-    blob_params.minRepeatability = 3
+    blob_params.thresholdStep = 4
+    blob_params.minRepeatability = 2
     ########
     # blob_params.thresholdStep = 3  # Alternative option
     # blob_params.minRepeatability = 3  # Alternative option
 
-    blob_params.minDistBetweenBlobs = 2
+    blob_params.minDistBetweenBlobs = 1
 
     blob_params.filterByColor = True
     blob_params.blobColor = 255
@@ -861,12 +860,6 @@ def detect_blobs_Chen(f_cycle):
     ####################################################################################
     # This parameter is used for filtering those extremely large blobs, which likely   #
     # to results from contamination                                                    #
-    #                                                                                  #
-    # Unfortunately, some genes expressing highly at a dense region tend to form large #
-    # blobs thus would to be filtered, lead to optics-identification failure.          #
-    # A known case in our practise is the gene 'pro-corazonin-like', this is a highly  #
-    # expressed gene at a small region in brain of some insects, and is usually        #
-    # detected as a low- or non-expression gene in IRIS                                #
     ####################################################################################
     blob_params.filterByArea = True
 
@@ -874,7 +867,7 @@ def detect_blobs_Chen(f_cycle):
     ########
     # blob_params.minArea = 4  # Alternative option
 
-    blob_params.maxArea = 25
+    blob_params.maxArea = 10
     ########
     # blob_params.maxArea = 121  # Alternative option
     # blob_params.maxArea = 145  # Alternative option
@@ -888,18 +881,11 @@ def detect_blobs_Chen(f_cycle):
         #################################
         # Setup threshold of gray-scale #
         #################################
-        blob_params.minThreshold = mode(floor(reshape(img, (img.size,)) / 2) * 2)[0][0]
+        blob_params.minThreshold = mode(floor(reshape(img, (img.size,)) / 2) * 2)[0][0] + 30
         #################################
 
-        mor_detector1 = SimpleBlobDetector.create(blob_params)
-        mor_kps1.extend(mor_detector1.detect(img))
-
-        blob_params.filterByColor = False
-
-        mor_detector2 = SimpleBlobDetector.create(blob_params)
-        mor_kps2.extend(mor_detector2.detect(255 - img))
-
-    mor_kps = mor_kps1 + mor_kps2
+        mor_detector = SimpleBlobDetector.create(blob_params)
+        mor_kps.extend(mor_detector.detect(img))
 
     #################################################################################
     # To map all the detected blobs into a new mask layer for redundancy filtering, #
@@ -943,7 +929,7 @@ def detect_blobs_Chen(f_cycle):
         r = int(key_point.pt[1])
         c = int(key_point.pt[0])
 
-        diff_0 = sum(channel_0[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_0[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36
+        diff_0 = sum(channel_0[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_0[(r - 1):(r + 3), (c - 1):(c + 3)]) / 16
 
         if diff_0 > 0:
             diff_list_0.append(int(around(diff_0)))
@@ -960,10 +946,9 @@ def detect_blobs_Chen(f_cycle):
         r = int(key_point.pt[1])
         c = int(key_point.pt[0])
 
-        if sum(channel_0[r:(r + 2), c:(c + 2)]) / 4 - \
-                sum(channel_0[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 > cut_off_0:
+        if sum(channel_0[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_0[(r - 1):(r + 3), (c - 1):(c + 3)]) / 16 > cut_off_0:
             greyscale_model_0[r, c] = sum(channel_0[r:(r + 2), c:(c + 2)]) / 4 - \
-                                      sum(channel_0[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36
+                                      sum(channel_0[(r - 1):(r + 3), (c - 1):(c + 3)]) / 16
     ##############################################################################################################
 
     image_model_pool = image_model_pooling_Chen(greyscale_model_0)

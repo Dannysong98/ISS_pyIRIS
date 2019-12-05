@@ -49,7 +49,7 @@ class BarcodeCube:
         :param called_base_in_one_cycle: The dictionary of bases in a cycle.
         :return: NONE
         """
-        self.__all_blobs_list.extend(set([_ for _ in called_base_in_one_cycle.keys()]))
+        self.__all_blobs_list.extend([_ for _ in called_base_in_one_cycle.keys()])
         self.bases_cube.append(called_base_in_one_cycle)
 
     #################################
@@ -104,31 +104,31 @@ class BarcodeCube:
         self.__all_blobs_list = new_coor
     ########
 
-    #########################################
-    # Block of alternative option (Abandon) #
-    #########################################
-    # def filter_blobs_list(self):
-    #     """
-    #     This method is used to filter the recorded bases in the called base list.
-    #
-    #     A new list will be generated, which store the filtered id of bases
-    #     """
-    #     new_coor = self.__all_blobs_list
-    #
-    #     for coor in self.__all_blobs_list:
-    #         r = int(coor[1:6].lstrip('0'))
-    #         c = int(coor[7:].lstrip('0'))
-    #
-    #         for row in range(r - 1, r + 3):
-    #             for col in range(c - 1, c + 3):
-    #                 if row == r and col == c:
-    #                     continue
-    #
-    #                 if 'r%05dc%05d' % (row, col) in self.__all_blobs_list:
-    #                     new_coor.remove('r%05dc%05d' % (row, col))
-    #
-    #     self.__all_blobs_list = set(new_coor)
-    #########################################
+    ###############################
+    # Block of alternative option #
+    ###############################
+    def filter_blobs_list2(self):
+        """
+        This method is used to filter the recorded bases in the called base list.
+
+        A new list will be generated, which store the filtered id of bases
+        """
+        new_coor = self.__all_blobs_list
+
+        for coor in self.__all_blobs_list:
+            r = int(coor[1:6].lstrip('0'))
+            c = int(coor[7:].lstrip('0'))
+
+            for row in range(r, r + 2):
+                for col in range(c, c + 2):
+                    if row == r and col == c:
+                        continue
+
+                    if 'r%05dc%05d' % (row, col) in self.__all_blobs_list:
+                        new_coor.remove('r%05dc%05d' % (row, col))
+
+        self.__all_blobs_list = set(new_coor)
+    ###############################
 
     #################################
 
@@ -193,7 +193,7 @@ class BarcodeCube:
             for cycle_id in range(0, len(self.bases_cube)):
                 self.adjusted_bases_cube.append({})
 
-                __check_greyscale(self.__all_blobs_list, self.bases_cube, self.adjusted_bases_cube, cycle_id)
+                __check_greyscale(set(self.__all_blobs_list), self.bases_cube, self.adjusted_bases_cube, cycle_id)
 
             if len(self.bases_cube) == 1:
                 print('There is only one cycle in this run', file=stderr)

@@ -339,15 +339,13 @@ def decode_data_Chen(f_cycles):
             f_std_img = channel_0
             ###################################
 
-        merged_img = convertScaleAbs(merged_img * (mean(reg_ref) / mean(merged_img)))
-
         ########################
         # For merging checking #
         ########################
         imwrite('debug.cycle_' + str(int(cycle_id + 1)) + '.tif', merged_img)
         ########################
 
-        adj_img_mats.append(merged_img)
+        adj_img_mats.append(channel_0)
         #########################################################################################
 
         ###################################################################################################
