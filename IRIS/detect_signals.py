@@ -847,7 +847,7 @@ def detect_blobs_Chen(f_cycle):
     blob_params = SimpleBlobDetector_Params()
 
     blob_params.thresholdStep = 4
-    blob_params.minRepeatability = 2
+    blob_params.minRepeatability = 3
     ########
     # blob_params.thresholdStep = 3  # Alternative option
     # blob_params.minRepeatability = 3  # Alternative option
@@ -873,15 +873,18 @@ def detect_blobs_Chen(f_cycle):
     # blob_params.maxArea = 145  # Alternative option
     ####################################################################################
 
-    blob_params.filterByCircularity = False
-    blob_params.filterByConvexity = False
+    blob_params.filterByCircularity = True
+    blob_params.minCircularity = 0.75
+
+    blob_params.filterByConvexity = True
+    blob_params.minConvexity = 0.6
     ##########################################################
 
     for img in channel_list:
         #################################
         # Setup threshold of gray-scale #
         #################################
-        blob_params.minThreshold = mode(floor(reshape(img, (img.size,)) / 2) * 2)[0][0] + 30
+        blob_params.minThreshold = mode(floor(reshape(img, (img.size,)) / 2) * 2)[0][0]
         #################################
 
         mor_detector = SimpleBlobDetector.create(blob_params)
@@ -901,9 +904,6 @@ def detect_blobs_Chen(f_cycle):
         mask_layer[r:(r + 2), c:(c + 2)] = 255
 
     mask_layer = GaussianBlur(mask_layer, (3, 3), 0)
-
-    blob_params.filterByColor = True
-    blob_params.blobColor = 255
 
     detector = SimpleBlobDetector.create(blob_params)
     kps = detector.detect(mask_layer)
