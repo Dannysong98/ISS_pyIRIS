@@ -219,7 +219,8 @@ server <- function(input, output, session) {
                                                data=used_data, 
                                                size=input$sct_size, alpha=input$sct_lumi
                                     ) +
-                                    scale_color_manual(values=color_list[sort(input$binfo_rows_selected)], labels=barcodeInfo[sort(input$binfo_rows_selected), 2])
+                                    scale_color_manual(values=color_list[sort(input$binfo_rows_selected)], 
+                                                       labels=barcodeInfo[sort(input$binfo_rows_selected), 2])
 
                                 if (input$scope == TRUE) {
                                     win_len <- input$win_length

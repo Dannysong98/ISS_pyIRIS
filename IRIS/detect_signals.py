@@ -118,7 +118,7 @@ def detect_blobs_Ke(f_cycle):
     # blob_params.thresholdStep = 3  # Alternative option
     # blob_params.minRepeatability = 3  # Alternative option
 
-    blob_params.minDistBetweenBlobs = 3
+    blob_params.minDistBetweenBlobs = 2
 
     blob_params.filterByColor = True
     blob_params.blobColor = 255
@@ -139,9 +139,9 @@ def detect_blobs_Ke(f_cycle):
     ########
     # blob_params.minArea = 4  # Alternative option
 
-    blob_params.maxArea = 121
+    blob_params.maxArea = 40
     ########
-    # blob_params.maxArea = 65  # Alternative option
+    # blob_params.maxArea = 121  # Alternative option
     # blob_params.maxArea = 145  # Alternative option
     ####################################################################################
 
@@ -231,10 +231,10 @@ def detect_blobs_Ke(f_cycle):
 
     diff_break = 10
 
-    cut_off_A = int(mode(around(divide(array(diff_list_A, dtype=uint8), diff_break)))[0][0]) - diff_break
-    cut_off_T = int(mode(around(divide(array(diff_list_T, dtype=uint8), diff_break)))[0][0]) - diff_break
-    cut_off_C = int(mode(around(divide(array(diff_list_C, dtype=uint8), diff_break)))[0][0]) - diff_break
-    cut_off_G = int(mode(around(divide(array(diff_list_G, dtype=uint8), diff_break)))[0][0]) - diff_break
+    cut_off_A = int(mode(around(divide(array(diff_list_A, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
+    cut_off_T = int(mode(around(divide(array(diff_list_T, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
+    cut_off_C = int(mode(around(divide(array(diff_list_C, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
+    cut_off_G = int(mode(around(divide(array(diff_list_G, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
     #########################################################################
 
     ##############################################################################################################
@@ -636,16 +636,16 @@ def detect_blobs_Lee(f_cycle):
     ##########################################################
     blob_params = SimpleBlobDetector_Params()
 
-    blob_params.thresholdStep = 1
-    blob_params.minRepeatability = 1
+    blob_params.thresholdStep = 4
+    blob_params.minRepeatability = 2
     ########
     # blob_params.thresholdStep = 3  # Alternative option
     # blob_params.minRepeatability = 3  # Alternative option
 
-    blob_params.minDistBetweenBlobs = 3
+    blob_params.minDistBetweenBlobs = 2
 
-    blob_params.filterByColor = True
-    blob_params.blobColor = 255
+    blob_params.filterByColor = False
+    # blob_params.blobColor = 255
 
     ####################################################################################
     # This parameter is used for filtering those extremely large blobs, which likely   #
@@ -684,7 +684,7 @@ def detect_blobs_Lee(f_cycle):
         #################################
 
         mor_detector = SimpleBlobDetector.create(blob_params)
-        mor_kps.extend(mor_detector.detect(img))
+        mor_kps.extend(mor_detector.detect(255 - img))
 
     #################################################################################
     # To map all the detected blobs into a new mask layer for redundancy filtering, #
@@ -855,7 +855,6 @@ def detect_blobs_Chen(f_cycle):
     blob_params.minDistBetweenBlobs = 1
 
     blob_params.filterByColor = False
-    blob_params.blobColor = 255
 
     ####################################################################################
     # This parameter is used for filtering those extremely large blobs, which likely   #
