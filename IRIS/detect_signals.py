@@ -847,14 +847,14 @@ def detect_blobs_Chen(f_cycle):
     blob_params = SimpleBlobDetector_Params()
 
     blob_params.thresholdStep = 4
-    blob_params.minRepeatability = 3
+    blob_params.minRepeatability = 2
     ########
     # blob_params.thresholdStep = 3  # Alternative option
     # blob_params.minRepeatability = 3  # Alternative option
 
     blob_params.minDistBetweenBlobs = 1
 
-    blob_params.filterByColor = True
+    blob_params.filterByColor = False
     blob_params.blobColor = 255
 
     ####################################################################################
@@ -888,7 +888,7 @@ def detect_blobs_Chen(f_cycle):
         #################################
 
         mor_detector = SimpleBlobDetector.create(blob_params)
-        mor_kps.extend(mor_detector.detect(img))
+        mor_kps.extend(mor_detector.detect(255 - img))
 
     #################################################################################
     # To map all the detected blobs into a new mask layer for redundancy filtering, #

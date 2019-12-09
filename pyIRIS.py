@@ -100,7 +100,7 @@ if __name__ == '__main__':
                 called_base_box_in_one_cycle = detect_signals.detect_blobs_Chen(cycle)
                 barcode_cube_obj.collect_called_bases(called_base_box_in_one_cycle)
 
-            barcode_cube_obj.filter_blobs_list2()
+            # barcode_cube_obj.filter_blobs_list2()  # Alternative option
 
         #############################################################
         # Start here, different types of data set are to be unified #
