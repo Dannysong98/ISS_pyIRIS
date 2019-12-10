@@ -17,14 +17,17 @@ and rotation between images but no zooming and retortion.
 
 
 from sys import stderr
-from cv2 import (convertScaleAbs, GaussianBlur, getStructuringElement, morphologyEx,
+from cv2 import (convertScaleAbs,
                  BRISK, ORB, BFMatcher, estimateAffinePartial2D,
-                 MORPH_CROSS, MORPH_GRADIENT, NORM_HAMMING, RANSAC)
-from numpy import (array, mean, float32)
+                 NORM_HAMMING, RANSAC)
+from numpy import (array, zeros, mean, float32, bool_, fft, abs, max)
+
+
 ##########################
 # For alternative option #
 ##########################
-# from cv2 import resize
+# from cv2 import (GaussianBlur, resize, getStructuringElement, morphologyEx,
+#                  MORPH_RECT, MORPH_GRADIENT)
 # from numpy import around
 ##########################
 
@@ -41,6 +44,24 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
     :param detection_method: The detection algorithm of feature points.
     :return f_key_points, f_descriptions: A transformation matrix from transformed image to reference.
     """
+    def __lpf(f_img):
+        """
+        Low-pass Filter
+
+        :param f_img: Input image
+        :return: Filtered image
+        """
+        row, col = f_img.shape
+
+        masker_window = zeros((row, col), dtype=bool_)
+        masker_window[int(row / 2) - int(row * 0.3):int(row / 2) + int(row * 0.3),
+                      int(col / 2) - int(col * 0.3):int(col / 2) + int(col * 0.3)] = 1
+
+        f_img = abs(fft.ifft2(fft.ifftshift(fft.fftshift(fft.fft2(f_img)) * masker_window)))
+        f_img = convertScaleAbs(f_img / max(f_img) * 255)
+
+        return f_img
+
     def __get_key_points_and_descriptors(f_gray_image, method=None):
         """
         For detecting the key points and their descriptions by BRISK or ORB.
@@ -56,34 +77,28 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
         :param method: The detection algorithm of key points.
         :return: A tuple including a group of key points and their descriptions.
         """
-        ###############################################################################
-        # In order to reduce the errors better in registration, we need to reduce     #
-        # some redundant features in each image. Here, a method of morphological      #
-        # transformation, Morphological gradient, the difference between              #
-        # dilation and erosion of an image, is used to expose key points under a      #
-        # 15x15 CROSS kernel. Alternatively, we merge adjacent 3 pixels (3x3) to blur #
-        # those characters of noise-like, meanwhile, to retain those primary one      #
-        ###############################################################################
-        f_gray_image = GaussianBlur(f_gray_image, (3, 3), 0)
-        ksize = (15, 15)
-        kernel = getStructuringElement(MORPH_CROSS, ksize)
-        f_gray_image = morphologyEx(f_gray_image, MORPH_GRADIENT, kernel, iterations=3)
+        #################################################################
+        # Low-pass filter in frequency domain of Fourier transformation #
+        #################################################################
+        f_gray_image = __lpf(f_gray_image)
         ########
 
-        ###############################
-        # Block of alternative option #
-        ###############################
-        # scale = 3
-        ########
-        # scale = 2  # Alternative option
-        # scale = 4  # Alternative option
-        #
-        # f_gray_image = resize(resize(f_gray_image, (int(around(f_gray_image.shape[1] / scale)),
-        #                                             int(around(f_gray_image.shape[0] / scale)))),
-        #                       (f_gray_image.shape[1], f_gray_image.shape[0]))
-        ###############################
+        ###########################################################################
+        # Block of alternative option                                             #
+        #                                                                         #
+        # In order to reduce the errors better in registration, we need to reduce #
+        # some redundant features in each image. Here, a method of morphological  #
+        # transformation, Morphological gradient, the difference between          #
+        # dilation and erosion of an image, is used to expose key points under a  #
+        # 15x15 rectangle kernel, after a Gaussian blur (3x3 kernel).             #
+        ###########################################################################
+        # f_gray_image = GaussianBlur(f_gray_image, (3, 3), 0)
+        # ksize = (15, 15)
+        # kernel = getStructuringElement(MORPH_RECT, ksize)
+        # f_gray_image = morphologyEx(f_gray_image, MORPH_GRADIENT, kernel, iterations=2)
+        ###########################################################################
 
-        ###############################################################################
+        #################################################################
 
         det = ''
         ext = ''
@@ -92,25 +107,24 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
         # We prepare two methods of feature points detection for selectable, one is 'BRISK', and the #
         # other is 'ORB'. In general, the algorithm 'ORB' is used as the open-source alternative of  #
         # 'SIFT' and 'SURF', which are almost the industry standard. In our practice, 'ORB' always   #
-        # detect very fewer points than 'BRISK' and often lead to registration failed. So, we choose #
-        # the latter as our method of point detecting, in default.                                   #
+        # detect very fewer but more robust key points than 'BRISK' and often lead to registration   #
+        # failed. So, we choose the latter as our method of point detecting, in default.             #
         ##############################################################################################
-        method = 'BRISK' if method is None else method
+        method = 'ORB' if method is None else method
 
-        if method == 'BRISK':
-            det = BRISK.create()
-            ext = BRISK.create()
-
-        elif method == 'ORB':
+        if method == 'ORB':
             det = ORB.create()
             ext = ORB.create()
 
+        elif method == 'BRISK':
+            det = BRISK.create()
+            ext = BRISK.create()
+
         else:
-            print('Only ORB and BRISK could be suggested', file=stderr)
+            print('Only ORB or BRISK could be suggested', file=stderr)
         ##############################################################################################
 
         f_key_points = det.detect(f_gray_image)
-
         _, f_descriptions = ext.compute(f_gray_image, f_key_points)
 
         return f_key_points, f_descriptions
@@ -147,13 +161,6 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
     #######################################
     transform_cycle = convertScaleAbs(transform_cycle * (mean(reference_cycle) / mean(transform_cycle)))
     #######################################
-
-    ####################################
-    # Fourier transformation (ABANDON) #
-    ####################################
-    # reference_cycle = convertScaleAbs(20 * log(abs(fftshift(fft2(reference_cycle)))))
-    # transform_cycle = convertScaleAbs(20 * log(abs(fftshift(fft2(transform_cycle)))))
-    ####################################
 
     kp1, des1 = __get_key_points_and_descriptors(reference_cycle, detection_method)
     kp2, des2 = __get_key_points_and_descriptors(transform_cycle, detection_method)

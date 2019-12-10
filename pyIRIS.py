@@ -32,12 +32,12 @@ ChangeLog:  2019-01-15  r001    First development version
             2019-08-27  r020    To modify the algorithm for base calling, for performance improving
             2019-08-30  r021    To add a function for lightness rectification
             2019-09-26  r022    New public version
+            2019-11-25  v1.0    Release version
 """
 
 
 from sys import (argv, stderr)
-from numpy import (array,
-                   uint8)
+from numpy import (array, uint8)
 
 from IRIS import (import_images, detect_signals, connect_barcodes, deal_with_result)
 
@@ -54,7 +54,7 @@ if __name__ == '__main__':
     process the data belonging the type of R. Ke, and the '--eng' means another type, with respective optimized 
     parameters.
     """
-    if len(argv) > 2 and ('--ke' in argv[1] or '--eng' in argv[1]):
+    if len(argv) > 2 and ('--ke' in argv[1] or '--eng' in argv[1] or '--lee' in argv[1] or '--chen' in argv[1]):
         cycle_stack = []
         std_img = array([], dtype=uint8)
         called_base_box_in_one_cycle = {}
@@ -67,6 +67,8 @@ if __name__ == '__main__':
             for cycle in cycle_stack:
                 called_base_box_in_one_cycle = detect_signals.detect_blobs_Ke(cycle)
                 barcode_cube_obj.collect_called_bases(called_base_box_in_one_cycle)
+
+            barcode_cube_obj.filter_blobs_list(std_img)
 
         if argv[1] == '--eng':
             cycle_stack, std_img = import_images.decode_data_Eng(argv[2:])
@@ -82,15 +84,31 @@ if __name__ == '__main__':
         #     pass
         #####################################
 
+        if argv[1] == '--lee':
+            cycle_stack, std_img = import_images.decode_data_Lee(argv[2:])
+
+            for cycle in cycle_stack:
+                called_base_box_in_one_cycle = detect_signals.detect_blobs_Lee(cycle)
+                barcode_cube_obj.collect_called_bases(called_base_box_in_one_cycle)
+
+            barcode_cube_obj.filter_blobs_list(std_img)
+
+        if argv[1] == '--chen':
+            cycle_stack, std_img = import_images.decode_data_Chen(argv[2:])
+
+            for cycle in cycle_stack:
+                called_base_box_in_one_cycle = detect_signals.detect_blobs_Chen(cycle)
+                barcode_cube_obj.collect_called_bases(called_base_box_in_one_cycle)
+
+            # barcode_cube_obj.filter_blobs_list2()  # Alternative option
+
         #############################################################
-        # Unified Filtering and Barcode Connection                  #
         # Start here, different types of data set are to be unified #
         #############################################################
-        barcode_cube_obj.filter_blobs_list()
         barcode_cube_obj.calling_adjust()
         #############################################################
 
         deal_with_result.write_reads_into_file(std_img, barcode_cube_obj.adjusted_bases_cube, len(cycle_stack))
 
     else:
-        print('Invalid image group\nUSAGE:  ' + argv[0] + ' <--ke|--eng> <image group>', file=stderr)
+        print('Invalid image group\nUSAGE:  ' + argv[0] + ' <--ke|--eng|--lee｜--chen> <image group>', file=stderr)

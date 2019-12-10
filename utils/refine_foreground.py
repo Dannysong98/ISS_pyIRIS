@@ -2,6 +2,7 @@
 
 
 from sys import argv
+
 from cv2 import (imread, imwrite, addWeighted,
                  IMREAD_GRAYSCALE)
 from numpy import (array, uint8)

@@ -2,14 +2,12 @@
 """"""
 
 
-from sys import (argv, exit,
-                 stderr)
+from sys import (argv, exit, stderr)
 from cv2 import (imread, createStitcherScans, cvtColor, imwrite, convertScaleAbs,
                  IMREAD_GRAYSCALE, IMREAD_COLOR, COLOR_BGR2GRAY)
-from numpy import (array, dot, mean,
-                   uint8, uint16)
+from numpy import (array, dot, mean, uint8, uint16)
 
-from ..IRIS.register_images import register_cycles
+from IRIS.register_images import register_cycles
 
 
 def background_stitcher(img_dirs):
@@ -40,6 +38,7 @@ def trans_coor(bg, img_dirs):
 
     for img_dir in img_dirs:
         mat = register_cycles(bg, imread(img_dir + '/background.tif', IMREAD_GRAYSCALE), 'BRISK')
+        # mat = register_cycles(bg, imread(img_dir + '/debug.cycle_1.reg.tif', IMREAD_GRAYSCALE), 'BRISK')
 
         with open(img_dir + '/basecalling_data.txt', 'rt') as IN:
             for ln in IN:
@@ -77,8 +76,8 @@ def overlap_filtering(adj_barcode_info):
         row = int(row)
         col = int(col)
 
-        for r in range(row - 5, row + 7):
-            for c in range(col - 5, col + 7):
+        for r in range(row - 2, row + 4):
+            for c in range(col - 2, col + 4):
 
                 if r != row and c != col:
 

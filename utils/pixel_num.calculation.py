@@ -2,6 +2,7 @@
 
 
 from sys import argv
+
 from cv2 import (imread, IMREAD_GRAYSCALE)
 from numpy import (array, sum)
 
