@@ -179,10 +179,10 @@ class BarcodeCube:
                             # adj_err_rate = error_rate  # Alternative option
                             ##############################################################
 
-                            if adj_err_rate > 1:
+                            if adj_err_rate >= 1:
                                 adj_err_rate = float(1)
 
-                            if adj_err_rate < min_err_rate:
+                            if adj_err_rate <= min_err_rate:
                                 max_qul_base = bases_cube[cycle_serial][coor][0]
                                 min_err_rate = adj_err_rate
                 ##################################################################################################
