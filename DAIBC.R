@@ -136,7 +136,7 @@ server <- function(input, output, session) {
                     col_number = ncol(barcodeInfo)
                     if(col_number == 2){
                         barcodeInfo <- cbind(barcodeInfo, '')
-                        barcodeInfo <- cbind(barcodeInfo, 17)
+                        barcodeInfo <- cbind(barcodeInfo, 16)
                     }
                     barcodeInfo <- cbind(barcodeInfo, 0)
                     rownames(barcodeInfo) <- barcodeInfo[, 1]
@@ -168,7 +168,7 @@ server <- function(input, output, session) {
 
                     baseCallingData$Row <- max_row - baseCallingData$Row
                     
-                    shapeVec <- rep(17, nrow(baseCallingData))
+                    shapeVec <- rep(16, nrow(baseCallingData))
                     if(col_number == 4){
                         shapeVec = apply(baseCallingData, 1, function(x){
                             if(sum(barcodeInfo$Barcode == x[2]) == 0){
@@ -213,7 +213,7 @@ server <- function(input, output, session) {
                     if(col_number == 2){
                         color_list <- as.data.frame(col2rgb(colors()[seq(657, 1, -3)]))
                         color_list <- rgb(color_list[1,] / 255, color_list[2,] / 255, color_list[3,] / 255)
-                        shape_list <- rep(17, nrow(barcodeInfo))
+                        shape_list <- rep(16, nrow(barcodeInfo))
                     }
                     else{
                         color_list <- as.data.frame(col2rgb(barcodeInfo$Color))
