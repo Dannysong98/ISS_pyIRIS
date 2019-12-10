@@ -1,5 +1,5 @@
 ## DESCIRPTION ##
-#   This Web App is used to appear the result of ISS Base Calling
+#   This Web App is used to visualize the result of ISS Base Calling
 #################
 
 ## AUTHOR ##
