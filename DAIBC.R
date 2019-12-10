@@ -1,5 +1,5 @@
 ## DESCIRPTION ##
-#   This Web App is used to analyse the result of ISS Base Calling
+#   This Web App is used to appear the result of ISS Base Calling
 #################
 
 ## AUTHOR ##
@@ -10,6 +10,7 @@
 ## VERSION ##
 #   2019-04-04  v1.0    Initial release
 #   2019-04-16  v1.1    To modify the large file (>5M) input
+#   2019-12-09  v1.2    Add support to pre-defined color and shape
 #############
 
 
@@ -29,9 +30,9 @@ library(rsconnect)
 ui <- fixedPage(
     theme=shinytheme('lumen'),
     
-    titlePanel('DAIBC', 'Data Analysing after ISS Base Calling'),
+    titlePanel('DAIBC', 'Data Appearance after ISS Base Calling'),
     
-    h5('Data Analysing after ISS Base Calling'),
+    h5('Data Appearance after ISS Base Calling'),
 
     sidebarPanel(
         fixedRow(
@@ -132,10 +133,16 @@ server <- function(input, output, session) {
                         
                     barcodeInfo <- read.table(barcodeInfoFile, sep='\t', comment.char='', quote='')
                     barcodeInfo <- barcodeInfo[order(barcodeInfo[, 1]),]
+                    col_number = ncol(barcodeInfo)
+                    if(col_number == 2){
+                        barcodeInfo <- cbind(barcodeInfo, '')
+                        barcodeInfo <- cbind(barcodeInfo, 17)
+                    }
                     barcodeInfo <- cbind(barcodeInfo, 0)
-                    barcodeInfo <- cbind(barcodeInfo, '')
                     rownames(barcodeInfo) <- barcodeInfo[, 1]
-                    colnames(barcodeInfo) = c('Barcode', 'Gene Name', 'Called Number', 'Color')
+                    colnames(barcodeInfo) = c('Barcode', 'Gene Name', 'Color', 'Shape', 'Called Number')
+                    
+                    barcodeHash <- hash(keys=barcodeInfo$Barcode, values=barcodeInfo$Shape)
                     
                     if (is.null(baseCallingDataFile)) {baseCallingDataFile <- 'example/basecalling_data.txt'}
                     
@@ -160,7 +167,33 @@ server <- function(input, output, session) {
                     bgImg <- rasterGrob(bgImg)
 
                     baseCallingData$Row <- max_row - baseCallingData$Row
-
+                    
+                    shapeVec <- rep(17, nrow(baseCallingData))
+                    if(col_number == 4){
+                        shapeVec = apply(baseCallingData, 1, function(x){
+                            if(sum(barcodeInfo$Barcode == x[2]) == 0){
+                                NA
+                            }
+                            else{
+                                barcodeInfo$Shape[which(barcodeInfo$Barcode == x[2])]
+                            }
+                        })
+                    }
+                    shapeVec = as.vector(shapeVec)
+                    baseCallingData = cbind(baseCallingData, shapeVec)
+                    colnames(baseCallingData)[6] = 'Shape'
+                    
+                    combination = paste(baseCallingData$Barcode, baseCallingData$Shape, sep = '-')
+                    geneName = as.character(apply(baseCallingData, 1, function(x){
+                        if(sum(barcodeInfo$Barcode == x[2]) == 0){
+                            'NA'
+                        }
+                        else{
+                            barcodeInfo$`Gene Name`[which(barcodeInfo$Barcode == x[2])]
+                        }
+                    }))
+                    baseCallingData = cbind(baseCallingData, combination, geneName)
+                        
                     img <- ggplot() +
                         annotation_custom(bgImg, xmin=0, xmax=max_col, ymin=0, ymax=max_row) + 
                         scale_x_continuous(limits=c(0, max_col)) + scale_y_continuous(limits=c(0, max_row)) + 
@@ -175,11 +208,18 @@ server <- function(input, output, session) {
                                        values=table(unlist(matrix(baseCallingData[, 2])))
                     )
                     
-                    for (k in barcodeInfo[, 1]) {if(has.key(k, barcodeNum)) {barcodeInfo[k, 3] <- barcodeNum[[k]]}}
+                    for (k in barcodeInfo[, 1]) {if(has.key(k, barcodeNum)) {barcodeInfo[k, 5] <- barcodeNum[[k]]}}
                     
-                    color_list <- as.data.frame(col2rgb(colors()[seq(657, 1, -3)]))
-                    color_list <- rgb(color_list[1,] / 255, color_list[2,] / 255, color_list[3,] / 255)
-
+                    if(col_number == 2){
+                        color_list <- as.data.frame(col2rgb(colors()[seq(657, 1, -3)]))
+                        color_list <- rgb(color_list[1,] / 255, color_list[2,] / 255, color_list[3,] / 255)
+                        shape_list <- rep(17, nrow(barcodeInfo))
+                    }
+                    else{
+                        color_list <- as.data.frame(col2rgb(barcodeInfo$Color))
+                        color_list <- rgb(color_list[1,] / 255, color_list[2,] / 255, color_list[3,] / 255)
+                        shape_list <- barcodeInfo$Shape
+                    }
                     output$binfo <- renderDataTable(
                         {
                             dt <- DT::datatable(barcodeInfo,
@@ -213,13 +253,21 @@ server <- function(input, output, session) {
                             if (! is.null(input$binfo_rows_selected)) {
                                 used_data <- baseCallingData[baseCallingData[, 2] %in% barcodeInfo[sort(input$binfo_rows_selected), 1] & 
                                                              baseCallingData[, 3] >= input$qua_thre,]
-                            
+
+                                r = sort(input$binfo_rows_selected)
+                                r = r[which(barcodeInfo[r, 5] > 0)]
+                                
+                                f_barcode = factor(used_data$Barcode, levels = barcodeInfo[sort(r), 2])
+                                used_data$Barcode = factor(used_data$Barcode, levels = barcodeInfo[sort(r), 2])
+                                used_data$geneName = factor(used_data$geneName, levels = unique(used_data$geneName[order(f_barcode)]))
+                                
                                 img <- img + 
-                                    geom_point(aes(x=Column, y=Row, color=Barcode),
+                                    geom_point(aes(x=Column, y=Row, color=geneName, shape=geneName),
                                                data=used_data, 
                                                size=input$sct_size, alpha=input$sct_lumi
                                     ) +
-                                    scale_color_manual(values=color_list[sort(input$binfo_rows_selected)], labels=barcodeInfo[sort(input$binfo_rows_selected), 2])
+                                    scale_color_manual(values=color_list[sort(r)], labels = barcodeInfo[sort(r), 2]) + 
+                                    scale_shape_manual(values=shape_list[sort(r)], labels = barcodeInfo[sort(r), 2])
 
                                 if (input$scope == TRUE) {
                                     win_len <- input$win_length
