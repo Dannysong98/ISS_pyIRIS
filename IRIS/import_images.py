@@ -20,9 +20,9 @@ tensor in the order of cycle
 
 from sys import stderr
 from cv2 import (imread, imreadmulti, imwrite,
-                 add, addWeighted, warpAffine, convertScaleAbs,
+                 add, addWeighted, warpAffine,
                  IMREAD_GRAYSCALE)
-from numpy import (array, uint8, mean)
+from numpy import (array, uint8)
 
 from .register_images import register_cycles
 
@@ -317,7 +317,6 @@ def decode_data_Chen(f_cycles):
     f_cycle_stack = []
 
     f_std_img = array([], dtype=uint8)
-    reg_ref = array([], dtype=uint8)
 
     for cycle_id in range(0, len(f_cycles)):
         adj_img_mats = []
@@ -337,8 +336,6 @@ def decode_data_Chen(f_cycles):
         merged_img = channel_0
 
         if cycle_id == 0:
-            reg_ref = channel_0
-
             ###################################
             # Output background independently #
             ###################################
