@@ -80,20 +80,39 @@ class BarcodeCube:
 
         blob_params.thresholdStep = 1
         blob_params.minRepeatability = 1
-        blob_params.minDistBetweenBlobs = 1
-
-        blob_params.filterByColor = True
-        blob_params.blobColor = 255
+        blob_params.minDistBetweenBlobs = 2
 
         blob_params.filterByArea = True
-        blob_params.minArea = 1
-        blob_params.maxArea = 10
+        blob_params.minArea = 2
+        blob_params.maxArea = 8
 
         blob_params.filterByCircularity = False
         blob_params.filterByConvexity = False
 
+        blob_params.filterByColor = False
+
         detector = SimpleBlobDetector.create(blob_params)
-        kps = detector.detect(blobs_mask)
+        kps1 = detector.detect(255 - blobs_mask)
+
+        blob_params.filterByColor = True
+        blob_params.blobColor = 255
+
+        detector = SimpleBlobDetector.create(blob_params)
+        kps2 = detector.detect(blobs_mask)
+
+        kps = kps1 + kps2
+        mask_layer = zeros(f_background.shape, dtype=uint8)
+
+        for key_point in kps:
+            r = int(key_point.pt[1])
+            c = int(key_point.pt[0])
+
+            mask_layer[r:(r + 2), c:(c + 2)] = 255
+
+        mask_layer = GaussianBlur(mask_layer, (3, 3), 0)
+
+        detector = SimpleBlobDetector.create(blob_params)
+        kps = detector.detect(mask_layer)
 
         for key_point in kps:
             r = int(key_point.pt[1])
