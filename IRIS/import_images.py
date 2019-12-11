@@ -276,7 +276,7 @@ def decode_data_Lee(f_cycles):
             f_std_img = channel_0
             ###################################
 
-        # trans_mat = register_cycles(reg_ref, merged_img, 'BRISK')  # Don't need registration
+        # trans_mat = register_cycles(reg_ref, merged_img, 'ORB')  # Don't need registration
 
         ########################
         # For merging checking #
@@ -341,6 +341,8 @@ def decode_data_Chen(f_cycles):
             ###################################
             f_std_img = channel_0
             ###################################
+
+        # trans_mat = register_cycles(reg_ref, merged_img, 'ORB')  # Don't need registration
 
         ########################
         # For merging checking #
