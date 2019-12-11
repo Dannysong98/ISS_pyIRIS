@@ -659,7 +659,7 @@ def detect_blobs_Lee(f_cycle):
     # blob_params.thresholdStep = 3  # Alternative option
     # blob_params.minRepeatability = 3  # Alternative option
 
-    blob_params.minDistBetweenBlobs = 2
+    blob_params.minDistBetweenBlobs = 1
 
     ####################################################################################
     # This parameter is used for filtering those extremely large blobs, which likely   #
@@ -677,7 +677,7 @@ def detect_blobs_Lee(f_cycle):
     ########
     # blob_params.minArea = 4  # Alternative option
 
-    blob_params.maxArea = 65
+    blob_params.maxArea = 10
     ########
     # blob_params.maxArea = 121  # Alternative option
     # blob_params.maxArea = 145  # Alternative option
@@ -749,17 +749,10 @@ def detect_blobs_Lee(f_cycle):
         r = int(key_point.pt[1])
         c = int(key_point.pt[0])
 
-        diff_A = sum(channel_A[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                 sum(channel_A[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
-
-        diff_T = sum(channel_T[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                 sum(channel_T[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
-
-        diff_C = sum(channel_C[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                 sum(channel_C[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
-
-        diff_G = sum(channel_G[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                 sum(channel_G[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
+        diff_A = sum(channel_A[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_A[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36
+        diff_T = sum(channel_T[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_T[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36
+        diff_C = sum(channel_C[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_C[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36
+        diff_G = sum(channel_G[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_G[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36
 
         if diff_A > 0:
             diff_list_A.append(int(around(diff_A)))
@@ -788,25 +781,21 @@ def detect_blobs_Lee(f_cycle):
         r = int(key_point.pt[1])
         c = int(key_point.pt[0])
 
-        if sum(channel_A[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                sum(channel_A[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144 > cut_off_A:
-            greyscale_model_A[r, c] = sum(channel_A[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                                      sum(channel_A[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
+        if sum(channel_A[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_A[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 > cut_off_A:
+            greyscale_model_A[r, c] = sum(channel_A[r:(r + 2), c:(c + 2)]) / 4 - \
+                                      sum(channel_A[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36
 
-        if sum(channel_T[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                sum(channel_T[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144 > cut_off_T:
-            greyscale_model_T[r, c] = sum(channel_T[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                                      sum(channel_T[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
+        if sum(channel_T[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_T[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 > cut_off_T:
+            greyscale_model_T[r, c] = sum(channel_T[r:(r + 2), c:(c + 2)]) / 4 - \
+                                      sum(channel_T[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36
 
-        if sum(channel_C[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                sum(channel_C[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144 > cut_off_C:
-            greyscale_model_C[r, c] = sum(channel_C[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                                      sum(channel_C[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
+        if sum(channel_C[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_C[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 > cut_off_C:
+            greyscale_model_C[r, c] = sum(channel_C[r:(r + 2), c:(c + 2)]) / 4 - \
+                                      sum(channel_C[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36
 
-        if sum(channel_G[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                sum(channel_G[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144 > cut_off_G:
-            greyscale_model_G[r, c] = sum(channel_G[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 - \
-                                      sum(channel_G[(r - 5):(r + 7), (c - 5):(c + 7)]) / 144
+        if sum(channel_G[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_G[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 > cut_off_G:
+            greyscale_model_G[r, c] = sum(channel_G[r:(r + 2), c:(c + 2)]) / 4 - \
+                                      sum(channel_G[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36
     ##############################################################################################################
 
     image_model_pool = image_model_pooling_Ke(greyscale_model_A,
