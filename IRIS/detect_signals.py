@@ -121,8 +121,6 @@ def detect_blobs_Ke(f_cycle):
 
     blob_params.minDistBetweenBlobs = 2
 
-    blob_params.filterByColor = False
-
     ####################################################################################
     # This parameter is used for filtering those extremely large blobs, which likely   #
     # to results from contamination                                                    #
@@ -155,6 +153,8 @@ def detect_blobs_Ke(f_cycle):
         #################################
         blob_params.minThreshold = mode(floor(reshape(img, (img.size,)) / 2) * 2)[0][0]
         #################################
+
+        blob_params.filterByColor = False
 
         mor_detector = SimpleBlobDetector.create(blob_params)
         mor_kps1.extend(mor_detector.detect(255 - img))
@@ -653,8 +653,6 @@ def detect_blobs_Lee(f_cycle):
 
     blob_params.minDistBetweenBlobs = 2
 
-    blob_params.filterByColor = False
-
     ####################################################################################
     # This parameter is used for filtering those extremely large blobs, which likely   #
     # to results from contamination                                                    #
@@ -671,14 +669,13 @@ def detect_blobs_Lee(f_cycle):
     ########
     # blob_params.minArea = 4  # Alternative option
 
-    blob_params.maxArea = 121
+    blob_params.maxArea = 65
     ########
-    # blob_params.maxArea = 65  # Alternative option
+    # blob_params.maxArea = 121  # Alternative option
     # blob_params.maxArea = 145  # Alternative option
     ####################################################################################
 
-    blob_params.filterByCircularity = True
-    blob_params.minCircularity = 0.4
+    blob_params.filterByCircularity = False
 
     blob_params.filterByConvexity = True
     blob_params.minConvexity = 0.3
@@ -691,6 +688,8 @@ def detect_blobs_Lee(f_cycle):
         blob_params.minThreshold = mode(floor(reshape(img, (img.size,)) / 2) * 2)[0][0]
         #################################
 
+        blob_params.filterByColor = False
+
         mor_detector = SimpleBlobDetector.create(blob_params)
         mor_kps1.extend(mor_detector.detect(255 - img))
 
@@ -700,7 +699,7 @@ def detect_blobs_Lee(f_cycle):
         mor_detector = SimpleBlobDetector.create(blob_params)
         mor_kps2.extend(mor_detector.detect(img))
 
-    mor_kps = mor_kps1 + mor_kps2
+    mor_kps = mor_kps1
 
     #################################################################################
     # To map all the detected blobs into a new mask layer for redundancy filtering, #
@@ -873,8 +872,6 @@ def detect_blobs_Chen(f_cycle):
 
     blob_params.minDistBetweenBlobs = 1
 
-    blob_params.filterByColor = False
-
     ####################################################################################
     # This parameter is used for filtering those extremely large blobs, which likely   #
     # to results from contamination                                                    #
@@ -895,7 +892,7 @@ def detect_blobs_Chen(f_cycle):
     blob_params.minCircularity = 0.75
 
     blob_params.filterByConvexity = True
-    blob_params.minConvexity = 0.6
+    blob_params.minConvexity = 0.3
     ##########################################################
 
     for img in channel_list:
@@ -904,6 +901,8 @@ def detect_blobs_Chen(f_cycle):
         #################################
         blob_params.minThreshold = mode(floor(reshape(img, (img.size,)) / 2) * 2)[0][0]
         #################################
+
+        blob_params.filterByColor = False
 
         mor_detector = SimpleBlobDetector.create(blob_params)
         mor_kps1.extend(mor_detector.detect(255 - img))
