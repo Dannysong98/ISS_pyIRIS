@@ -11,7 +11,7 @@ region in each cycle.
 
 
 from sys import stderr
-from cv2 import (SimpleBlobDetector_Params, SimpleBlobDetector, GaussianBlur, imwrite)
+from cv2 import (SimpleBlobDetector_Params, SimpleBlobDetector, GaussianBlur)
 from numpy import (sqrt, zeros, uint8)
 
 
@@ -74,8 +74,7 @@ class BarcodeCube:
 
             blobs_mask[r, c] = 255
 
-        blobs_mask = GaussianBlur(blobs_mask, (5, 5), 0)
-        imwrite('debug.tif', blobs_mask)
+        blobs_mask = GaussianBlur(blobs_mask, (3, 3), 0)
 
         blob_params = SimpleBlobDetector_Params()
 
@@ -85,12 +84,14 @@ class BarcodeCube:
 
         blob_params.filterByArea = True
         blob_params.minArea = 1
-        blob_params.maxArea = 16
+        blob_params.maxArea = 65
 
         blob_params.filterByCircularity = False
         blob_params.filterByConvexity = False
 
-        blob_params.filterByColor = False
+        blob_params.filterByColor = True
+
+        blob_params.blobColor = 0
 
         detector = SimpleBlobDetector.create(blob_params)
         kps = detector.detect(255 - blobs_mask)

@@ -145,6 +145,8 @@ def detect_blobs_Ke(f_cycle):
 
     blob_params.filterByCircularity = False
     blob_params.filterByConvexity = True
+
+    blob_params.filterByColor = True
     ##########################################################
 
     for img in channel_list:
@@ -154,12 +156,11 @@ def detect_blobs_Ke(f_cycle):
         blob_params.minThreshold = mode(floor(reshape(img, (img.size,)) / 2) * 2)[0][0]
         #################################
 
-        blob_params.filterByColor = False
+        blob_params.blobColor = 0
 
         mor_detector = SimpleBlobDetector.create(blob_params)
         mor_kps1.extend(mor_detector.detect(255 - img))
 
-        blob_params.filterByColor = True
         blob_params.blobColor = 255
 
         mor_detector = SimpleBlobDetector.create(blob_params)
@@ -378,8 +379,6 @@ def detect_blobs_Eng(f_cycle):
 
     blob_params.minDistBetweenBlobs = 2
 
-    blob_params.filterByArea = True
-
     blob_params.minArea = 1
     ########
     # blob_params.minArea = 2  # Alternative option
@@ -391,15 +390,16 @@ def detect_blobs_Eng(f_cycle):
     blob_params.filterByCircularity = False
     blob_params.filterByConvexity = True
 
+    blob_params.filterByArea = True
+
     for img in channel_list:
         blob_params.minThreshold = mode(floor(reshape(img, (img.size,)) / 2) * 2)[0][0]
 
-        blob_params.filterByColor = False
+        blob_params.blobColor = 0
 
         mor_detector = SimpleBlobDetector.create(blob_params)
         mor_kps1.extend(mor_detector.detect(img))
 
-        blob_params.filterByColor = True
         blob_params.blobColor = 255
 
         mor_detector = SimpleBlobDetector.create(blob_params)
@@ -685,6 +685,8 @@ def detect_blobs_Lee(f_cycle):
 
     blob_params.filterByCircularity = False
     blob_params.filterByConvexity = False
+
+    blob_params.filterByColor = True
     ##########################################################
 
     for img in channel_list:
@@ -694,12 +696,11 @@ def detect_blobs_Lee(f_cycle):
         blob_params.minThreshold = mode(floor(reshape(img, (img.size,)) / 2) * 2)[0][0]
         #################################
 
-        blob_params.filterByColor = False
+        blob_params.blobColor = 0
 
         mor_detector = SimpleBlobDetector.create(blob_params)
         mor_kps1.extend(mor_detector.detect(255 - img))
 
-        blob_params.filterByColor = True
         blob_params.blobColor = 255
 
         mor_detector = SimpleBlobDetector.create(blob_params)
@@ -888,6 +889,8 @@ def detect_blobs_Chen(f_cycle):
 
     blob_params.filterByConvexity = True
     blob_params.minConvexity = 0.3
+
+    blob_params.filterByColor = True
     ##########################################################
 
     for img in channel_list:
@@ -897,12 +900,11 @@ def detect_blobs_Chen(f_cycle):
         blob_params.minThreshold = mode(floor(reshape(img, (img.size,)) / 2) * 2)[0][0]
         #################################
 
-        blob_params.filterByColor = False
+        blob_params.blobColor = 0
 
         mor_detector = SimpleBlobDetector.create(blob_params)
         mor_kps1.extend(mor_detector.detect(255 - img))
 
-        blob_params.filterByColor = True
         blob_params.blobColor = 255
 
         mor_detector = SimpleBlobDetector.create(blob_params)
