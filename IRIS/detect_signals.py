@@ -653,7 +653,7 @@ def detect_blobs_Lee(f_cycle):
     ##########################################################
     blob_params = SimpleBlobDetector_Params()
 
-    blob_params.thresholdStep = 4
+    blob_params.thresholdStep = 2
     blob_params.minRepeatability = 2
     ########
     # blob_params.thresholdStep = 3  # Alternative option
