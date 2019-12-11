@@ -96,7 +96,8 @@ def detect_blobs_Ke(f_cycle):
 
     channel_list = (channel_A, channel_T, channel_C, channel_G)
 
-    mor_kps = []
+    mor_kps1 = []
+    mor_kps2 = []
 
     ##########################################################
     # Parameters setup for preliminary blob detection        #
@@ -120,8 +121,7 @@ def detect_blobs_Ke(f_cycle):
 
     blob_params.minDistBetweenBlobs = 2
 
-    blob_params.filterByColor = True
-    blob_params.blobColor = 255
+    blob_params.filterByColor = False
 
     ####################################################################################
     # This parameter is used for filtering those extremely large blobs, which likely   #
@@ -139,9 +139,9 @@ def detect_blobs_Ke(f_cycle):
     ########
     # blob_params.minArea = 4  # Alternative option
 
-    blob_params.maxArea = 40
+    blob_params.maxArea = 121
     ########
-    # blob_params.maxArea = 121  # Alternative option
+    # blob_params.maxArea = 65  # Alternative option
     # blob_params.maxArea = 145  # Alternative option
     ####################################################################################
 
@@ -157,7 +157,15 @@ def detect_blobs_Ke(f_cycle):
         #################################
 
         mor_detector = SimpleBlobDetector.create(blob_params)
-        mor_kps.extend(mor_detector.detect(img))
+        mor_kps1.extend(mor_detector.detect(255 - img))
+
+        blob_params.filterByColor = True
+        blob_params.blobColor = 255
+
+        mor_detector = SimpleBlobDetector.create(blob_params)
+        mor_kps2.extend(mor_detector.detect(img))
+
+    mor_kps = mor_kps1 + mor_kps2
 
     #################################################################################
     # To map all the detected blobs into a new mask layer for redundancy filtering, #
@@ -620,7 +628,8 @@ def detect_blobs_Lee(f_cycle):
 
     channel_list = (channel_0,)
 
-    mor_kps = []
+    mor_kps1 = []
+    mor_kps2 = []
 
     ##########################################################
     # Parameters setup for preliminary blob detection        #
@@ -683,7 +692,15 @@ def detect_blobs_Lee(f_cycle):
         #################################
 
         mor_detector = SimpleBlobDetector.create(blob_params)
-        mor_kps.extend(mor_detector.detect(255 - img))
+        mor_kps1.extend(mor_detector.detect(255 - img))
+
+        blob_params.filterByColor = True
+        blob_params.blobColor = 255
+
+        mor_detector = SimpleBlobDetector.create(blob_params)
+        mor_kps2.extend(mor_detector.detect(img))
+
+    mor_kps = mor_kps1 + mor_kps2
 
     #################################################################################
     # To map all the detected blobs into a new mask layer for redundancy filtering, #
@@ -699,9 +716,6 @@ def detect_blobs_Lee(f_cycle):
         mask_layer[r:(r + 2), c:(c + 2)] = 255
 
     mask_layer = GaussianBlur(mask_layer, (3, 3), 0)
-
-    blob_params.filterByColor = True
-    blob_params.blobColor = 255
 
     detector = SimpleBlobDetector.create(blob_params)
     kps = detector.detect(mask_layer)
@@ -834,7 +848,8 @@ def detect_blobs_Chen(f_cycle):
 
     channel_list = (channel_0,)
 
-    mor_kps = []
+    mor_kps1 = []
+    mor_kps2 = []
 
     ##########################################################
     # Parameters setup for preliminary blob detection        #
@@ -891,8 +906,15 @@ def detect_blobs_Chen(f_cycle):
         #################################
 
         mor_detector = SimpleBlobDetector.create(blob_params)
-        mor_kps.extend(mor_detector.detect(255 - img))
+        mor_kps1.extend(mor_detector.detect(255 - img))
 
+        blob_params.filterByColor = True
+        blob_params.blobColor = 255
+
+        mor_detector = SimpleBlobDetector.create(blob_params)
+        mor_kps2.extend(mor_detector.detect(img))
+
+    mor_kps = mor_kps1 + mor_kps2
     #################################################################################
     # To map all the detected blobs into a new mask layer for redundancy filtering, #
     # and detect on this mask layer again to ensure blobs' location across all      #
@@ -907,9 +929,6 @@ def detect_blobs_Chen(f_cycle):
         mask_layer[r:(r + 2), c:(c + 2)] = 255
 
     mask_layer = GaussianBlur(mask_layer, (3, 3), 0)
-
-    blob_params.filterByColor = True
-    blob_params.blobColor = 255
 
     detector = SimpleBlobDetector.create(blob_params)
     kps = detector.detect(mask_layer)
