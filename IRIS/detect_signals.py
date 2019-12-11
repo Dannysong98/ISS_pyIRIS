@@ -676,9 +676,7 @@ def detect_blobs_Lee(f_cycle):
     ####################################################################################
 
     blob_params.filterByCircularity = False
-
-    blob_params.filterByConvexity = True
-    blob_params.minConvexity = 0.3
+    blob_params.filterByConvexity = False
     ##########################################################
 
     for img in channel_list:
@@ -699,7 +697,7 @@ def detect_blobs_Lee(f_cycle):
         mor_detector = SimpleBlobDetector.create(blob_params)
         mor_kps2.extend(mor_detector.detect(img))
 
-    mor_kps = mor_kps1
+    mor_kps = mor_kps1 + mor_kps2
 
     #################################################################################
     # To map all the detected blobs into a new mask layer for redundancy filtering, #
@@ -914,6 +912,7 @@ def detect_blobs_Chen(f_cycle):
         mor_kps2.extend(mor_detector.detect(img))
 
     mor_kps = mor_kps1 + mor_kps2
+
     #################################################################################
     # To map all the detected blobs into a new mask layer for redundancy filtering, #
     # and detect on this mask layer again to ensure blobs' location across all      #
