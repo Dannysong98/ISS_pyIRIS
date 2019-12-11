@@ -645,7 +645,6 @@ def detect_blobs_Lee(f_cycle):
     blob_params.minDistBetweenBlobs = 2
 
     blob_params.filterByColor = False
-    # blob_params.blobColor = 255
 
     ####################################################################################
     # This parameter is used for filtering those extremely large blobs, which likely   #
@@ -698,6 +697,11 @@ def detect_blobs_Lee(f_cycle):
         c = int(key_point.pt[0])
 
         mask_layer[r:(r + 2), c:(c + 2)] = 255
+
+    mask_layer = GaussianBlur(mask_layer, (3, 3), 0)
+
+    blob_params.filterByColor = True
+    blob_params.blobColor = 255
 
     detector = SimpleBlobDetector.create(blob_params)
     kps = detector.detect(mask_layer)
@@ -903,6 +907,9 @@ def detect_blobs_Chen(f_cycle):
         mask_layer[r:(r + 2), c:(c + 2)] = 255
 
     mask_layer = GaussianBlur(mask_layer, (3, 3), 0)
+
+    blob_params.filterByColor = True
+    blob_params.blobColor = 255
 
     detector = SimpleBlobDetector.create(blob_params)
     kps = detector.detect(mask_layer)
