@@ -11,7 +11,7 @@ region in each cycle.
 
 
 from sys import stderr
-from cv2 import (SimpleBlobDetector_Params, SimpleBlobDetector, GaussianBlur)
+from cv2 import (SimpleBlobDetector_Params, SimpleBlobDetector, GaussianBlur, imwrite)
 from numpy import (sqrt, zeros, uint8)
 
 
@@ -72,9 +72,10 @@ class BarcodeCube:
             r = int(coor[1:6].lstrip('0'))
             c = int(coor[7:].lstrip('0'))
 
-            blobs_mask[r:(r + 2), c:(c + 2)] = 255
+            blobs_mask[r, c] = 255
 
-        blobs_mask = GaussianBlur(blobs_mask, (3, 3), 0)
+        blobs_mask = GaussianBlur(blobs_mask, (5, 5), 0)
+        imwrite('debug.tif', blobs_mask)
 
         blob_params = SimpleBlobDetector_Params()
 
@@ -83,8 +84,8 @@ class BarcodeCube:
         blob_params.minDistBetweenBlobs = 2
 
         blob_params.filterByArea = True
-        blob_params.minArea = 2
-        blob_params.maxArea = 8
+        blob_params.minArea = 1
+        blob_params.maxArea = 16
 
         blob_params.filterByCircularity = False
         blob_params.filterByConvexity = False
@@ -92,27 +93,7 @@ class BarcodeCube:
         blob_params.filterByColor = False
 
         detector = SimpleBlobDetector.create(blob_params)
-        kps1 = detector.detect(255 - blobs_mask)
-
-        blob_params.filterByColor = True
-        blob_params.blobColor = 255
-
-        detector = SimpleBlobDetector.create(blob_params)
-        kps2 = detector.detect(blobs_mask)
-
-        kps = kps1 + kps2
-        mask_layer = zeros(f_background.shape, dtype=uint8)
-
-        for key_point in kps:
-            r = int(key_point.pt[1])
-            c = int(key_point.pt[0])
-
-            mask_layer[r:(r + 2), c:(c + 2)] = 255
-
-        mask_layer = GaussianBlur(mask_layer, (3, 3), 0)
-
-        detector = SimpleBlobDetector.create(blob_params)
-        kps = detector.detect(mask_layer)
+        kps = detector.detect(255 - blobs_mask)
 
         for key_point in kps:
             r = int(key_point.pt[1])
