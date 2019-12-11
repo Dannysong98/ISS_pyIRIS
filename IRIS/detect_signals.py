@@ -693,7 +693,7 @@ def detect_blobs_Lee(f_cycle):
         #################################
         # Setup threshold of gray-scale #
         #################################
-        blob_params.minThreshold = mode(floor(reshape(img, (img.size,)) / 2) * 2)[0][0]
+        blob_params.minThreshold = mode(floor(reshape(img, (img.size,)) / 2) * 2)[0][0] + 10
         #################################
 
         blob_params.blobColor = 0
