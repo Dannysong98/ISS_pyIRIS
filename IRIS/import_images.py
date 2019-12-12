@@ -260,10 +260,10 @@ def decode_data_Lee(f_cycles):
         ##############################################
         # Read five channels of FISSEQ into a matrix #
         ##############################################
-        channel_A = imread('/'.join((f_cycles[cycle_id], 'f3_T_' + cycle + '_C_00.tif')), IMREAD_GRAYSCALE)
-        channel_C = imread('/'.join((f_cycles[cycle_id], 'f3_T_' + cycle + '_C_01.tif')), IMREAD_GRAYSCALE)
-        channel_G = imread('/'.join((f_cycles[cycle_id], 'f3_T_' + cycle + '_C_02.tif')), IMREAD_GRAYSCALE)
-        channel_T = imread('/'.join((f_cycles[cycle_id], 'f3_T_' + cycle + '_C_03.tif')), IMREAD_GRAYSCALE)
+        channel_A = imread('/'.join((f_cycles[cycle_id], 'f3_T_' + cycle + '_C_03.tif')), IMREAD_GRAYSCALE)
+        channel_C = imread('/'.join((f_cycles[cycle_id], 'f3_T_' + cycle + '_C_02.tif')), IMREAD_GRAYSCALE)
+        channel_G = imread('/'.join((f_cycles[cycle_id], 'f3_T_' + cycle + '_C_01.tif')), IMREAD_GRAYSCALE)
+        channel_T = imread('/'.join((f_cycles[cycle_id], 'f3_T_' + cycle + '_C_00.tif')), IMREAD_GRAYSCALE)
         channel_0 = imread('/'.join((f_cycles[cycle_id], 'f3_T_' + cycle + '_C_04.tif')), IMREAD_GRAYSCALE)
         ##############################################
 
