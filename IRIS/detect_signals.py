@@ -587,12 +587,12 @@ def detect_blobs_Lee(f_cycle):
     greyscale_model_G = zeros(channel_G.shape, dtype=float32)
 
     #############################################################################
-    # Here, a morphological transformation, Tophat, under a 3x3 ELLIPSE kernel, #
+    # Here, a morphological transformation, Tophat, under a 15x15 ELLIPSE kernel, #
     # is used to expose blobs                                                   #
     #############################################################################
-    ksize = (15, 15)
-    kernel = getStructuringElement(MORPH_ELLIPSE, ksize)
-    channel_0 = morphologyEx(channel_0, MORPH_TOPHAT, kernel, iterations=3)
+    # ksize = (15, 15)
+    # kernel = getStructuringElement(MORPH_ELLIPSE, ksize)
+    # channel_0 = morphologyEx(channel_0, MORPH_TOPHAT, kernel, iterations=3)
     ########
 
     ###############################
