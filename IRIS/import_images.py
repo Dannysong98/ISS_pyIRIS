@@ -87,7 +87,7 @@ def decode_data_Ke(f_cycles):
             foreground = add(add(add(channel_A, channel_T), channel_C), channel_G)
             background = channel_0
 
-            f_std_img = addWeighted(foreground, 0.5, background, 0.6, 0)
+            f_std_img = addWeighted(foreground, 0.4, background, 0.6, 0)
             ########
             # f_std_img = foreground
             # f_std_img = addWeighted(foreground, 0.5, background, 0.5, 0)  # Alternative option
