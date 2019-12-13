@@ -240,10 +240,10 @@ def detect_blobs_Ke(f_cycle):
 
     diff_break = 10
 
-    cut_off_A = int(mode(around(divide(array(diff_list_A, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
-    cut_off_T = int(mode(around(divide(array(diff_list_T, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
-    cut_off_C = int(mode(around(divide(array(diff_list_C, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
-    cut_off_G = int(mode(around(divide(array(diff_list_G, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
+    cut_off_A = int(mode(around(divide(array(diff_list_A, dtype=uint8), diff_break)))[0][0]) * diff_break - diff_break
+    cut_off_T = int(mode(around(divide(array(diff_list_T, dtype=uint8), diff_break)))[0][0]) * diff_break - diff_break
+    cut_off_C = int(mode(around(divide(array(diff_list_C, dtype=uint8), diff_break)))[0][0]) * diff_break - diff_break
+    cut_off_G = int(mode(around(divide(array(diff_list_G, dtype=uint8), diff_break)))[0][0]) * diff_break - diff_break
     #########################################################################
 
     ##############################################################################################################
@@ -490,18 +490,18 @@ def detect_blobs_Eng(f_cycle):
 
     diff_break = 10
 
-    cut_off_1 = int(mode(around(divide(array(diff_list_1, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
-    cut_off_2 = int(mode(around(divide(array(diff_list_2, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
-    cut_off_3 = int(mode(around(divide(array(diff_list_3, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
-    cut_off_4 = int(mode(around(divide(array(diff_list_4, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
-    cut_off_5 = int(mode(around(divide(array(diff_list_5, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
-    cut_off_6 = int(mode(around(divide(array(diff_list_6, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
-    cut_off_7 = int(mode(around(divide(array(diff_list_7, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
-    cut_off_8 = int(mode(around(divide(array(diff_list_8, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
-    cut_off_9 = int(mode(around(divide(array(diff_list_9, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
-    cut_off_A = int(mode(around(divide(array(diff_list_A, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
-    cut_off_B = int(mode(around(divide(array(diff_list_B, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
-    cut_off_C = int(mode(around(divide(array(diff_list_C, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
+    cut_off_1 = int(mode(around(divide(array(diff_list_1, dtype=uint8), diff_break)))[0][0]) * diff_break - diff_break
+    cut_off_2 = int(mode(around(divide(array(diff_list_2, dtype=uint8), diff_break)))[0][0]) * diff_break - diff_break
+    cut_off_3 = int(mode(around(divide(array(diff_list_3, dtype=uint8), diff_break)))[0][0]) * diff_break - diff_break
+    cut_off_4 = int(mode(around(divide(array(diff_list_4, dtype=uint8), diff_break)))[0][0]) * diff_break - diff_break
+    cut_off_5 = int(mode(around(divide(array(diff_list_5, dtype=uint8), diff_break)))[0][0]) * diff_break - diff_break
+    cut_off_6 = int(mode(around(divide(array(diff_list_6, dtype=uint8), diff_break)))[0][0]) * diff_break - diff_break
+    cut_off_7 = int(mode(around(divide(array(diff_list_7, dtype=uint8), diff_break)))[0][0]) * diff_break - diff_break
+    cut_off_8 = int(mode(around(divide(array(diff_list_8, dtype=uint8), diff_break)))[0][0]) * diff_break - diff_break
+    cut_off_9 = int(mode(around(divide(array(diff_list_9, dtype=uint8), diff_break)))[0][0]) * diff_break - diff_break
+    cut_off_A = int(mode(around(divide(array(diff_list_A, dtype=uint8), diff_break)))[0][0]) * diff_break - diff_break
+    cut_off_B = int(mode(around(divide(array(diff_list_B, dtype=uint8), diff_break)))[0][0]) * diff_break - diff_break
+    cut_off_C = int(mode(around(divide(array(diff_list_C, dtype=uint8), diff_break)))[0][0]) * diff_break - diff_break
 
     for key_point in kps:
         r = int(key_point.pt[1])
@@ -738,10 +738,10 @@ def detect_blobs_Lee(f_cycle):
 
     diff_break = 10
 
-    cut_off_A = int(mode(around(divide(array(diff_list_A, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
-    cut_off_T = int(mode(around(divide(array(diff_list_T, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
-    cut_off_C = int(mode(around(divide(array(diff_list_C, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
-    cut_off_G = int(mode(around(divide(array(diff_list_G, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
+    cut_off_A = int(mode(around(divide(array(diff_list_A, dtype=uint8), diff_break)))[0][0]) * diff_break - diff_break
+    cut_off_T = int(mode(around(divide(array(diff_list_T, dtype=uint8), diff_break)))[0][0]) * diff_break - diff_break
+    cut_off_C = int(mode(around(divide(array(diff_list_C, dtype=uint8), diff_break)))[0][0]) * diff_break - diff_break
+    cut_off_G = int(mode(around(divide(array(diff_list_G, dtype=uint8), diff_break)))[0][0]) * diff_break - diff_break
     #########################################################################
 
     ##############################################################################################################
@@ -927,7 +927,7 @@ def detect_blobs_Chen(f_cycle):
 
     diff_break = 10
 
-    cut_off_0 = int(mode(around(divide(array(diff_list_0, dtype=uint8), diff_break)))[0][0]) - diff_break / 2
+    cut_off_0 = int(mode(around(divide(array(diff_list_0, dtype=uint8), diff_break)))[0][0]) * diff_break - diff_break
     #########################################################################
 
     ##############################################################################################################
