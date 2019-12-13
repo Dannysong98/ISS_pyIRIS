@@ -143,8 +143,11 @@ def detect_blobs_Ke(f_cycle):
     # blob_params.maxArea = 145  # Alternative option
     ####################################################################################
 
-    blob_params.filterByCircularity = False
+    blob_params.filterByCircularity = True
+    blob_params.minCircularity = 0.3
+
     blob_params.filterByConvexity = True
+    blob_params.minConvexity = 0.1
 
     blob_params.filterByColor = True
     ##########################################################
@@ -240,10 +243,10 @@ def detect_blobs_Ke(f_cycle):
 
     diff_bk = 10
 
-    cut_off_A = int(mode(around(divide(array(diff_list_A, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk * 2
-    cut_off_T = int(mode(around(divide(array(diff_list_T, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk * 2
-    cut_off_C = int(mode(around(divide(array(diff_list_C, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk * 2
-    cut_off_G = int(mode(around(divide(array(diff_list_G, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk * 2
+    cut_off_A = int(mode(around(divide(array(diff_list_A, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk
+    cut_off_T = int(mode(around(divide(array(diff_list_T, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk
+    cut_off_C = int(mode(around(divide(array(diff_list_C, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk
+    cut_off_G = int(mode(around(divide(array(diff_list_G, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk
     #########################################################################
 
     ##############################################################################################################
@@ -389,8 +392,11 @@ def detect_blobs_Eng(f_cycle):
     ########
     # blob_params.maxArea = 100  # Alternative option
 
-    blob_params.filterByCircularity = False
-    blob_params.filterByConvexity = False
+    blob_params.filterByCircularity = True
+    blob_params.minCircularity = 0.3
+
+    blob_params.filterByConvexity = True
+    blob_params.minConvexity = 0.1
 
     blob_params.filterByColor = True
 
@@ -490,18 +496,18 @@ def detect_blobs_Eng(f_cycle):
 
     diff_bk = 10
 
-    cut_off_1 = int(mode(around(divide(array(diff_list_1, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk * 2
-    cut_off_2 = int(mode(around(divide(array(diff_list_2, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk * 2
-    cut_off_3 = int(mode(around(divide(array(diff_list_3, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk * 2
-    cut_off_4 = int(mode(around(divide(array(diff_list_4, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk * 2
-    cut_off_5 = int(mode(around(divide(array(diff_list_5, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk * 2
-    cut_off_6 = int(mode(around(divide(array(diff_list_6, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk * 2
-    cut_off_7 = int(mode(around(divide(array(diff_list_7, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk * 2
-    cut_off_8 = int(mode(around(divide(array(diff_list_8, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk * 2
-    cut_off_9 = int(mode(around(divide(array(diff_list_9, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk * 2
-    cut_off_A = int(mode(around(divide(array(diff_list_A, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk * 2
-    cut_off_B = int(mode(around(divide(array(diff_list_B, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk * 2
-    cut_off_C = int(mode(around(divide(array(diff_list_C, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk * 2
+    cut_off_1 = int(mode(around(divide(array(diff_list_1, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk
+    cut_off_2 = int(mode(around(divide(array(diff_list_2, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk
+    cut_off_3 = int(mode(around(divide(array(diff_list_3, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk
+    cut_off_4 = int(mode(around(divide(array(diff_list_4, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk
+    cut_off_5 = int(mode(around(divide(array(diff_list_5, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk
+    cut_off_6 = int(mode(around(divide(array(diff_list_6, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk
+    cut_off_7 = int(mode(around(divide(array(diff_list_7, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk
+    cut_off_8 = int(mode(around(divide(array(diff_list_8, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk
+    cut_off_9 = int(mode(around(divide(array(diff_list_9, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk
+    cut_off_A = int(mode(around(divide(array(diff_list_A, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk
+    cut_off_B = int(mode(around(divide(array(diff_list_B, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk
+    cut_off_C = int(mode(around(divide(array(diff_list_C, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk
 
     for key_point in kps:
         r = int(key_point.pt[1])
@@ -652,8 +658,11 @@ def detect_blobs_Lee(f_cycle):
     # blob_params.maxArea = 145  # Alternative option
     ####################################################################################
 
-    blob_params.filterByCircularity = False
-    blob_params.filterByConvexity = False
+    blob_params.filterByCircularity = True
+    blob_params.minCircularity = 0.3
+
+    blob_params.filterByConvexity = True
+    blob_params.minConvexity = 0.1
 
     blob_params.filterByColor = True
     ##########################################################
@@ -738,10 +747,10 @@ def detect_blobs_Lee(f_cycle):
 
     diff_bk = 10
 
-    cut_off_A = int(mode(around(divide(array(diff_list_A, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk * 2
-    cut_off_T = int(mode(around(divide(array(diff_list_T, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk * 2
-    cut_off_C = int(mode(around(divide(array(diff_list_C, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk * 2
-    cut_off_G = int(mode(around(divide(array(diff_list_G, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk * 2
+    cut_off_A = int(mode(around(divide(array(diff_list_A, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk
+    cut_off_T = int(mode(around(divide(array(diff_list_T, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk
+    cut_off_C = int(mode(around(divide(array(diff_list_C, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk
+    cut_off_G = int(mode(around(divide(array(diff_list_G, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk
     #########################################################################
 
     ##############################################################################################################
@@ -854,10 +863,10 @@ def detect_blobs_Chen(f_cycle):
     ####################################################################################
 
     blob_params.filterByCircularity = True
-    blob_params.minCircularity = 0.75
+    blob_params.minCircularity = 0.3
 
     blob_params.filterByConvexity = True
-    blob_params.minConvexity = 0.3
+    blob_params.minConvexity = 0.1
 
     blob_params.filterByColor = True
     ##########################################################
@@ -927,7 +936,7 @@ def detect_blobs_Chen(f_cycle):
 
     diff_bk = 10
 
-    cut_off_0 = int(mode(around(divide(array(diff_list_0, dtype=uint8), diff_bk)))[0][0]) * diff_bk - diff_bk * 2
+    cut_off_0 = int(mode(around(divide(array(diff_list_0, dtype=uint8), diff_bk)))[0][0]) * diff_bk - diff_bk
     #########################################################################
 
     ##############################################################################################################
