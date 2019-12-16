@@ -121,7 +121,7 @@ def detect_blobs_Ke(f_cycle):
     # blob_params.thresholdStep = 3  # Alternative option
     # blob_params.minRepeatability = 3  # Alternative option
 
-    blob_params.minDistBetweenBlobs = 2
+    blob_params.minDistBetweenBlobs = 3
 
     ####################################################################################
     # This parameter is used for filtering those extremely large blobs, which likely   #
@@ -325,21 +325,21 @@ def detect_blobs_Eng(f_cycle):
     greyscale_model_B = zeros(channel_B.shape, dtype=float32)
     greyscale_model_C = zeros(channel_C.shape, dtype=float32)
 
-    # ksize = (3, 3)
-    # kernel = getStructuringElement(MORPH_ELLIPSE, ksize)
-    #
-    # channel_1 = morphologyEx(channel_1, MORPH_TOPHAT, kernel)
-    # channel_2 = morphologyEx(channel_2, MORPH_TOPHAT, kernel)
-    # channel_3 = morphologyEx(channel_3, MORPH_TOPHAT, kernel)
-    # channel_4 = morphologyEx(channel_4, MORPH_TOPHAT, kernel)
-    # channel_5 = morphologyEx(channel_5, MORPH_TOPHAT, kernel)
-    # channel_6 = morphologyEx(channel_6, MORPH_TOPHAT, kernel)
-    # channel_7 = morphologyEx(channel_7, MORPH_TOPHAT, kernel)
-    # channel_8 = morphologyEx(channel_8, MORPH_TOPHAT, kernel)
-    # channel_9 = morphologyEx(channel_9, MORPH_TOPHAT, kernel)
-    # channel_A = morphologyEx(channel_A, MORPH_TOPHAT, kernel)
-    # channel_B = morphologyEx(channel_B, MORPH_TOPHAT, kernel)
-    # channel_C = morphologyEx(channel_C, MORPH_TOPHAT, kernel)
+    ksize = (3, 3)
+    kernel = getStructuringElement(MORPH_ELLIPSE, ksize)
+
+    channel_1 = morphologyEx(channel_1, MORPH_TOPHAT, kernel)
+    channel_2 = morphologyEx(channel_2, MORPH_TOPHAT, kernel)
+    channel_3 = morphologyEx(channel_3, MORPH_TOPHAT, kernel)
+    channel_4 = morphologyEx(channel_4, MORPH_TOPHAT, kernel)
+    channel_5 = morphologyEx(channel_5, MORPH_TOPHAT, kernel)
+    channel_6 = morphologyEx(channel_6, MORPH_TOPHAT, kernel)
+    channel_7 = morphologyEx(channel_7, MORPH_TOPHAT, kernel)
+    channel_8 = morphologyEx(channel_8, MORPH_TOPHAT, kernel)
+    channel_9 = morphologyEx(channel_9, MORPH_TOPHAT, kernel)
+    channel_A = morphologyEx(channel_A, MORPH_TOPHAT, kernel)
+    channel_B = morphologyEx(channel_B, MORPH_TOPHAT, kernel)
+    channel_C = morphologyEx(channel_C, MORPH_TOPHAT, kernel)
     ########
 
     ###############################
