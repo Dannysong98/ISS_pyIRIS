@@ -61,7 +61,8 @@ and the 2nd one means gene info. **DON'T INSERT ANY SPACE CHARACTER INTO GENE IN
     TGAC    HER2
     CTGA    VIM
 
-You could also predefine color and shape for each gene/barcode in the file. Shape index can be set according to https://www.datanovia.com/en/blog/ggplot-point-shapes-best-tips/
+You could also predefine color and shape for each gene/barcode in the file at column 3 and 4, respectively. Shape 
+index can be set according to https://www.datanovia.com/en/blog/ggplot-point-shapes-best-tips/
 
     AACA    SOX2    red     0
     AGTC    BIRC5   orange  0
