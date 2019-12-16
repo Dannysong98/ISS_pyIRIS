@@ -61,6 +61,20 @@ and the 2nd one means gene info. **DON'T INSERT ANY SPACE CHARACTER INTO GENE IN
     TGAC    HER2
     CTGA    VIM
 
+You could also predefine color and shape for each gene/barcode in the file. Shape index can be set according to https://www.datanovia.com/en/blog/ggplot-point-shapes-best-tips/
+
+    AACA    SOX2    red     0
+    AGTC    BIRC5   orange  0
+    GTCA    SCUBE2  yellow  0
+    AACT    KLF4    green   0
+    AGCT    CCNB1   cyan    0
+    GCAT    ACTB    blue    0
+    AACG    TP53    purple  0
+    ACTG    MYBL2   red     1
+    GCTA    GAPDH   orange  1
+    TGAC    HER2    yellow  1
+    CTGA    VIM     green   1
+
 ### The format of result files of pyIRIS
 
 See 'README.1.pyIRIS.md' for detail.
