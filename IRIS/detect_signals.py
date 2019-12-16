@@ -235,7 +235,7 @@ def detect_blobs_Ke(f_cycle):
         if diff_G >= 1:
             diff_list_G.append(int(around(diff_G)))
 
-    diff_bk = 10
+    diff_bk = 5
 
     cut_off_A = int(mode(multiply(around(divide(asarray(diff_list_A, dtype=uint8), diff_bk)), diff_bk))[0][0])
     cut_off_T = int(mode(multiply(around(divide(asarray(diff_list_T, dtype=uint8), diff_bk)), diff_bk))[0][0])
