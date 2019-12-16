@@ -4,10 +4,10 @@ username:
 account: yuhao819
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
-appId: 1602640
-bundleId: 2670966
+appId: 1602684
+bundleId: 2671016
 url: https://yuhao819.shinyapps.io/DAIBC/
-when: 1576476616.99821
+when: 1576478956.93118
 asMultiple: FALSE
 asStatic: FALSE
 ignoredFiles: LICENSE|pyIRIS.py|README.1.pyIRIS.md|README.2.DAIBC.md|README.md|tool.stitch_images.py|utils/assign_shape_color.py|utils/extract_blob.py|utils/pixel_num.calculation.py|utils/refine_foreground.py|IRIS|misc

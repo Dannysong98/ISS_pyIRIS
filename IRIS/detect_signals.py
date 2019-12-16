@@ -26,7 +26,7 @@ from cv2 import (getStructuringElement, morphologyEx, GaussianBlur, convertScale
 # from cv2 import (Laplacian,
 #                  CV_32F)
 ######################
-from numpy import (array, zeros, ones, reshape, sum, divide, floor, around, abs, max, int, float32, uint8, bool_, fft)
+from numpy import (array, zeros, ones, sum, divide, around, abs, max, int, float32, uint8, bool_, fft)
 from scipy.stats import mode
 
 from .call_bases import (image_model_pooling_Ke, image_model_pooling_Eng, image_model_pooling_Chen, pool2base)
@@ -113,6 +113,8 @@ def detect_blobs_Ke(f_cycle):
     ##########################################################
     blob_params = SimpleBlobDetector_Params()
 
+    blob_params.minThreshold = 5
+
     blob_params.thresholdStep = 2
     blob_params.minRepeatability = 2
     ########
@@ -153,19 +155,11 @@ def detect_blobs_Ke(f_cycle):
     ##########################################################
 
     for img in channel_list:
-        #################################
-        # Setup threshold of gray-scale #
-        #################################
-        blob_params.minThreshold = mode(floor(reshape(img, (img.size,)) / 2) * 2)[0][0]
-        #################################
-
         blob_params.blobColor = 0
-
         mor_detector = SimpleBlobDetector.create(blob_params)
         mor_kps1.extend(mor_detector.detect(255 - img))
 
         blob_params.blobColor = 255
-
         mor_detector = SimpleBlobDetector.create(blob_params)
         mor_kps2.extend(mor_detector.detect(img))
 
@@ -243,10 +237,11 @@ def detect_blobs_Ke(f_cycle):
 
     diff_bk = 10
 
-    cut_off_A = int(mode(around(divide(array(diff_list_A, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk * 2
-    cut_off_T = int(mode(around(divide(array(diff_list_T, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk * 2
-    cut_off_C = int(mode(around(divide(array(diff_list_C, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk * 2
-    cut_off_G = int(mode(around(divide(array(diff_list_G, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk * 2
+    cut_off_A = int(mode(around(divide(array(diff_list_A, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk / 2
+    cut_off_T = int(mode(around(divide(array(diff_list_T, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk / 2
+    cut_off_C = int(mode(around(divide(array(diff_list_C, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk / 2
+    cut_off_G = int(mode(around(divide(array(diff_list_G, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk / 2
+    print(cut_off_A, cut_off_T, cut_off_C, cut_off_G)
     #########################################################################
 
     ###################################################################################################
@@ -374,6 +369,8 @@ def detect_blobs_Eng(f_cycle):
 
     blob_params = SimpleBlobDetector_Params()
 
+    blob_params.minThreshold = 5
+
     blob_params.thresholdStep = 2
     blob_params.minRepeatability = 2
     ########
@@ -401,15 +398,11 @@ def detect_blobs_Eng(f_cycle):
     blob_params.filterByColor = True
 
     for img in channel_list:
-        blob_params.minThreshold = mode(floor(reshape(img, (img.size,)) / 2) * 2)[0][0]
-
         blob_params.blobColor = 0
-
         mor_detector = SimpleBlobDetector.create(blob_params)
-        mor_kps1.extend(mor_detector.detect(img))
+        mor_kps1.extend(mor_detector.detect(255 - img))
 
         blob_params.blobColor = 255
-
         mor_detector = SimpleBlobDetector.create(blob_params)
         mor_kps2.extend(mor_detector.detect(img))
 
@@ -628,6 +621,8 @@ def detect_blobs_Lee(f_cycle):
     ##########################################################
     blob_params = SimpleBlobDetector_Params()
 
+    blob_params.minThreshold = 5
+
     blob_params.thresholdStep = 2
     blob_params.minRepeatability = 2
     ########
@@ -668,19 +663,11 @@ def detect_blobs_Lee(f_cycle):
     ##########################################################
 
     for img in channel_list:
-        #################################
-        # Setup threshold of gray-scale #
-        #################################
-        blob_params.minThreshold = mode(floor(reshape(img, (img.size,)) / 2) * 2)[0][0]
-        #################################
-
         blob_params.blobColor = 0
-
         mor_detector = SimpleBlobDetector.create(blob_params)
         mor_kps1.extend(mor_detector.detect(255 - img))
 
         blob_params.blobColor = 255
-
         mor_detector = SimpleBlobDetector.create(blob_params)
         mor_kps2.extend(mor_detector.detect(img))
 
@@ -838,6 +825,8 @@ def detect_blobs_Chen(f_cycle):
     ##########################################################
     blob_params = SimpleBlobDetector_Params()
 
+    blob_params.minThreshold = 5
+
     blob_params.thresholdStep = 4
     blob_params.minRepeatability = 2
     ########
@@ -872,19 +861,11 @@ def detect_blobs_Chen(f_cycle):
     ##########################################################
 
     for img in channel_list:
-        #################################
-        # Setup threshold of gray-scale #
-        #################################
-        blob_params.minThreshold = mode(floor(reshape(img, (img.size,)) / 2) * 2)[0][0]
-        #################################
-
         blob_params.blobColor = 0
-
         mor_detector = SimpleBlobDetector.create(blob_params)
         mor_kps1.extend(mor_detector.detect(255 - img))
 
         blob_params.blobColor = 255
-
         mor_detector = SimpleBlobDetector.create(blob_params)
         mor_kps2.extend(mor_detector.detect(img))
 

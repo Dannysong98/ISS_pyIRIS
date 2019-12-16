@@ -30,5 +30,10 @@ def merge_foreground_Ke(f_cycles, f_brightness=None):
 
 
 if __name__ == '__main__':
-    fg = merge_foreground_Ke(argv[1], argv[2])
+    try:
+        fg = merge_foreground_Ke(argv[1], argv[2])
+
+    except IndexError:
+        fg = merge_foreground_Ke(argv[1])
+
     imwrite('background.new.tif', fg)
