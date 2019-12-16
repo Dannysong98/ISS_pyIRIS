@@ -163,7 +163,7 @@ def detect_blobs_Ke(f_cycle):
         mor_detector = SimpleBlobDetector.create(blob_params)
         mor_kps2.extend(mor_detector.detect(img))
 
-    mor_kps = mor_kps1 + mor_kps2
+    mor_kps = set(mor_kps1 + mor_kps2)
 
     #################################################################################
     # To map all the detected blobs into a new mask layer for redundancy filtering, #
@@ -406,7 +406,7 @@ def detect_blobs_Eng(f_cycle):
         mor_detector = SimpleBlobDetector.create(blob_params)
         mor_kps2.extend(mor_detector.detect(img))
 
-    mor_kps = mor_kps1 + mor_kps2
+    mor_kps = set(mor_kps1 + mor_kps2)
 
     mask_layer = zeros(channel_1.shape, dtype=uint8)
 
@@ -671,7 +671,7 @@ def detect_blobs_Lee(f_cycle):
         mor_detector = SimpleBlobDetector.create(blob_params)
         mor_kps2.extend(mor_detector.detect(img))
 
-    mor_kps = mor_kps1 + mor_kps2
+    mor_kps = set(mor_kps1 + mor_kps2)
 
     #################################################################################
     # To map all the detected blobs into a new mask layer for redundancy filtering, #
@@ -869,7 +869,7 @@ def detect_blobs_Chen(f_cycle):
         mor_detector = SimpleBlobDetector.create(blob_params)
         mor_kps2.extend(mor_detector.detect(img))
 
-    mor_kps = mor_kps1 + mor_kps2
+    mor_kps = set(mor_kps1 + mor_kps2)
 
     #################################################################################
     # To map all the detected blobs into a new mask layer for redundancy filtering, #
