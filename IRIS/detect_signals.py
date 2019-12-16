@@ -211,7 +211,7 @@ def detect_blobs_Ke(f_cycle):
         r = int(key_point.pt[1])
         c = int(key_point.pt[0])
 
-        diff_A = sum(channel_A[(r - 1):(r + 3), (c - 1):(c + 3)]) / 16 - \
+        diff_A = sum(channel_A[(r - 4):(r + 6), (c - 4):(c + 6)]) / 16 - \
                  sum(channel_A[(r - 4):(r + 6), (c - 4):(c + 6)]) / 100
 
         diff_T = sum(channel_T[(r - 1):(r + 3), (c - 1):(c + 3)]) / 16 - \
