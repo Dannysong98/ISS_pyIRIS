@@ -1,5 +1,5 @@
 ## DESCIRPTION ##
-#   This Web App is used to visualize the result of ISS Base Calling
+#   This Web App is used to visualize the result of IRIS
 #################
 
 ## AUTHOR ##
@@ -130,22 +130,27 @@ server <- function(input, output, session) {
                     bgImgFile <- input$ifile$datapath
         
                     if (is.null(barcodeInfoFile)) {barcodeInfoFile <- 'example/barcode_info.txt'}
-                        
+                    
+                    # read barcode information
                     barcodeInfo <- read.table(barcodeInfoFile, sep='\t', comment.char='', quote='')
                     barcodeInfo <- barcodeInfo[order(barcodeInfo[, 1]),]
                     col_number = ncol(barcodeInfo)
+                    
+                    # store information of designed barcodes and their corresponding gene name, predefined color, shape
                     if(col_number == 2){
                         barcodeInfo <- cbind(barcodeInfo, '')
                         barcodeInfo <- cbind(barcodeInfo, 16)
                     }
                     barcodeInfo <- cbind(barcodeInfo, 0)
                     rownames(barcodeInfo) <- barcodeInfo[, 1]
+                    
                     colnames(barcodeInfo) = c('Barcode', 'Gene Name', 'Color', 'Shape', 'Called Number')
                     
                     barcodeHash <- hash(keys=barcodeInfo$Barcode, values=barcodeInfo$Shape)
                     
                     if (is.null(baseCallingDataFile)) {baseCallingDataFile <- 'example/basecalling_data.txt'}
                     
+                    # read IRIS called result
                     baseCallingData <- read.table(baseCallingDataFile, sep='\t', comment.char='', quote='')
                     baseCallingData <- baseCallingData[grep('N', baseCallingData[, 2], invert=TRUE),]
                     baseCallingData <- baseCallingData[grep('!', baseCallingData[, 3], invert=TRUE),]
@@ -160,6 +165,7 @@ server <- function(input, output, session) {
                     
                     if (is.null(bgImgFile)) {bgImgFile <- 'example/bg_img.tif'}
                     
+                    # read background image
                     bgImg <- readTIFF(bgImgFile, as.is=TRUE)
                     max_row <- dim(bgImg)[1]
                     max_col <- dim(bgImg)[2]
@@ -168,7 +174,9 @@ server <- function(input, output, session) {
 
                     baseCallingData$Row <- max_row - baseCallingData$Row
                     
+                    # set default shape 
                     shapeVec <- rep(16, nrow(baseCallingData))
+                    # set shape according to barcode information file if there's any
                     if(col_number == 4){
                         shapeVec = apply(baseCallingData, 1, function(x){
                             if(sum(barcodeInfo$Barcode == x[2]) == 0){
@@ -183,6 +191,7 @@ server <- function(input, output, session) {
                     baseCallingData = cbind(baseCallingData, shapeVec)
                     colnames(baseCallingData)[6] = 'Shape'
                     
+                    # store gene name information in IRIS output
                     combination = paste(baseCallingData$Barcode, baseCallingData$Shape, sep = '-')
                     geneName = as.character(apply(baseCallingData, 1, function(x){
                         if(sum(barcodeInfo$Barcode == x[2]) == 0){
@@ -193,7 +202,8 @@ server <- function(input, output, session) {
                         }
                     }))
                     baseCallingData = cbind(baseCallingData, combination, geneName)
-                        
+                    
+                    # plot background image with ggplot
                     img <- ggplot() +
                         annotation_custom(bgImg, xmin=0, xmax=max_col, ymin=0, ymax=max_row) + 
                         scale_x_continuous(limits=c(0, max_col)) + scale_y_continuous(limits=c(0, max_row)) + 
@@ -204,12 +214,14 @@ server <- function(input, output, session) {
                               legend.position='right'
                         )
                     
+                    # count barcode number
                     barcodeNum <- hash(keys=baseCallingData[!duplicated(baseCallingData[, 2]), 2], 
                                        values=table(unlist(matrix(baseCallingData[, 2])))
                     )
                     
                     for (k in barcodeInfo[, 1]) {if(has.key(k, barcodeNum)) {barcodeInfo[k, 5] <- barcodeNum[[k]]}}
                     
+                    # set random color to each barcode/gene, or set color according to the predefined barcode information 
                     if(col_number == 2){
                         color_list <- as.data.frame(col2rgb(colors()[seq(657, 1, -3)]))
                         color_list <- rgb(color_list[1,] / 255, color_list[2,] / 255, color_list[3,] / 255)
@@ -220,6 +232,8 @@ server <- function(input, output, session) {
                         color_list <- rgb(color_list[1,] / 255, color_list[2,] / 255, color_list[3,] / 255)
                         shape_list <- barcodeInfo$Shape
                     }
+                     
+                    # visualize table in DAIBC
                     output$binfo <- renderDataTable(
                         {
                             dt <- DT::datatable(barcodeInfo,
@@ -261,6 +275,7 @@ server <- function(input, output, session) {
                                 used_data$Barcode = factor(used_data$Barcode, levels = barcodeInfo[sort(r), 2])
                                 used_data$geneName = factor(used_data$geneName, levels = unique(used_data$geneName[order(f_barcode)]))
                                 
+                                # plot called blobs
                                 img <- img + 
                                     geom_point(aes(x=Column, y=Row, color=geneName, shape=geneName),
                                                data=used_data, 

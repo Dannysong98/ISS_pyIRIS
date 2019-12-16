@@ -3,7 +3,7 @@
 This class is used to detect fluorescence signal in each channel.
 
 Usually, chemical reaction or taking photo in local region will trigger the generating of different quality
-fluorescence signal in a image, like low gray scale or indistinction between fluorescence signal and background.
+fluorescence signal in a image, such as low gray scale or indistinction between fluorescence signal and background.
 
 A Morphological transformation is called to expose a majority of high quality fluorescence signal as blobs. In this
 process, large scale transformator is used to expose dissociative fluorescence signal and small one is used to treat
@@ -104,11 +104,11 @@ def detect_blobs_Ke(f_cycle):
     # Here, some of parameters are very crucial, such as     #
     # 'thresholdStep', 'minRepeatability', 'minArea', which  #
     # could greatly affect the number of detected blobs. And #
-    # more importantly, they would need to be modified in    #
+    # more importantly, they would need to be optimized in   #
     # different experiments.                                 #
     #                                                        #
-    # We prepared some cases for the different experiments   #
-    # we met during debugging, and we look forward to        #
+    # We prepared some parameter set for the different       #
+    # experiments during debugging, and we look forward to   #
     # standardize the experiments                            #
     ##########################################################
     blob_params = SimpleBlobDetector_Params()
@@ -129,7 +129,7 @@ def detect_blobs_Ke(f_cycle):
     # blobs thus would to be filtered, lead to optics-identification failure.          #
     # A known case in our practise is the gene 'pro-corazonin-like', this is a highly  #
     # expressed gene at a small region in brain of some insects, and is usually        #
-    # detected as a low- or non-expression gene in IRIS                                #
+    # detected as a low- or non-expression gene by IRIS                                #
     ####################################################################################
     blob_params.filterByArea = True
 
@@ -194,20 +194,20 @@ def detect_blobs_Ke(f_cycle):
     kps = detector.detect(mask_layer)
     #################################################################################
 
-    #########################################################################
-    # Calculate the threshold for distinction between blobs and potential   #
-    # pseudo-blobs                                                          #
-    #                                                                       #
-    # A crucial feature of real blob is that the gray-scale of pixel        #
-    # should increase rapidly in its core region, compared with periphery   #
-    #                                                                       #
-    # The step of detection could expose a massive amount of blobs but also #
-    # include some false-positive. We calculate the difference of mean      #
-    # gray-scale between pixel in core region and periphery of each blob,   #
-    # which named as 'base score', and calculate a threshold of each        #
-    # channel. This threshold could be used to filter those false-positive  #
-    # blobs in following step                                               #
-    #########################################################################
+    ##########################################################################
+    # Calculate the threshold for distinction between blobs and potential    #
+    # pseudo-blobs                                                           #
+    #                                                                        #
+    # A crucial feature of real blob is that the gray-scale of pixel         #
+    # should increase rapidly in its core region, compared with periphery    #
+    #                                                                        #
+    # The step of detection could expose a massive amount of blobs but also  #
+    # include some false-positive. We calculate the difference of mean       #
+    # gray-scale between pixel in core region and periphery of each blob,    #
+    # which named as 'base score', and automatically determine the threshold #
+    # for each channel. This threshold could be used to filter false-positive#
+    # blobs in following step                                                #
+    ##########################################################################
     diff_list_A = []
     diff_list_T = []
     diff_list_C = []
@@ -249,9 +249,9 @@ def detect_blobs_Ke(f_cycle):
     cut_off_G = int(mode(around(divide(array(diff_list_G, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk * 2
     #########################################################################
 
-    ##############################################################################################################
-    # The coordinates of real blobs will be used to locate the difference of gary-scale among different channels #
-    ##############################################################################################################
+    ##################################################################################################
+    # The coordinates of real blobs will be used to calcuate the base score among different channels #
+    ##################################################################################################
     for key_point in kps:
         r = int(key_point.pt[1])
         c = int(key_point.pt[0])
@@ -275,7 +275,7 @@ def detect_blobs_Ke(f_cycle):
                 sum(channel_G[(r - 4):(r + 6), (c - 4):(c + 6)]) / 100 > cut_off_G:
             greyscale_model_G[r, c] = sum(channel_G[(r - 1):(r + 3), (c - 1):(c + 3)]) / 16 - \
                                       sum(channel_G[(r - 4):(r + 6), (c - 4):(c + 6)]) / 100
-    ##############################################################################################################
+    ##################################################################################################
 
     image_model_pool = image_model_pooling_Ke(greyscale_model_A,
                                               greyscale_model_T,

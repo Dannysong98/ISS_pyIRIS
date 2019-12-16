@@ -6,7 +6,7 @@
 
 ## Introduction
 
-This software is used to analyze the results of pyIRIS by importing barcode info file and the two result files of 
+This software is used to visualize the results of pyIRIS by importing barcode info file and the two result files of 
 pyIRIS.
 
 ---
@@ -21,7 +21,7 @@ pyIRIS.
 
 ### Installing R models
 
-We suggest to install following models, like:
+DAIBC requires the following packages:
 
 	install.packages('shiny')
 	install.packages('shinyWidgets')
@@ -36,7 +36,7 @@ We suggest to install following models, like:
 
 ### Online published version
 
-We published our DAIBC on: https://yuhao819.shinyapps.io/DAIBC/
+We publish DAIBC on: https://yuhao819.shinyapps.io/DAIBC/
 
 ### The initial user interface of DAIBC
 ![](./misc/s0.png)
@@ -46,8 +46,8 @@ We published our DAIBC on: https://yuhao819.shinyapps.io/DAIBC/
 ## The file format of imported files
 ### The format of barcode info file
 
-This file should be prepared by manual with a format like following, of which, the 1st field means barcode sequence, 
-and the 2nd one means gene info. **DON'T INSERT ANY SPACE CHARACTER INTO GENE INFO**:
+This file should be prepared manually with the 1st field indicating barcode sequence, and the 2nd one indicating its 
+gene name. **DON'T INSERT ANY SPACE CHARACTER INTO GENE INFO**:
 
     AACA    SOX2
     AGTC    BIRC5
@@ -61,6 +61,21 @@ and the 2nd one means gene info. **DON'T INSERT ANY SPACE CHARACTER INTO GENE IN
     TGAC    HER2
     CTGA    VIM
 
+You could also predefine color and shape for each gene/barcode at the 3rd and 4th columns, respectively. Shape 
+index can be set according to https://www.datanovia.com/en/blog/ggplot-point-shapes-best-tips/
+
+    AACA    SOX2    red     0
+    AGTC    BIRC5   orange  0
+    GTCA    SCUBE2  yellow  0
+    AACT    KLF4    green   0
+    AGCT    CCNB1   cyan    0
+    GCAT    ACTB    blue    0
+    AACG    TP53    purple  0
+    ACTG    MYBL2   red     1
+    GCTA    GAPDH   orange  1
+    TGAC    HER2    yellow  1
+    CTGA    VIM     green   1
+
 ### The format of result files of pyIRIS
 
 See 'README.1.pyIRIS.md' for detail.
@@ -72,9 +87,9 @@ See 'README.1.pyIRIS.md' for detail.
 
 ![](./misc/s1.png)
 
-* Your need re-click the button of 'PARSE IMPORTED DATA' if any of input file has been updated
+* Your need click the button 'PARSE IMPORTED DATA' again to refresh the plot if any of input file is changed
 
-### 2. Choose barcodes which need to be imaged
+### 2. Choose barcodes which need to be visualized
 
 ![](./misc/s2.png)
 
@@ -82,18 +97,18 @@ See 'README.1.pyIRIS.md' for detail.
 
 ![](./misc/s3.png)
 
-* In control region:
-    * 'Quality Threshold' based on Phred+ 33 score system, of which, value 53 means Q20 and value 63 means Q30
-    * 'Scatter Size' means how large a blob is, of which, value 2 means the radius of blob is 2 pixels
-    * 'Scatter Luminance' means transparency of blob
+* In control panel:
+    * 'Quality Threshold' is based on Phred+ 33 score system. For example, value 53 means Q20 and value 63 means Q30
+    * 'Scatter Size' means how large a blob is plotted. The value indicates the radius of each blob
+    * 'Scatter Luminance' means transparency of the blobs
 
 ### 3.2. Calculate the density of scatter of blobs (optional)
 
 ![](./misc/s4.png)
 
-* In control region:
-    * 'Window Length' means how many pixels in a tile
-    * 'Minimum Scatter Number' means the floor of visibility of a tile
+* In control panel:
+    * 'Window Length' means the window size of each tile
+    * 'Minimum Scatter Number' means the minimum number of transcripts used in visibilizing a tile
     
 ### 4. Export illustration into a PDF file
 
