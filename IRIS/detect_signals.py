@@ -249,9 +249,9 @@ def detect_blobs_Ke(f_cycle):
     cut_off_G = int(mode(around(divide(array(diff_list_G, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk * 2
     #########################################################################
 
-    ##################################################################################################
-    # The coordinates of real blobs will be used to calcuate the base score among different channels #
-    ##################################################################################################
+    ###################################################################################################
+    # The coordinates of real blobs will be used to calculate the base score among different channels #
+    ###################################################################################################
     for key_point in kps:
         r = int(key_point.pt[1])
         c = int(key_point.pt[0])
