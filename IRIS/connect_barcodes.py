@@ -18,8 +18,8 @@ from numpy import (sqrt, zeros, uint8)
 class BarcodeCube:
     def __init__(self):
         """
-        This method will initialize three members, '__all_blobs_list' store all blobs' id, 'bases_cube' is
-        a list stores the dictionary of bases in each cycle, and 'adjusted_bases_cube' is a list stores
+        This method will initialize three members. '__all_blobs_list' stores all blobs' id; 'bases_cube' is
+        a list stored the dictionary of bases in each cycle; and 'adjusted_bases_cube' is a list stored
         the dictionary of bases in each cycle, with error rate adjusted.
         """
         self.__all_blobs_list = []
@@ -27,10 +27,10 @@ class BarcodeCube:
         self.bases_cube = []
         self.adjusted_bases_cube = []
 
-        ########################################################################################################
-        # Setup search region                                                                                  #
-        # The more large you setup, the more well in TPR and correlation with RNA-Seq, but less number of blob #
-        ########################################################################################################
+        ############################################################################################################
+        # Setup search region                                                                                      #
+        # The larger you set, TPR might increase but less blobs are called because some dense blobs might collapse #
+        ############################################################################################################
         self.__search_region = 2  # 6x6
         ########
         # self.__search_region = 0  # Alternative option, 2x2
@@ -135,8 +135,8 @@ class BarcodeCube:
 
     def calling_adjust(self):
         """
-        This method is used to connect bases into barcodes, by anchoring the coordinates of blobs in reference layer,
-        and search their NxN region in each cycle.
+        This method is used to connect bases into barcodes by anchoring the coordinates of blobs in reference layer,
+        and searching their NxN region in each cycle.
 
         :return: NONE
         """
@@ -155,8 +155,8 @@ class BarcodeCube:
                 # It will search a NxN region to connect bases from each cycle in ref-coordinates                #
                 #                                                                                                #
                 # Process of registration almost align all location of cycles the same, but at pixel level, this #
-                # registration is not accurate enough. Here, we choose a simple approach to solve this problem,  #
-                # we get locations of blobs from a reference image layer, then to search a NxN (6x6 by default)  #
+                # registration is not accurate enough. Here, we choose a simple approach to solve this problem.  #
+                # We get locations of blobs from a reference image layer, then to search a NxN (6x6 by default)  #
                 # region in those cycles that need to be connected. This approach should not only solve this     #
                 # problem but also bring few false positive in output                                            #
                 ##################################################################################################
@@ -169,10 +169,7 @@ class BarcodeCube:
 
                             ##############################################################
                             # Adjust of error rate of each coordinate by the Pythagorean #
-                            # theorem. This function can be off if no need               #
-                            #
-                            # If the search region is so large you set, we suggest you   #
-                            # to adjust the error rate based on Pythagorean theorem      #
+                            # theorem. This function can be off if not needed            #
                             ##############################################################
                             D = sqrt((row - r) ** 2 + (col - c) ** 2)
                             adj_err_rate = sqrt(((error_rate * D) ** 2) + (error_rate ** 2))
