@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """
-This module is used to register images which contained in pixel-matrix.
+This module is used to register images which are stored in pixel-matrix.
 
 The process of registration can be split into 3 steps:
 1) Detect raw key points.
-2) Filter out bad matched key point pairs and keep the good ones.
+2) Filter out matched key point pair outliers and keep the good ones.
 3) Compute transform matrix used in images registration between different cycles.
 
 Here, we used two algorithms for key points detecting: BRISK (S Leutenegger. et al., IEEE, 2011) and
-ORB (E Rublee. et al., Citeseer, 2011). The bad matched key points would be marked, and be filtered subsequently to
+ORB (E Rublee. et al., Citeseer, 2011). The matched key points outliers would be marked and filtered to
 ensure the accuracy in transform matrix calculation
 
-Transform matrices will be used to transform images by rigid registration. It means there are only translation
+Transform matrices will be used to transform images by rigid registration. This means that there are only translation
 and rotation between images but no zooming and retortion.
 """
 
@@ -34,15 +34,15 @@ from numpy import (array, zeros, mean, float32, bool_, fft, abs, max)
 
 def register_cycles(reference_cycle, transform_cycle, detection_method=None):
     """
-    For computing the transform matrix between reference image and transform image.
+    For computing the transform matrix between reference image and the image to be registered.
 
-    Input reference image, transform image and one of the algorithms of detector.
+    Input reference image, image to be registered and one of the algorithms of detector.
     Returning transform matrix.
 
     :param reference_cycle: Image reference that will be used to register other images.
     :param transform_cycle: Images will be registered.
-    :param detection_method: The detection algorithm of feature points.
-    :return f_key_points, f_descriptions: A transformation matrix from transformed image to reference.
+    :param detection_method: The algorithm for key points detection.
+    :return f_key_points, f_descriptions: A transformation matrix from image to be registered to reference.
     """
     def __lpf(f_img):
         """
@@ -66,16 +66,16 @@ def register_cycles(reference_cycle, transform_cycle, detection_method=None):
         """
         For detecting the key points and their descriptions by BRISK or ORB.
 
-        Here, we employed morphology transforming to pre-process image for exposing the key points
-        (by a 3x3 Gaussian blur), under a kernel of 15x15. A BRISK or ORB detector used to scan the image for locating
-        key points, and computed their descriptions.
+        Here, we employed LPF to pre-process image for exposing the key points.
+        A BRISK or ORB detector used to scan the image for detecting key points
+        and computing their descriptions.
 
         Input a gray scale image and one of the algorithms of detector.
         Returning key points and their descriptions.
 
         :param f_gray_image: The 8-bit image.
-        :param method: The detection algorithm of key points.
-        :return: A tuple including a group of key points and their descriptions.
+        :param method: The algorithm for key points detection.
+        :return: A tuple including key points and their descriptions.
         """
         #################################################################
         # Low-pass filter in frequency domain of Fourier transformation #
