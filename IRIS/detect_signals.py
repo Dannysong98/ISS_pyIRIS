@@ -113,7 +113,7 @@ def detect_blobs_Ke(f_cycle):
     ##########################################################
     blob_params = SimpleBlobDetector_Params()
 
-    blob_params.minThreshold = 10
+    blob_params.minThreshold = 5
 
     blob_params.thresholdStep = 2
     blob_params.minRepeatability = 2
@@ -223,24 +223,25 @@ def detect_blobs_Ke(f_cycle):
         diff_G = sum(channel_G[(r - 1):(r + 3), (c - 1):(c + 3)]) / 16 - \
                  sum(channel_G[(r - 4):(r + 6), (c - 4):(c + 6)]) / 100
 
-        if diff_A > 0:
+        if diff_A >= 1:
             diff_list_A.append(int(around(diff_A)))
 
-        if diff_T > 0:
+        if diff_T >= 1:
             diff_list_T.append(int(around(diff_T)))
 
-        if diff_C > 0:
+        if diff_C >= 1:
             diff_list_C.append(int(around(diff_C)))
 
-        if diff_G > 0:
+        if diff_G >= 1:
             diff_list_G.append(int(around(diff_G)))
 
     diff_bk = 10
 
-    cut_off_A = int(mode(multiply(around(divide(asarray(diff_list_A, dtype=uint8), diff_bk)), diff_bk))[0][0]) - diff_bk
-    cut_off_T = int(mode(multiply(around(divide(asarray(diff_list_T, dtype=uint8), diff_bk)), diff_bk))[0][0]) - diff_bk
-    cut_off_C = int(mode(multiply(around(divide(asarray(diff_list_C, dtype=uint8), diff_bk)), diff_bk))[0][0]) - diff_bk
-    cut_off_G = int(mode(multiply(around(divide(asarray(diff_list_G, dtype=uint8), diff_bk)), diff_bk))[0][0]) - diff_bk
+    cut_off_A = int(mode(multiply(around(divide(asarray(diff_list_A, dtype=uint8), diff_bk)), diff_bk))[0][0])
+    cut_off_T = int(mode(multiply(around(divide(asarray(diff_list_T, dtype=uint8), diff_bk)), diff_bk))[0][0])
+    cut_off_C = int(mode(multiply(around(divide(asarray(diff_list_C, dtype=uint8), diff_bk)), diff_bk))[0][0])
+    cut_off_G = int(mode(multiply(around(divide(asarray(diff_list_G, dtype=uint8), diff_bk)), diff_bk))[0][0])
+
     print(cut_off_A, cut_off_T, cut_off_C, cut_off_G)
     #########################################################################
 
@@ -252,22 +253,22 @@ def detect_blobs_Ke(f_cycle):
         c = int(key_point.pt[0])
 
         if sum(channel_A[(r - 1):(r + 3), (c - 1):(c + 3)]) / 16 - \
-                sum(channel_A[(r - 4):(r + 6), (c - 4):(c + 6)]) / 100 > cut_off_A:
+                sum(channel_A[(r - 4):(r + 6), (c - 4):(c + 6)]) / 100 >= cut_off_A:
             greyscale_model_A[r, c] = sum(channel_A[(r - 1):(r + 3), (c - 1):(c + 3)]) / 16 - \
                                       sum(channel_A[(r - 4):(r + 6), (c - 4):(c + 6)]) / 100
 
         if sum(channel_T[(r - 1):(r + 3), (c - 1):(c + 3)]) / 16 - \
-                sum(channel_T[(r - 4):(r + 6), (c - 4):(c + 6)]) / 100 > cut_off_T:
+                sum(channel_T[(r - 4):(r + 6), (c - 4):(c + 6)]) / 100 >= cut_off_T:
             greyscale_model_T[r, c] = sum(channel_T[(r - 1):(r + 3), (c - 1):(c + 3)]) / 16 - \
                                       sum(channel_T[(r - 4):(r + 6), (c - 4):(c + 6)]) / 100
 
         if sum(channel_C[(r - 1):(r + 3), (c - 1):(c + 3)]) / 16 - \
-                sum(channel_C[(r - 4):(r + 6), (c - 4):(c + 6)]) / 100 > cut_off_C:
+                sum(channel_C[(r - 4):(r + 6), (c - 4):(c + 6)]) / 100 >= cut_off_C:
             greyscale_model_C[r, c] = sum(channel_C[(r - 1):(r + 3), (c - 1):(c + 3)]) / 16 - \
                                       sum(channel_C[(r - 4):(r + 6), (c - 4):(c + 6)]) / 100
 
         if sum(channel_G[(r - 1):(r + 3), (c - 1):(c + 3)]) / 16 - \
-                sum(channel_G[(r - 4):(r + 6), (c - 4):(c + 6)]) / 100 > cut_off_G:
+                sum(channel_G[(r - 4):(r + 6), (c - 4):(c + 6)]) / 100 >= cut_off_G:
             greyscale_model_G[r, c] = sum(channel_G[(r - 1):(r + 3), (c - 1):(c + 3)]) / 16 - \
                                       sum(channel_G[(r - 4):(r + 6), (c - 4):(c + 6)]) / 100
     ##################################################################################################
@@ -369,7 +370,7 @@ def detect_blobs_Eng(f_cycle):
 
     blob_params = SimpleBlobDetector_Params()
 
-    blob_params.minThreshold = 10
+    blob_params.minThreshold = 5
 
     blob_params.thresholdStep = 2
     blob_params.minRepeatability = 2
@@ -451,106 +452,118 @@ def detect_blobs_Eng(f_cycle):
         diff_B = sum(channel_B[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_B[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36
         diff_C = sum(channel_C[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_C[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36
 
-        if diff_1 > 0:
+        if diff_1 >= 1:
             diff_list_1.append(int(around(diff_1)))
 
-        if diff_2 > 0:
+        if diff_2 >= 1:
             diff_list_2.append(int(around(diff_2)))
 
-        if diff_3 > 0:
+        if diff_3 >= 1:
             diff_list_3.append(int(around(diff_3)))
 
-        if diff_4 > 0:
+        if diff_4 >= 1:
             diff_list_4.append(int(around(diff_4)))
 
-        if diff_5 > 0:
+        if diff_5 >= 1:
             diff_list_5.append(int(around(diff_5)))
 
-        if diff_6 > 0:
+        if diff_6 >= 1:
             diff_list_6.append(int(around(diff_6)))
 
-        if diff_7 > 0:
+        if diff_7 >= 1:
             diff_list_7.append(int(around(diff_7)))
 
-        if diff_8 > 0:
+        if diff_8 >= 1:
             diff_list_8.append(int(around(diff_8)))
 
-        if diff_9 > 0:
+        if diff_9 >= 1:
             diff_list_9.append(int(around(diff_9)))
 
-        if diff_A > 0:
+        if diff_A >= 1:
             diff_list_A.append(int(around(diff_A)))
 
-        if diff_B > 0:
+        if diff_B >= 1:
             diff_list_B.append(int(around(diff_B)))
 
-        if diff_C > 0:
+        if diff_C >= 1:
             diff_list_C.append(int(around(diff_C)))
 
     diff_bk = 10
 
-    cut_off_1 = int(mode(multiply(around(divide(asarray(diff_list_1, dtype=uint8), diff_bk)), diff_bk))[0][0]) - diff_bk
-    cut_off_2 = int(mode(multiply(around(divide(asarray(diff_list_2, dtype=uint8), diff_bk)), diff_bk))[0][0]) - diff_bk
-    cut_off_3 = int(mode(multiply(around(divide(asarray(diff_list_3, dtype=uint8), diff_bk)), diff_bk))[0][0]) - diff_bk
-    cut_off_4 = int(mode(multiply(around(divide(asarray(diff_list_4, dtype=uint8), diff_bk)), diff_bk))[0][0]) - diff_bk
-    cut_off_5 = int(mode(multiply(around(divide(asarray(diff_list_5, dtype=uint8), diff_bk)), diff_bk))[0][0]) - diff_bk
-    cut_off_6 = int(mode(multiply(around(divide(asarray(diff_list_6, dtype=uint8), diff_bk)), diff_bk))[0][0]) - diff_bk
-    cut_off_7 = int(mode(multiply(around(divide(asarray(diff_list_7, dtype=uint8), diff_bk)), diff_bk))[0][0]) - diff_bk
-    cut_off_8 = int(mode(multiply(around(divide(asarray(diff_list_8, dtype=uint8), diff_bk)), diff_bk))[0][0]) - diff_bk
-    cut_off_9 = int(mode(multiply(around(divide(asarray(diff_list_9, dtype=uint8), diff_bk)), diff_bk))[0][0]) - diff_bk
-    cut_off_A = int(mode(multiply(around(divide(asarray(diff_list_A, dtype=uint8), diff_bk)), diff_bk))[0][0]) - diff_bk
-    cut_off_B = int(mode(multiply(around(divide(asarray(diff_list_B, dtype=uint8), diff_bk)), diff_bk))[0][0]) - diff_bk
-    cut_off_C = int(mode(multiply(around(divide(asarray(diff_list_C, dtype=uint8), diff_bk)), diff_bk))[0][0]) - diff_bk
+    cut_off_1 = int(mode(multiply(around(divide(asarray(diff_list_1, dtype=uint8), diff_bk)), diff_bk))[0][0])
+    cut_off_2 = int(mode(multiply(around(divide(asarray(diff_list_2, dtype=uint8), diff_bk)), diff_bk))[0][0])
+    cut_off_3 = int(mode(multiply(around(divide(asarray(diff_list_3, dtype=uint8), diff_bk)), diff_bk))[0][0])
+    cut_off_4 = int(mode(multiply(around(divide(asarray(diff_list_4, dtype=uint8), diff_bk)), diff_bk))[0][0])
+    cut_off_5 = int(mode(multiply(around(divide(asarray(diff_list_5, dtype=uint8), diff_bk)), diff_bk))[0][0])
+    cut_off_6 = int(mode(multiply(around(divide(asarray(diff_list_6, dtype=uint8), diff_bk)), diff_bk))[0][0])
+    cut_off_7 = int(mode(multiply(around(divide(asarray(diff_list_7, dtype=uint8), diff_bk)), diff_bk))[0][0])
+    cut_off_8 = int(mode(multiply(around(divide(asarray(diff_list_8, dtype=uint8), diff_bk)), diff_bk))[0][0])
+    cut_off_9 = int(mode(multiply(around(divide(asarray(diff_list_9, dtype=uint8), diff_bk)), diff_bk))[0][0])
+    cut_off_A = int(mode(multiply(around(divide(asarray(diff_list_A, dtype=uint8), diff_bk)), diff_bk))[0][0])
+    cut_off_B = int(mode(multiply(around(divide(asarray(diff_list_B, dtype=uint8), diff_bk)), diff_bk))[0][0])
+    cut_off_C = int(mode(multiply(around(divide(asarray(diff_list_C, dtype=uint8), diff_bk)), diff_bk))[0][0])
 
     for key_point in kps:
         r = int(key_point.pt[1])
         c = int(key_point.pt[0])
 
-        if sum(channel_1[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_1[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 > cut_off_1:
+        if sum(channel_1[r:(r + 2), c:(c + 2)]) / 4 - \
+                sum(channel_1[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 >= cut_off_1:
             greyscale_model_1[r, c] = sum(channel_1[r:(r + 2), c:(c + 2)]) / 4 - \
                                       sum(channel_1[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36
 
-        if sum(channel_2[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_2[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 > cut_off_2:
+        if sum(channel_2[r:(r + 2), c:(c + 2)]) / 4 - \
+                sum(channel_2[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 >= cut_off_2:
             greyscale_model_2[r, c] = sum(channel_2[r:(r + 2), c:(c + 2)]) / 4 - \
                                       sum(channel_2[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36
 
-        if sum(channel_3[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_3[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 > cut_off_3:
+        if sum(channel_3[r:(r + 2), c:(c + 2)]) / 4 - \
+                sum(channel_3[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 >= cut_off_3:
             greyscale_model_3[r, c] = sum(channel_3[r:(r + 2), c:(c + 2)]) / 4 - \
                                       sum(channel_3[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36
 
-        if sum(channel_4[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_4[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 > cut_off_4:
+        if sum(channel_4[r:(r + 2), c:(c + 2)]) / 4 - \
+                sum(channel_4[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 >= cut_off_4:
             greyscale_model_4[r, c] = sum(channel_4[r:(r + 2), c:(c + 2)]) / 4 - \
                                       sum(channel_4[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36
 
-        if sum(channel_5[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_5[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 > cut_off_5:
+        if sum(channel_5[r:(r + 2), c:(c + 2)]) / 4 - \
+                sum(channel_5[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 >= cut_off_5:
             greyscale_model_5[r, c] = sum(channel_5[r:(r + 2), c:(c + 2)]) / 4 - \
                                       sum(channel_5[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36
 
-        if sum(channel_6[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_6[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 > cut_off_6:
+        if sum(channel_6[r:(r + 2), c:(c + 2)]) / 4 - \
+                sum(channel_6[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 >= cut_off_6:
             greyscale_model_6[r, c] = sum(channel_6[r:(r + 2), c:(c + 2)]) / 4 - \
                                       sum(channel_6[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36
 
-        if sum(channel_7[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_7[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 > cut_off_7:
+        if sum(channel_7[r:(r + 2), c:(c + 2)]) / 4 - \
+                sum(channel_7[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 >= cut_off_7:
             greyscale_model_7[r, c] = sum(channel_7[r:(r + 2), c:(c + 2)]) / 4 - \
                                       sum(channel_7[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36
 
-        if sum(channel_8[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_8[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 > cut_off_8:
+        if sum(channel_8[r:(r + 2), c:(c + 2)]) / 4 - \
+                sum(channel_8[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 >= cut_off_8:
             greyscale_model_8[r, c] = sum(channel_8[r:(r + 2), c:(c + 2)]) / 4 - \
                                       sum(channel_8[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36
 
-        if sum(channel_9[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_9[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 > cut_off_9:
+        if sum(channel_9[r:(r + 2), c:(c + 2)]) / 4 - \
+                sum(channel_9[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 >= cut_off_9:
             greyscale_model_9[r, c] = sum(channel_9[r:(r + 2), c:(c + 2)]) / 4 - \
                                       sum(channel_9[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36
 
-        if sum(channel_A[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_A[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 > cut_off_A:
+        if sum(channel_A[r:(r + 2), c:(c + 2)]) / 4 - \
+                sum(channel_A[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 >= cut_off_A:
             greyscale_model_A[r, c] = sum(channel_A[r:(r + 2), c:(c + 2)]) / 4 - \
                                       sum(channel_A[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36
 
-        if sum(channel_B[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_B[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 > cut_off_B:
+        if sum(channel_B[r:(r + 2), c:(c + 2)]) / 4 - \
+                sum(channel_B[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 >= cut_off_B:
             greyscale_model_B[r, c] = sum(channel_B[r:(r + 2), c:(c + 2)]) / 4 - \
                                       sum(channel_B[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36
 
-        if sum(channel_C[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_C[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 > cut_off_C:
+        if sum(channel_C[r:(r + 2), c:(c + 2)]) / 4 - \
+                sum(channel_C[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 >= cut_off_C:
             greyscale_model_C[r, c] = sum(channel_C[r:(r + 2), c:(c + 2)]) / 4 - \
                                       sum(channel_C[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36
 
@@ -621,7 +634,7 @@ def detect_blobs_Lee(f_cycle):
     ##########################################################
     blob_params = SimpleBlobDetector_Params()
 
-    blob_params.minThreshold = 10
+    blob_params.minThreshold = 5
 
     blob_params.thresholdStep = 2
     blob_params.minRepeatability = 2
@@ -720,24 +733,24 @@ def detect_blobs_Lee(f_cycle):
         diff_C = sum(channel_C[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_C[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36
         diff_G = sum(channel_G[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_G[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36
 
-        if diff_A > 0:
+        if diff_A >= 1:
             diff_list_A.append(int(around(diff_A)))
 
-        if diff_T > 0:
+        if diff_T >= 1:
             diff_list_T.append(int(around(diff_T)))
 
-        if diff_C > 0:
+        if diff_C >= 1:
             diff_list_C.append(int(around(diff_C)))
 
-        if diff_G > 0:
+        if diff_G >= 1:
             diff_list_G.append(int(around(diff_G)))
 
     diff_bk = 10
 
-    cut_off_A = int(mode(multiply(around(divide(asarray(diff_list_A, dtype=uint8), diff_bk)), diff_bk))[0][0]) - diff_bk
-    cut_off_T = int(mode(multiply(around(divide(asarray(diff_list_T, dtype=uint8), diff_bk)), diff_bk))[0][0]) - diff_bk
-    cut_off_C = int(mode(multiply(around(divide(asarray(diff_list_C, dtype=uint8), diff_bk)), diff_bk))[0][0]) - diff_bk
-    cut_off_G = int(mode(multiply(around(divide(asarray(diff_list_G, dtype=uint8), diff_bk)), diff_bk))[0][0]) - diff_bk
+    cut_off_A = int(mode(multiply(around(divide(asarray(diff_list_A, dtype=uint8), diff_bk)), diff_bk))[0][0])
+    cut_off_T = int(mode(multiply(around(divide(asarray(diff_list_T, dtype=uint8), diff_bk)), diff_bk))[0][0])
+    cut_off_C = int(mode(multiply(around(divide(asarray(diff_list_C, dtype=uint8), diff_bk)), diff_bk))[0][0])
+    cut_off_G = int(mode(multiply(around(divide(asarray(diff_list_G, dtype=uint8), diff_bk)), diff_bk))[0][0])
     #########################################################################
 
     ##############################################################################################################
@@ -747,19 +760,23 @@ def detect_blobs_Lee(f_cycle):
         r = int(key_point.pt[1])
         c = int(key_point.pt[0])
 
-        if sum(channel_A[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_A[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 > cut_off_A:
+        if sum(channel_A[r:(r + 2), c:(c + 2)]) / 4 - \
+                sum(channel_A[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 >= cut_off_A:
             greyscale_model_A[r, c] = sum(channel_A[r:(r + 2), c:(c + 2)]) / 4 - \
                                       sum(channel_A[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36
 
-        if sum(channel_T[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_T[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 > cut_off_T:
+        if sum(channel_T[r:(r + 2), c:(c + 2)]) / 4 - \
+                sum(channel_T[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 >= cut_off_T:
             greyscale_model_T[r, c] = sum(channel_T[r:(r + 2), c:(c + 2)]) / 4 - \
                                       sum(channel_T[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36
 
-        if sum(channel_C[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_C[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 > cut_off_C:
+        if sum(channel_C[r:(r + 2), c:(c + 2)]) / 4 - \
+                sum(channel_C[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 >= cut_off_C:
             greyscale_model_C[r, c] = sum(channel_C[r:(r + 2), c:(c + 2)]) / 4 - \
                                       sum(channel_C[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36
 
-        if sum(channel_G[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_G[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 > cut_off_G:
+        if sum(channel_G[r:(r + 2), c:(c + 2)]) / 4 - \
+                sum(channel_G[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36 >= cut_off_G:
             greyscale_model_G[r, c] = sum(channel_G[r:(r + 2), c:(c + 2)]) / 4 - \
                                       sum(channel_G[(r - 2):(r + 4), (c - 2):(c + 4)]) / 36
     ##############################################################################################################
@@ -825,7 +842,7 @@ def detect_blobs_Chen(f_cycle):
     ##########################################################
     blob_params = SimpleBlobDetector_Params()
 
-    blob_params.minThreshold = 10
+    blob_params.minThreshold = 5
 
     blob_params.thresholdStep = 4
     blob_params.minRepeatability = 2
@@ -912,12 +929,12 @@ def detect_blobs_Chen(f_cycle):
 
         diff_0 = sum(channel_0[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_0[(r - 1):(r + 3), (c - 1):(c + 3)]) / 16
 
-        if diff_0 > 0:
+        if diff_0 >= 1:
             diff_list_0.append(int(around(diff_0)))
 
     diff_bk = 10
 
-    cut_off_0 = int(mode(multiply(around(divide(asarray(diff_list_0, dtype=uint8), diff_bk)), diff_bk))[0][0]) - diff_bk
+    cut_off_0 = int(mode(multiply(around(divide(asarray(diff_list_0, dtype=uint8), diff_bk)), diff_bk))[0][0])
     #########################################################################
 
     ##############################################################################################################
@@ -927,7 +944,8 @@ def detect_blobs_Chen(f_cycle):
         r = int(key_point.pt[1])
         c = int(key_point.pt[0])
 
-        if sum(channel_0[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_0[(r - 1):(r + 3), (c - 1):(c + 3)]) / 16 > cut_off_0:
+        if sum(channel_0[r:(r + 2), c:(c + 2)]) / 4 - \
+                sum(channel_0[(r - 1):(r + 3), (c - 1):(c + 3)]) / 16 >= cut_off_0:
             greyscale_model_0[r, c] = sum(channel_0[r:(r + 2), c:(c + 2)]) / 4 - \
                                       sum(channel_0[(r - 1):(r + 3), (c - 1):(c + 3)]) / 16
     ##############################################################################################################
