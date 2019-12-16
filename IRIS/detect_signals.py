@@ -243,10 +243,10 @@ def detect_blobs_Ke(f_cycle):
 
     diff_bk = 10
 
-    cut_off_A = int(mode(around(divide(array(diff_list_A, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk
-    cut_off_T = int(mode(around(divide(array(diff_list_T, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk
-    cut_off_C = int(mode(around(divide(array(diff_list_C, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk
-    cut_off_G = int(mode(around(divide(array(diff_list_G, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk
+    cut_off_A = int(mode(around(divide(array(diff_list_A, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk * 2
+    cut_off_T = int(mode(around(divide(array(diff_list_T, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk * 2
+    cut_off_C = int(mode(around(divide(array(diff_list_C, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk * 2
+    cut_off_G = int(mode(around(divide(array(diff_list_G, dtype=uint8), diff_bk)) * diff_bk)[0][0]) - diff_bk * 2
     #########################################################################
 
     ##############################################################################################################

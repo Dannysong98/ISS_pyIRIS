@@ -224,7 +224,7 @@ server <- function(input, output, session) {
                         {
                             dt <- DT::datatable(barcodeInfo,
                                                 options=list(dom='ftipr', 
-                                                             order=list(2, 'desc'),
+                                                             order=list(4, 'desc'),
                                                              columnDefs=list(list(className='dt-left', targets=2),
                                                                              list(width='10%', targets=3)
                                                              )
