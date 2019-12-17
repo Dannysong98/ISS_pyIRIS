@@ -117,6 +117,9 @@ class BarcodeCube:
         new_coor = self.__all_blobs_list
 
         for coor in self.__all_blobs_list:
+            if int(coor[1:6]) == 0 or int(coor[7:]) == 0:
+                continue
+
             r = int(coor[1:6].lstrip('0'))
             c = int(coor[7:].lstrip('0'))
 
