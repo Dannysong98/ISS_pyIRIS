@@ -17,15 +17,9 @@ recorded to calculate base quality in the next step.
 """
 
 
-from cv2 import (getStructuringElement, morphologyEx, GaussianBlur, convertScaleAbs,
+from cv2 import (getStructuringElement, morphologyEx, GaussianBlur, convertScaleAbs, Laplacian,
                  SimpleBlobDetector, SimpleBlobDetector_Params,
-                 MORPH_ELLIPSE, MORPH_TOPHAT)
-######################
-# Alternative option #
-######################
-from cv2 import (Laplacian,
-                 CV_32F)
-######################
+                 MORPH_ELLIPSE, MORPH_TOPHAT, CV_32F)
 from numpy import (asarray, zeros, ones, sum, divide, multiply, around, abs, max, fft, int, float32, uint8, bool_)
 from scipy.stats import mode
 
@@ -787,20 +781,18 @@ def detect_blobs_Chen(f_cycle):
     :param f_cycle: A image matrix in the 3D common data tensor.
     :return: A base box of this cycle, which store their coordinates, base and its error rate.
     """
-    channel_0 = convertScaleAbs(Laplacian(GaussianBlur(f_cycle[0], (3, 3), 0), CV_32F))
+    channel_0 = f_cycle[0]
+    channel_0 = convertScaleAbs(Laplacian(GaussianBlur(channel_0, (3, 3), 0), CV_32F))
 
     greyscale_model_0 = zeros(channel_0.shape, dtype=float32)
 
     #############################################################################
-    # Here, a morphological transformation, Tophat, under a 5x5 ELLIPSE kernel, #
+    # Here, a morphological transformation, Tophat, under a 3x3 ELLIPSE kernel, #
     # is used to expose blobs                                                   #
     #############################################################################
-    ksize = (5, 5)
+    ksize = (3, 3)
     kernel = getStructuringElement(MORPH_ELLIPSE, ksize)
     channel_0 = morphologyEx(channel_0, MORPH_TOPHAT, kernel)
-
-    import cv2 as cv
-    cv.imwrite('debug.tif', channel_0)
     ########
 
     ##################################################################
@@ -830,7 +822,7 @@ def detect_blobs_Chen(f_cycle):
     ##########################################################
     blob_params = SimpleBlobDetector_Params()
 
-    blob_params.minThreshold = 3
+    blob_params.minThreshold = 5
     ########
     # blob_params.minRepeatability = 5  # Alternative option
 
@@ -839,7 +831,7 @@ def detect_blobs_Chen(f_cycle):
     ########
     # blob_params.minRepeatability = 3  # Alternative option
 
-    blob_params.minDistBetweenBlobs = 2
+    blob_params.minDistBetweenBlobs = 1
 
     ####################################################################################
     # This parameter is used for filtering those extremely large blobs, which likely   #
@@ -851,17 +843,14 @@ def detect_blobs_Chen(f_cycle):
     ########
     # blob_params.minArea = 4  # Alternative option
 
-    blob_params.maxArea = 10
+    blob_params.maxArea = 16
     ########
     # blob_params.maxArea = 121  # Alternative option
     # blob_params.maxArea = 145  # Alternative option
     ####################################################################################
 
-    blob_params.filterByCircularity = True
-    blob_params.minCircularity = 0.4
-
-    blob_params.filterByConvexity = True
-    blob_params.minConvexity = 0.1
+    blob_params.filterByCircularity = False
+    blob_params.filterByConvexity = False
 
     blob_params.filterByColor = True
     blob_params.blobColor = 255
@@ -907,20 +896,22 @@ def detect_blobs_Chen(f_cycle):
     # channel. This threshold could be used to filter those false-positive  #
     # blobs in following step                                               #
     #########################################################################
-    diff_list_0 = []
-
-    for key_point in kps:
-        r = int(key_point.pt[1])
-        c = int(key_point.pt[0])
-
-        diff_0 = sum(channel_0[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_0[(r - 1):(r + 3), (c - 1):(c + 3)]) / 16
-
-        if diff_0 >= 1:
-            diff_list_0.append(int(around(diff_0)))
-
-    diff_bk = 5
-
-    cut_off_0 = int(mode(multiply(around(divide(asarray(diff_list_0, dtype=uint8), diff_bk)), diff_bk))[0][0])
+    # diff_list_0 = []
+    #
+    # for key_point in kps:
+    #     r = int(key_point.pt[1])
+    #     c = int(key_point.pt[0])
+    #
+    #     diff_0 = sum(channel_0[r:(r + 2), c:(c + 2)]) / 4 - sum(channel_0[(r - 1):(r + 3), (c - 1):(c + 3)]) / 16
+    #
+    #     if diff_0 >= 1:
+    #         diff_list_0.append(int(around(diff_0)))
+    #
+    # diff_bk = 5
+    #
+    # cut_off_0 = int(mode(multiply(around(divide(asarray(diff_list_0, dtype=uint8), diff_bk)), diff_bk))[0][0])
+    ########
+    cut_off_0 = 1  # Alternative option
     #########################################################################
 
     ##############################################################################################################
