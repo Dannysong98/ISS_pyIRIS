@@ -2,9 +2,10 @@
 """
 This model is used to import the images and store them into a 3D matrix.
 
-We prepare two strategies to parse the different techniques of in situ sequencing, which published by R Ke and KH Chen.
+We prepare two strategies to parse the different techniques of in situ sequencing, which published by R Ke (R Ke,
+Nat. Methods, 2013) and KH Chen (Chen et al, Science, 2015).
 
-Here, Ke's data (R Ke, Nat. Methods, 2013) is employed as the major data structure in our software. In this data
+Here, Ke's data is employed as the major data structure in our software. In this data
 structure, barcodes are composed of 4 types of pseudo-color, representing the A, T, C, G bases. In addition there's a
 DAPI background.
 

@@ -76,46 +76,22 @@ Directory construction form of R Ke we required is:
 	|
 	(...)
 
-#### Directory structure form of CH Eng
+#### Directory structure form of KH Chen
 
-Directory structure form of CH Eng we recommended is:
+Directory structure form of KH Chen we recommended is:
 
 	data directory
-	|---hyb1
-	|   |---pos1.tif
-	|   |---pos2.tif
-	|   |---pos3.tif
-	|   |---(...)
+	|---cycle 16
+	|   |---STORM.tif
 	|
-	|---hyb2
-	|   |---pos1.tif
-	|   |---pos2.tif
-	|   |---pos3.tif
-	|   |---(...)
+	|---cycle 15
+	|   |---STORM.tif
 	|
-	|---hyb3
-	|   |---pos1.tif
-	|   |---pos2.tif
-	|   |---pos3.tif
-	|   |---(...)
+	|---cycle 14
+	|   |---STORM.tif
 	|
-	|---hyb4
-	|   |---pos1.tif
-	|   |---pos2.tif
-	|   |---pos3.tif
-	|   |---(...)
-	|
-	|---hyb5
-	|   |---(...)
-	|
-	|---hyb6
-	|   |---(...)
-	|
-	|---hyb7
-	|   |---(...)
-	|
-	|---hyb8
-	|   |---(...)
+	|---cycle 13
+	|   |---STORM.tif
 	|
 	(...)
 
@@ -129,11 +105,9 @@ You should input the directories of cycle, like one of the following command if 
 	python3 pyIRIS.py --ke {1..4}
 
 You should input the the image files in each cycle, like one of the following command if your data is consistent with 
-**Eng's**:
+**Chen's**:
 
-	python3 pyIRIS.py --eng 1/pos1.tif 2/pos1.tif 3/pos1.tif 4/pos1.tif
-	python3 pyIRIS.py --eng 1/pos2.tif 2/pos2.tif 3/pos2.tif 4/pos2.tif
-	python3 pyIRIS.py --eng {1..20}/pos1.tif
+	python3 pyIRIS.py --chen {16..1}
 	
 ---
 
