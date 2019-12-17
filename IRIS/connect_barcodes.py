@@ -145,6 +145,9 @@ class BarcodeCube:
             adjusted_bases_cube[cycle_serial] = {}
 
             for ref_coordinate in all_blobs_list:
+                if int(ref_coordinate[1:6]) == 0 or int(ref_coordinate[7:]) == 0:
+                    continue
+
                 r = int(ref_coordinate[1:6].lstrip('0'))
                 c = int(ref_coordinate[7:].lstrip('0'))
 
