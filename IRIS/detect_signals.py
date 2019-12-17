@@ -787,7 +787,7 @@ def detect_blobs_Chen(f_cycle):
     :param f_cycle: A image matrix in the 3D common data tensor.
     :return: A base box of this cycle, which store their coordinates, base and its error rate.
     """
-    channel_0 = f_cycle[0]
+    channel_0 = convertScaleAbs(Laplacian(GaussianBlur(f_cycle[0], (3, 3), 0), CV_32F))
 
     greyscale_model_0 = zeros(channel_0.shape, dtype=float32)
 
@@ -795,8 +795,6 @@ def detect_blobs_Chen(f_cycle):
     # Here, a morphological transformation, Tophat, under a 5x5 ELLIPSE kernel, #
     # is used to expose blobs                                                   #
     #############################################################################
-    channel_0 = convertScaleAbs(Laplacian(GaussianBlur(channel_0, (3, 3), 0), CV_32F))
-
     ksize = (5, 5)
     kernel = getStructuringElement(MORPH_ELLIPSE, ksize)
     channel_0 = morphologyEx(channel_0, MORPH_TOPHAT, kernel)
