@@ -2,16 +2,11 @@
 """
 This model is used to import the images and store them into a 3D matrix.
 
-We prepare two strategies to parse the different techniques of in situ sequencing, which published by R Ke and CH Eng.
+We prepare two strategies to parse the different techniques of in situ sequencing, which published by R Ke and KH Chen.
 
 Here, Ke's data (R Ke, Nat. Methods, 2013) is employed as the major data structure in our software. In this data
 structure, barcodes are composed of 4 types of pseudo-color, representing the A, T, C, G bases. In addition there's a
 DAPI background.
-
-In the type of Eng's data, each image is composed of 4 channels, of which, the first 3 channels represents blobs by
-3 pseudo-colors and the last one is background. Then, each continuous 4 images are made a Round, also named a Cycle.
-So, there are 12 pseudo-colors in a Round. For example, the Eng's data (CH Eng, Nat. Methods, 2017) include 5 Rounds,
-20 images, 80 channels in any of shooting region.
 
 Our software generate a 3D matrix to store all the images. Each channel is made of a image matrix, and insert into this
 tensor in the order of cycle
@@ -19,7 +14,7 @@ tensor in the order of cycle
 
 
 from sys import stderr
-from cv2 import (imread, imreadmulti, imwrite,
+from cv2 import (imread, imwrite,
                  add, addWeighted, warpAffine,
                  IMREAD_GRAYSCALE)
 from numpy import (array, uint8)
