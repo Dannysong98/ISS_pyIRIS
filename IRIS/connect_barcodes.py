@@ -91,10 +91,10 @@ class BarcodeCube:
 
         blob_params.filterByColor = True
 
-        blob_params.blobColor = 0
+        blob_params.blobColor = 255
 
         detector = SimpleBlobDetector.create(blob_params)
-        kps = detector.detect(255 - blobs_mask)
+        kps = detector.detect(blobs_mask)
 
         for key_point in kps:
             r = int(key_point.pt[1])
