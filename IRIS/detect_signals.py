@@ -478,7 +478,7 @@ def detect_blobs_Eng(f_cycle):
         if diff_C >= 1:
             diff_list_C.append(int(around(diff_C)))
 
-    diff_bk = 10
+    diff_bk = 5
 
     cut_off_1 = int(mode(multiply(around(divide(asarray(diff_list_1, dtype=uint8), diff_bk)), diff_bk))[0][0])
     cut_off_2 = int(mode(multiply(around(divide(asarray(diff_list_2, dtype=uint8), diff_bk)), diff_bk))[0][0])
@@ -731,7 +731,7 @@ def detect_blobs_Lee(f_cycle):
         if diff_G >= 1:
             diff_list_G.append(int(around(diff_G)))
 
-    diff_bk = 10
+    diff_bk = 5
 
     cut_off_A = int(mode(multiply(around(divide(asarray(diff_list_A, dtype=uint8), diff_bk)), diff_bk))[0][0])
     cut_off_T = int(mode(multiply(around(divide(asarray(diff_list_T, dtype=uint8), diff_bk)), diff_bk))[0][0])
@@ -914,7 +914,7 @@ def detect_blobs_Chen(f_cycle):
         if diff_0 >= 1:
             diff_list_0.append(int(around(diff_0)))
 
-    diff_bk = 10
+    diff_bk = 5
 
     cut_off_0 = int(mode(multiply(around(divide(asarray(diff_list_0, dtype=uint8), diff_bk)), diff_bk))[0][0])
     #########################################################################
