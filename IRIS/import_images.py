@@ -15,8 +15,7 @@ tensor in the order of cycle
 
 
 from sys import stderr
-from cv2 import (imread, imwrite,
-                 add, addWeighted, warpAffine,
+from cv2 import (imread, imwrite, add, addWeighted, warpAffine,
                  IMREAD_GRAYSCALE)
 from numpy import (array, uint8)
 
