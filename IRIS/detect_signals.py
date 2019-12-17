@@ -795,10 +795,12 @@ def detect_blobs_Chen(f_cycle):
     # Here, a morphological transformation, Tophat, under a 5x5 ELLIPSE kernel, #
     # is used to expose blobs                                                   #
     #############################################################################
-    # ksize = (5, 5)
-    # kernel = getStructuringElement(MORPH_ELLIPSE, ksize)
-    # channel_0 = morphologyEx(channel_0, MORPH_TOPHAT, kernel)
-    channel_0 = convertScaleAbs(Laplacian(GaussianBlur(channel_0, (5, 5), 0), CV_32F) * 2)
+    channel_0 = convertScaleAbs(Laplacian(GaussianBlur(channel_0, (3, 3), 0), CV_32F))
+
+    ksize = (5, 5)
+    kernel = getStructuringElement(MORPH_ELLIPSE, ksize)
+    channel_0 = morphologyEx(channel_0, MORPH_TOPHAT, kernel)
+
     import cv2 as cv
     cv.imwrite('debug.tif', channel_0)
     ########
@@ -830,14 +832,16 @@ def detect_blobs_Chen(f_cycle):
     ##########################################################
     blob_params = SimpleBlobDetector_Params()
 
-    blob_params.minThreshold = 1
+    blob_params.minThreshold = 3
+    ########
+    # blob_params.minRepeatability = 5  # Alternative option
 
     blob_params.thresholdStep = 3
     blob_params.minRepeatability = 2
     ########
     # blob_params.minRepeatability = 3  # Alternative option
 
-    blob_params.minDistBetweenBlobs = 1
+    blob_params.minDistBetweenBlobs = 2
 
     ####################################################################################
     # This parameter is used for filtering those extremely large blobs, which likely   #
@@ -849,14 +853,17 @@ def detect_blobs_Chen(f_cycle):
     ########
     # blob_params.minArea = 4  # Alternative option
 
-    blob_params.maxArea = 16
+    blob_params.maxArea = 10
     ########
     # blob_params.maxArea = 121  # Alternative option
     # blob_params.maxArea = 145  # Alternative option
     ####################################################################################
 
-    blob_params.filterByCircularity = False
-    blob_params.filterByConvexity = False
+    blob_params.filterByCircularity = True
+    blob_params.minCircularity = 0.4
+
+    blob_params.filterByConvexity = True
+    blob_params.minConvexity = 0.1
 
     blob_params.filterByColor = True
     blob_params.blobColor = 255
