@@ -126,8 +126,8 @@ class BarcodeCube:
             r = int(coor[1:6].lstrip('0'))
             c = int(coor[7:].lstrip('0'))
 
-            for row in range(r, r + 2):
-                for col in range(c, c + 2):
+            for row in range(r - 1, r + 3):
+                for col in range(c - 1, c + 3):
                     if row == r and col == c:
                         continue
 
