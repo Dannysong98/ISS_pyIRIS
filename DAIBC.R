@@ -30,9 +30,9 @@ library(rsconnect)
 ui <- fixedPage(
     theme=shinytheme('lumen'),
     
-    titlePanel('DAIBC', 'Data Appearance after ISS Base Calling'),
+    titlePanel('DAIBC', 'Data Analysis after ISS Base Calling'),
     
-    h5('Data Appearance after ISS Base Calling'),
+    h5('Data Analysis after ISS Base Calling'),
 
     sidebarPanel(
         fixedRow(
