@@ -109,7 +109,7 @@ You should input the the image files in each cycle, like one of the following co
 
 	python3 pyIRIS.py --chen {16..1}
 	
-(**Chen's data is start from its last cycle number and end of the first one**)
+(*Chen's data is start from its last cycle number and end of the first one*)
 	
 ---
 
