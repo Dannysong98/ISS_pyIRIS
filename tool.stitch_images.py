@@ -4,10 +4,26 @@
 
 from sys import (argv, exit, stderr)
 from cv2 import (imread, createStitcherScans, cvtColor, imwrite, convertScaleAbs,
-                 IMREAD_GRAYSCALE, IMREAD_COLOR, COLOR_BGR2GRAY)
-from numpy import (array, dot, mean, uint8, uint16)
+                 IMREAD_GRAYSCALE, COLOR_BGR2GRAY, COLOR_GRAY2BGR)
+from numpy import (array, zeros, dot, mean, uint8, uint16, bool_, fft, abs, max)
 
 from IRIS.register_images import register_cycles
+
+
+def lpf(f_img):
+    """"""
+    row, col = f_img.shape
+
+    P = 0.3
+
+    masker_window = zeros((row, col), dtype=bool_)
+    masker_window[int(row / 2) - int(row * P):int(row / 2) + int(row * P),
+                  int(col / 2) - int(col * P):int(col / 2) + int(col * P)] = 1
+
+    f_img = abs(fft.ifft2(fft.ifftshift(fft.fftshift(fft.fft2(f_img)) * masker_window)))
+    f_img = convertScaleAbs(f_img / max(f_img) * 255)
+
+    return f_img
 
 
 def background_stitcher(img_dirs):
@@ -15,7 +31,11 @@ def background_stitcher(img_dirs):
     imgs = []
 
     for img_dir in img_dirs:
-        imgs.append(imread(img_dir + '/background.tif', IMREAD_COLOR))
+        img = imread(img_dir + '/background.tif', IMREAD_GRAYSCALE)
+        img = lpf(img)
+        img = cvtColor(img, COLOR_GRAY2BGR)
+
+        imgs.append(img)
 
     for i in range(0, len(imgs)):
         imgs[i] = convertScaleAbs(imgs[i] * mean(imgs[0]) / mean(imgs[i]))
@@ -28,7 +48,7 @@ def background_stitcher(img_dirs):
         return stitched_img
 
     else:
-        print('FAIL TO STITCH', file=stderr)
+        print('FAIL TO STITCH in ' + str(status), file=stderr)
         exit(1)
 
 
@@ -37,8 +57,8 @@ def trans_coor(bg, img_dirs):
     adj_barcode_info = {}
 
     for img_dir in img_dirs:
-        mat = register_cycles(bg, imread(img_dir + '/background.tif', IMREAD_GRAYSCALE), 'BRISK')
-        # mat = register_cycles(bg, imread(img_dir + '/debug.cycle_1.reg.tif', IMREAD_GRAYSCALE), 'BRISK')
+        # mat = register_cycles(bg, imread(img_dir + '/background.tif', IMREAD_GRAYSCALE), 'BRISK')
+        mat = register_cycles(bg, imread(img_dir + '/debug.cycle_1.reg.tif', IMREAD_GRAYSCALE), 'BRISK')
 
         with open(img_dir + '/basecalling_data.txt', 'rt') as IN:
             for ln in IN:
@@ -76,8 +96,8 @@ def overlap_filtering(adj_barcode_info):
         row = int(row)
         col = int(col)
 
-        for r in range(row - 2, row + 4):
-            for c in range(col - 2, col + 4):
+        for r in range(row - 1, row + 3):
+            for c in range(col - 1, col + 3):
 
                 if r != row and c != col:
 
