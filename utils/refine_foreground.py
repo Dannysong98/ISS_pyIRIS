@@ -8,9 +8,10 @@ from cv2 import (imread, imwrite, addWeighted,
 from numpy import (array, uint8)
 
 
-def merge_foreground_Ke(f_cycles, f_brightness=None):
+def merge_foreground_Ke(f_cycles, f_brightness1=None, f_brightness2=None):
     """"""
-    brightness = float(f_brightness) if f_brightness is not None else 0.5
+    brightness1 = float(f_brightness1) if f_brightness1 is not None else 0.5
+    brightness2 = float(f_brightness2) if f_brightness2 is not None else 0.5
     foreground = array([], dtype=uint8)
 
     if len(f_cycles) == 1:
@@ -22,8 +23,8 @@ def merge_foreground_Ke(f_cycles, f_brightness=None):
             channel_G = imread('/'.join((f_cycles[cycle_id], 'Y3.tif')),   IMREAD_GRAYSCALE)
 
             foreground = addWeighted(addWeighted(addWeighted(channel_A, brightness,
-                                                             channel_T, brightness, 0), brightness,
-                                                 channel_C, brightness, 0), brightness,
+                                                             channel_T, brightness, 0), brightness1,
+                                                 channel_C, brightness, 0), brightness2,
                                      channel_G, brightness, 0)
 
     return foreground
@@ -31,7 +32,7 @@ def merge_foreground_Ke(f_cycles, f_brightness=None):
 
 if __name__ == '__main__':
     try:
-        fg = merge_foreground_Ke(argv[1], argv[2])
+        fg = merge_foreground_Ke(argv[1], argv[2], argv[3])
 
     except IndexError:
         fg = merge_foreground_Ke(argv[1])
