@@ -21,11 +21,16 @@ def merge_foreground_Ke(f_cycles, f_brightness1=None, f_brightness2=None):
             channel_T = imread('/'.join((f_cycles[cycle_id], 'FAM.tif')),  IMREAD_GRAYSCALE)
             channel_C = imread('/'.join((f_cycles[cycle_id], 'TXR.tif')),  IMREAD_GRAYSCALE)
             channel_G = imread('/'.join((f_cycles[cycle_id], 'Y3.tif')),   IMREAD_GRAYSCALE)
+            channel_0 = imread('/'.join((f_cycles[cycle_id], 'DAPI.tif')),   IMREAD_GRAYSCALE)
 
-            foreground = addWeighted(addWeighted(addWeighted(channel_A, brightness,
-                                                             channel_T, brightness, 0), brightness1,
-                                                 channel_C, brightness, 0), brightness2,
-                                     channel_G, brightness, 0)
+            foreground = addWeighted(
+                addWeighted(
+                    addWeighted(
+                        addWeighted(channel_A, 0.5,
+                                    channel_T, 0.5, 0), 0.5,
+                        channel_C, 0.5, 0), 0.5,
+                    channel_G, 0.5, 0), brightness1,
+                channel_0, brightness2, 0)
 
     return foreground
 
