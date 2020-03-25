@@ -12,7 +12,7 @@ number of failure and treat it as error rate.
 """
 
 
-from numpy import (around, transpose, nonzero, sum)
+from numpy import (around, transpose, nonzero)
 from scipy.stats import binom_test
 
 
@@ -113,7 +113,7 @@ def image_model_pooling_Chen(f_image_model_0):
 def pool2base(f_image_model_pool, binom=None):
     """
     :param f_image_model_pool: The dictionary of blobs, including base, coordinate and base score.
-    :param binom: May need binom-test in error rate calculating?
+    :param binom: May need binom-test in error rate calculation.
     :return f_base_box: A dictionary of blobs with its base, location and base error rate.
     """
     f_base_box = {}
@@ -121,14 +121,26 @@ def pool2base(f_image_model_pool, binom=None):
     for read_id in f_image_model_pool:
         sorted_base = [_ for _ in sorted(f_image_model_pool[read_id].items(), key=lambda x: x[1], reverse=True)]
 
-        if binom is True:
-            error_rate = around(binom_test((sorted_base[0][1], sorted_base[1][1]), p=0.5, alternative='greater'), 4)
+        if len(sorted_base) > 1:
+
+            if binom is True:
+                error_rate = around(binom_test((sorted_base[0][1], sorted_base[1][1]), p=0.5, alternative='greater'), 4)
+
+            else:
+                error_rate = 1 - sorted_base[0][1] / sum([_[1] for _ in sorted_base[:]])
+
+            if read_id not in f_base_box:
+                f_base_box.update({read_id: [sorted_base[0][0], error_rate]})
 
         else:
-            error_rate = 1 - sorted_base[0][1] / sum(sorted_base[:][1])
+            if binom is True:
+                error_rate = around(binom_test((sorted_base[0][1], 0), p=0.5, alternative='greater'), 4)
 
-        if read_id not in f_base_box:
-            f_base_box.update({read_id: [sorted_base[0][0], error_rate]})
+            else:
+                error_rate = 1 - sorted_base[0][1] / sum([_[1] for _ in sorted_base[:]])
+
+            if read_id not in f_base_box:
+                f_base_box.update({read_id: [sorted_base[0][0], error_rate]})
 
     return f_base_box
 
