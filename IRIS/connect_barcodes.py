@@ -75,7 +75,7 @@ class BarcodeCube:
             r = int(coor[1:6].lstrip('0'))
             c = int(coor[7:].lstrip('0'))
 
-            blobs_mask[r, c] = 255
+            blobs_mask[r:r + 2, c:c + 2] = 255
 
         blobs_mask = GaussianBlur(blobs_mask, (3, 3), 0)
 
