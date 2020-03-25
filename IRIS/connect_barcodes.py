@@ -131,7 +131,7 @@ class BarcodeCube:
                     if row == r and col == c:
                         continue
 
-                    if 'r%05dc%05d' % (row, col) in self.__all_blobs_list:
+                    elif 'r%05dc%05d' % (row, col) in self.__all_blobs_list:
                         new_coor.remove('r%05dc%05d' % (row, col))
 
         self.__all_blobs_list = set(new_coor)
