@@ -127,7 +127,7 @@ def pool2base(f_image_model_pool, binom=None):
                 error_rate = around(binom_test((sorted_base[0][1], sorted_base[1][1]), p=0.5, alternative='greater'), 4)
 
             else:
-                error_rate = 1 - sorted_base[0][1] / sum([_[1] for _ in sorted_base[:]])
+                error_rate = 1 - sorted_base[0][1] / sum([_[1] for _ in sorted_base])
 
             if read_id not in f_base_box:
                 f_base_box.update({read_id: [sorted_base[0][0], error_rate]})
@@ -137,7 +137,7 @@ def pool2base(f_image_model_pool, binom=None):
                 error_rate = around(binom_test((sorted_base[0][1], 0), p=0.5, alternative='greater'), 4)
 
             else:
-                error_rate = 1 - sorted_base[0][1] / sum([_[1] for _ in sorted_base[:]])
+                error_rate = 1 - sorted_base[0][1] / sum([_[1] for _ in sorted_base])
 
             if read_id not in f_base_box:
                 f_base_box.update({read_id: [sorted_base[0][0], error_rate]})
